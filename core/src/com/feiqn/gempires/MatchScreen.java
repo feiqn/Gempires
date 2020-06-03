@@ -10,45 +10,13 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 import java.util.ArrayList;
 import java.util.Random;
 
 public class MatchScreen extends ScreenAdapter {
-
-    public class Gem extends Image {
-
-        TextureRegion image;
-        Rectangle bounds;
-        float x, y;
-        public Gem(TextureRegion region) {
-            x = this.getX();
-            y = this.getY();
-            image = new TextureRegion(region);
-            bounds = new Rectangle((int) getX(), (int) getY(), (int) getWidth(), (int) getHeight());
-        }
-
-        public Rectangle getBounds() {
-            return bounds;
-        }
-
-        private void setXY(float pX,float pY) {
-            setPosition(pX, pY);
-            bounds.setX((int)pX);
-            bounds.setY((int)pY);
-        }
-
-        @Override
-        public void draw(Batch batch, float parentAlpha) {
-            super.draw(batch, parentAlpha);
-        }
-    }
 
     GempiresGame game;
 
@@ -91,36 +59,11 @@ public class MatchScreen extends ScreenAdapter {
         for(int i = 0; i < slots.size() - 1; i++) {
             final Random random = new Random();
             final int gemColor = random.nextInt(7);
-            // final Image newGem = new Image(gemTextures[gemColor]);
-            final Gem gem = new Gem(gemTextures[gemColor]);
-            final int finalI = i;
+            final Gem gem = new Gem(gemTextures[gemColor], gemColor, gems, slots, i, rows, columns);
 
             gem.setPosition(slots.get(i).x, slots.get(i).y);
 
-            gem.addListener(new InputListener() {
-                @Override
-                public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                    gem.setColor(.5f, .5f, .5f, 1);
-                    Gdx.app.log("gemTouched", "Gem touched at location: " + slots.get(finalI).x + ", " + slots.get(finalI).y + " of color: " + gemColor);
-                    return true;
-                }
-
-                @Override
-                public void touchUp(InputEvent event, float x, float y, int point, int button) {
-                    gem.setColor(1.5f, 1.5f, 1.5f, 1);
-
-                    if(x > 0.5f && y < 1 && y > -1) {
-                        Gdx.app.log("moveRight", "Move right");
-                    } else if(x < -0.5f && y < 1 && y > -1) {
-                        Gdx.app.log("moveLeft", "Move left");
-                    } else if(x < 1 && x > -1 && y < -0.5f) {
-                        Gdx.app.log("moveDown", "Move down");
-                    } else if(x < 1 && x > -1 && y > 0.5f) {
-                        Gdx.app.log("moveUp", "Move up");
-                    }
-                }
-            });
-            //gems.add((gem));
+            gems.add((gem));
             stage.addActor(gem);
         }
     }
