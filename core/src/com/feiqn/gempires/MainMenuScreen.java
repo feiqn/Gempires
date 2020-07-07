@@ -85,7 +85,6 @@ public class MainMenuScreen extends ScreenAdapter {
 
         stage.act();
         stage.draw();
-
     }
 
 }

@@ -14,115 +14,162 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.feiqn.gempires.GempiresGame;
-import com.feiqn.gempires.logic.Gem;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
 public class MatchScreen extends ScreenAdapter {
-    // Tables are kind of made for this sort of thing. Fuck tables.
+    // Tables are kind of made for this sort of thing.
+    // For no particular reason whatsoever, fuck tables.
 
     private OrthographicCamera camera;
     private OrthogonalTiledMapRenderer orthoMapRenderer;
     private TiledMap matchMap;
+
     public MapProperties mapProperties;
 
-    GempiresGame game;
-
+    private GempiresGame game;
     private Stage stage;
-    public int rows, columns;
-    int horizontalMatchLength, verticalMatchLength;
+
+    public Group gemGroup;
+
+    public boolean matchFound;
+
+    public int rows,
+               columns,
+               horizontalMatchLength,
+               verticalMatchLength;
 
     private TextureRegion[] gemTextures;
 
     // TODO: switch to Pooling for gems, and libGDX's Array<> data type
-    public ArrayList<Gem> gems;
+    public ArrayList<Gem> gems,
+                          sendToDestroy,
+                          matchesForThisGem,
+                          leftMatches, // TODO: I know this is awful I'll fix it later
+                          rightMatches,
+                          upMatches,
+                          downMatches;
+
     public ArrayList<Vector2> slots;
-    public ArrayList<Gem> sendToDestroy;
 
     public MatchScreen(GempiresGame game) { this.game = game; }
 
-    // TODO: later, this function can probably folded in to the gems array, and slots<> can be removed
-    public void createSlots(int countRows, int countColumns) {
+    public void createAndFillSlots(int countRows, int countColumns) {
+        // TODO: slots<> can probably be safely removed at this point
+
+        int revolution = 0;
+
         rows = countRows;
         columns = countColumns;
 
         Gdx.app.log("rowsLength", "rows set to: " + rows);
         Gdx.app.log("colLength", "columns set to: " + columns);
 
-        Vector2 firstPosition = new Vector2(.5f, .5f);
-        Vector2 lastPosition = firstPosition;
-        slots.add(firstPosition);
-        for(int i = 0; i < countRows; i++) {
-            for(int x = 0; x < countColumns; x++) {
-                Vector2 nextPosition = new Vector2(lastPosition.x + 1, lastPosition.y);
+        final Vector2 firstPosition = new Vector2(.5f, .5f);
+        Vector2 previousPosition = firstPosition;
+
+        for(int i = 0; i < countRows; i++) { // height
+            for (int x = 0; x < countColumns; x++) { // width
+
+                Vector2 nextPosition;
+
+                if(x != 0) {
+                    nextPosition = new Vector2(previousPosition.x + 1, previousPosition.y);
+                } else {
+                    nextPosition = previousPosition;
+                }
 
                 slots.add(nextPosition);
-                lastPosition = nextPosition;
+
+                final Random random = new Random();
+                final int gemColor = random.nextInt(7);
+                final Gem gem = new Gem(gemTextures[gemColor], gemColor, revolution, this);
+
+
+                gem.positionInRow = x;
+                gem.positionInColumn = i;
+
+                gem.setXY(nextPosition.x, nextPosition.y);
+
+                gems.add(gem);
+                stage.addActor(gem);
+
+                previousPosition = nextPosition;
+
+
+                revolution++;
             }
-            if(slots.size() < countColumns * countRows) {
-                lastPosition.y += 1;
+
+            previousPosition.x = firstPosition.x;
+
+            if (slots.size() < countColumns * countRows) {
+                previousPosition.y += 1;
             }
-            lastPosition.x = firstPosition.x;
         }
     }
 
-    public void fillSlots() {
-        for(int i = 0; i < slots.size() - 1; i++) {
-            final Random random = new Random();
-            final int gemColor = random.nextInt(7);
-            final com.feiqn.gempires.logic.Gem gem = new com.feiqn.gempires.logic.Gem(gemTextures[gemColor], gemColor, i, this);
-
-            gem.setPosition(slots.get(i).x, slots.get(i).y);
-
-            gems.add((gem));
-            stage.addActor(gem);
-        }
-    }
-
-    public void swapGems(com.feiqn.gempires.logic.Gem origin, com.feiqn.gempires.logic.Gem destination) {
+    public void swapGems(Gem origin, Gem destination) {
         final Vector2 originSlot = new Vector2(origin.getX(), origin.getY());
 
         origin.setXY(destination.getX(), destination.getY());
         destination.setXY(originSlot.x, originSlot.y);
+
         Collections.swap(gems, gems.indexOf(origin), gems.indexOf(destination));
+
         origin.GemIndex = gems.indexOf(origin);
         destination.GemIndex = gems.indexOf(destination);
+
+        final int originPositionInRow = origin.positionInRow;
+        final int originPositionInColumn = origin.positionInColumn;
+
+        origin.positionInRow = destination.positionInRow;
+        origin.positionInColumn = destination. positionInColumn;
+
+        destination.positionInRow = originPositionInRow;
+        destination.positionInColumn = originPositionInColumn;
     }
 
-    public void checkBoundsForSwap(final float mouseUpAtX, final float mouseUpAtY, int index) {
+    public void checkBoundsThenSwap(final float mouseUpAtX, final float mouseUpAtY, int index) {
 
         // TODO: animate :)
         if (mouseUpAtX > 1.1f && mouseUpAtY < 1 && mouseUpAtY > -1 && index != gems.size() - 1 && index % columns != columns - 1) { // MOVE RIGHT ->
             swapGems(gems.get(index), gems.get(index + 1));
-            if(!checkWholeBoardForMatches()) {
+            matchFound = checkWholeBoardForMatches();
+            if(!matchFound) {
                 swapGems(gems.get(index), gems.get(index + 1));
             }
         } else if (mouseUpAtX < -0.1f && mouseUpAtY < 1 && mouseUpAtY > -1 && index % columns != 0) { // MOVE LEFT <-
             swapGems(gems.get(index), gems.get(index - 1));
-            if(!checkWholeBoardForMatches()) {
+            matchFound = checkWholeBoardForMatches();
+            if(!matchFound) {
                 swapGems(gems.get(index), gems.get(index - 1));
             }
         } else if (mouseUpAtX < 1 && mouseUpAtX > -1 && mouseUpAtY < -0.3f && index - columns > 0) { // MOVE DOWN v
             swapGems(gems.get(index), gems.get(index - columns));
-            if(!checkWholeBoardForMatches()) {
+            matchFound = checkWholeBoardForMatches();
+            if(!matchFound) {
                 swapGems(gems.get(index), gems.get(index - columns));
             }
         } else if (mouseUpAtX < 1 && mouseUpAtX > -1 && mouseUpAtY > 0.5f && index + columns < gems.size() -1) { // MOVE UP ^
             swapGems(gems.get(index), gems.get(index + columns));
-            if(!checkWholeBoardForMatches()) {
+            matchFound = checkWholeBoardForMatches();
+            if(!matchFound) {
                 swapGems(gems.get(index), gems.get(index + columns));
             }
         }
     }
 
-    public void destroy(ArrayList<com.feiqn.gempires.logic.Gem> gemsToDestroy) {
-        for (com.feiqn.gempires.logic.Gem gem : gemsToDestroy) {
+    public void destroy(ArrayList<Gem> gemsToDestroy) {
+
+        for(Gem gem : gemsToDestroy) {
+
             final int gemToDestroy = gem.GemIndex;
-            gems.get(gemToDestroy).remove();
+
             gem.remove();
-            // TODO: some logic for holding empty spaces in the index, e.g., blank gems that are immediately removed; or maybe switch to a standard static Gem[] of size rows * columns
+            gem.setToBlank();
+
         }
         drop();
     }
@@ -159,38 +206,62 @@ public class MatchScreen extends ScreenAdapter {
         return colour;
     }
 
-    public void look(com.feiqn.gempires.logic.Gem gem) {
+    public void look(Gem gem) {
         horizontalMatchLength = 0;
         verticalMatchLength = 0;
+        matchesForThisGem = new ArrayList<>();
+
         final String color = gemColorAsString(gem.GemColor);
 
         Gdx.app.log("reader", "I'm looking for " + color + " gems now.");
         Gdx.app.log("reader", "From index " + gem.GemIndex + ", I see: ");
 
-        // TODO: something wonky in each of these loops, don't work quite right
+        // TODO: these should all be folded into one neat little function
         lookLeft(gem);
         lookRight(gem);
         lookDown(gem);
         lookUp(gem);
+
+        horizontalMatchLength = leftMatches.size() + rightMatches.size();
+        verticalMatchLength = upMatches.size() + downMatches.size();
+
+        // Gdx.app.log("reader", "HML: " + horizontalMatchLength + ", VML: " + verticalMatchLength);
+
+        if(horizontalMatchLength >= 2) {
+            matchFound = true;
+            Gdx.app.log("matchFound", "Good horizontal matches.");
+            sendToDestroy.addAll(leftMatches);
+            sendToDestroy.addAll(rightMatches);
+        }
+
+        if(verticalMatchLength >= 2) {
+            matchFound = true;
+            Gdx.app.log("matchFound", "Good vertical matches.");
+            sendToDestroy.addAll(upMatches);
+            sendToDestroy.addAll(downMatches);
+        }
     }
 
-    private void lookUp(com.feiqn.gempires.logic.Gem gem) {
-        final int distanceToBottomBound = gem.GemIndex / columns;
+    private void lookUp(Gem gem) {
+        final int distanceToBottomBound = gem.positionInColumn;
         final int distanceToTopBound = rows - distanceToBottomBound - 1;
+        upMatches = new ArrayList<>();
 
-        // TODO: check for inverse problem as lookDown
+        // Gdx.app.log("lookUp", "There are " + distanceToTopBound + " gems above me.");
 
-        for(int u = 0; u < distanceToTopBound; u++) {
+        for(int u = 0; u <= distanceToTopBound; u++) {
+
             try {
-                Gdx.app.log("reader", "up: " + gems.get(gem.GemIndex+ + (u * columns)).GemIndex + ", and it's " + gemColorAsString(gems.get(gem.GemIndex+ + (u * columns)).GemColor));
+                final Gem target = gems.get(gem.GemIndex + (u * columns));
 
-                if (gems.get(gem.GemIndex+ + (u * columns)).GemColor == gem.GemColor) {
-                    if (gems.get(gem.GemIndex+ + (u * columns)).GemIndex != gem.GemIndex) {
+                if(target.GemIndex != gem.GemIndex) {
+                    Gdx.app.log("reader", "up: " + target.GemIndex + ", and it's " + gemColorAsString(target.GemColor));
+                }
+                if(target.GemColor == gem.GemColor && target.GemIndex != gem.GemIndex) {
                         Gdx.app.log("reader", "I call that an up match!");
                         verticalMatchLength++;
-                        sendToDestroy.add(gems.get(gem.GemIndex + +(u * columns)));
-                    }
-                } else {
+                        upMatches.add(target);
+                } else if(target.GemIndex != gem.GemIndex) {
                     Gdx.app.log("reader", "No match up.");
                     break;
                 }
@@ -198,43 +269,54 @@ public class MatchScreen extends ScreenAdapter {
         }
     }
 
-    private void lookDown(com.feiqn.gempires.logic.Gem gem) {
-        final int distanceToBottomBound = gem.GemIndex / columns;
+    private void lookDown(Gem gem) {
+        final int distanceToBottomBound = gem.positionInColumn;
+        downMatches = new ArrayList<>();
 
-        // TODO: fix breaking early
+       // Gdx.app.log("lookDown", "There are " + distanceToBottomBound + " gems below me.");
 
-        for(int b = 0; b < distanceToBottomBound; b++) {
+        for(int b = 0; b <= distanceToBottomBound; b++) {
+
             try {
-                Gdx.app.log("reader", "down: " + gems.get(gem.GemIndex - (b * columns)).GemIndex + ", and it's " + gemColorAsString(gems.get(gem.GemIndex - (b * columns)).GemColor));
-                if (gems.get(gem.GemIndex - (b * columns)).GemColor == gem.GemColor) {
-                    if (gems.get(gem.GemIndex - (b * columns)).GemIndex != gem.GemIndex)
+                final Gem target = gems.get(gem.GemIndex - (b * columns));
+
+                if(target.GemIndex != gem.GemIndex) {
+                    Gdx.app.log("reader", "down: " + target.GemIndex + ", and it's " + gemColorAsString(target.GemColor));
+                }
+                if(target.GemColor == gem.GemColor && target.GemIndex != gem.GemIndex) {
                     Gdx.app.log("reader", "I call that a down match!");
                     verticalMatchLength++;
-                    sendToDestroy.add(gems.get(gem.GemIndex - (b * columns)));
-                } else {
+                    downMatches.add(target);
+                } else if(target.GemIndex != gem.GemIndex) {
                     Gdx.app.log("reader", "No match down.");
                     break;
                 }
-            } catch(Exception e) { /* uwu */ }
+            } catch(Exception e) {
+                Gdx.app.log("reader", "broke down :(");
+            }
         }
     }
 
-    private void lookRight(com.feiqn.gempires.logic.Gem gem) {
-        final int distanceToLeftBound = gem.GemIndex % rows;
+    private void lookRight(Gem gem) {
+        final int distanceToLeftBound = gem.positionInRow;
         final int distanceToRightBound = columns - distanceToLeftBound - 1;
+        rightMatches = new ArrayList<>();
 
-        // TODO: doesn't properly respect right bounds
+        Gdx.app.log("lookRight", "There are " + distanceToRightBound + " gems to my right.");
 
-        for(int r = 0; r < distanceToRightBound; r ++) {
+        for(int r = 0; r <= distanceToRightBound; r ++) {
+
             try {
-                Gdx.app.log("reader", "right: " + gems.get(gem.GemIndex + r).GemIndex + ", and it's " + gemColorAsString(gems.get(gem.GemIndex + r).GemColor));
-                if (gems.get(gem.GemIndex + r).GemColor == gem.GemColor) {
-                    if (gems.get(gem.GemIndex + r).GemIndex != gem.GemIndex) {
-                        Gdx.app.log("reader", "I call that a right match!");
+                final Gem target = gems.get(gem.GemIndex + r);
+
+                if(target.GemIndex != gem.GemIndex) {
+                    Gdx.app.log("reader", "right: " + target.GemIndex + ", and it's " + gemColorAsString(target.GemColor));
+                }
+                if (target.GemColor == gem.GemColor && target.GemIndex != gem.GemIndex) {
+                        Gdx.app.log("reader", "I call that a right-match!");
                         horizontalMatchLength++;
-                        sendToDestroy.add(gems.get(gem.GemIndex + r));
-                    }
-                } else {
+                        rightMatches.add(target);
+                } else if(target.GemIndex != gem.GemIndex) {
                     Gdx.app.log("reader", "No match to the right.");
                     break;
                 }
@@ -242,44 +324,44 @@ public class MatchScreen extends ScreenAdapter {
         }
     }
 
-    private void lookLeft(com.feiqn.gempires.logic.Gem gem) {
-        final int distanceToLeftBound = gem.GemIndex % rows;
+    private void lookLeft(Gem gem) {
+        final int distanceToLeftBound = gem.positionInRow;
+        leftMatches = new ArrayList<>();
 
-        // TODO: something especially wonky here, breaking early
+        // Gdx.app.log("lookLeft", "There are " + distanceToLeftBound + " gems to my left.");
 
-        for(int l = 0; l < distanceToLeftBound; l++) {
+        for(int l = 0; l <= distanceToLeftBound; l++) {
+
             try {
-                Gdx.app.log("reader", "left: " + gem.GemIndex + ", and it's " + gemColorAsString(gem.GemColor));
-                if (gems.get(gem.GemIndex - l).GemColor == gem.GemColor) {
-                    if (gems.get(gem.GemIndex - l).GemIndex != gem.GemIndex) {
-                        Gdx.app.log("reader", "I call that a left match!");
-                        horizontalMatchLength++;
-                        sendToDestroy.add(gems.get(gem.GemIndex - l));
-                    }
-                } else {
+                final Gem target = gems.get(gem.GemIndex - l);
+
+                if(target.GemIndex != gem.GemIndex) {
+                    Gdx.app.log("reader", "left: " + target.GemIndex + ", and it's " + gemColorAsString(target.GemColor));
+                }
+                if (target.GemColor == gem.GemColor && target.GemIndex != gem.GemIndex) {
+                    Gdx.app.log("reader", "I call that a left match!");
+                    horizontalMatchLength++;
+                    leftMatches.add(target);
+                } else if(target.GemIndex != gem.GemIndex) {
                     Gdx.app.log("reader", "No match to the left.");
                     break;
                 }
-            } catch(Exception e) { /* uwu */ }
+            } catch(Exception e) {
+                Gdx.app.log("break", "loop broken on revolution: " + l );
+            }
         }
     }
 
     public boolean checkWholeBoardForMatches() {
-        boolean matchFound = false;
+        matchFound = false;
         sendToDestroy = new ArrayList<>();
 
-        for(int i = 0; i < gems.size() - 1; i++) { // gems.forEach((g) -> look(g)); would be better after updating gradle build to 1.8
-            look(gems.get(i));
-        }
+        // TODO: still not quite right...
 
-        Gdx.app.log("reader", "HML: " + horizontalMatchLength + ", VML: " + verticalMatchLength);
-        if(horizontalMatchLength > 3 || verticalMatchLength > 3) {
-            matchFound = true;
-            Gdx.app.log("matchFound", "true");
-            destroy(sendToDestroy);
-        } else {
-            Gdx.app.log("reader", "No matches on the bored.");
-        }
+        for(Gem gem : gems) { look(gem); }
+
+        if(matchFound) { destroy(sendToDestroy); }
+
         return matchFound;
     }
 
@@ -295,7 +377,6 @@ public class MatchScreen extends ScreenAdapter {
         int mapHeight = mapProperties.get("height", Integer.class);
 
         camera.setToOrtho(false, 8, 8);
-
 
         // camera.position.set(mapWidth * .5f, camera.viewportHeight * .5f, 0);
         camera.update();
@@ -321,9 +402,7 @@ public class MatchScreen extends ScreenAdapter {
         slots = new ArrayList<Vector2>();
         gems = new ArrayList<Gem>();
 
-        createSlots(5, 7);
-
-        fillSlots();
+        createAndFillSlots(5, 7);
 
         Gdx.input.setInputProcessor(stage);
 

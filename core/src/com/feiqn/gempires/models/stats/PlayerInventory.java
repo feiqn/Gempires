@@ -8,9 +8,12 @@ public class PlayerInventory {
 
     private Preferences pref;
 
-    private float foodCount;
-    private float oreCount;
-    private float arcanaCount;
+    private float foodCount,
+                  maxFood,
+                  oreCount,
+                  maxOre,
+                  arcanaCount,
+                  maxArcana;
 
     public PlayerInventory() {
         pref = Gdx.app.getPreferences("Player Inventory");

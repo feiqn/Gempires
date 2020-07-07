@@ -1,19 +1,24 @@
 package com.feiqn.gempires.logic.castle;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.feiqn.gempires.logic.ui.HeroRosterPopup;
 import com.feiqn.gempires.logic.ui.ItemNotifierBubble;
-import com.feiqn.gempires.logic.ui.StructurePopUpMenu;
+import com.feiqn.gempires.logic.ui.StructurePopupMenu;
 
 public class Structure extends Image {
     public enum Type {
         FARM,               // grow food to feed troops
+        SILO,               // store food
         MINE,               // mine ore to build things
-        LIBRARY,            // research arcana to level up goddessStatue
+        WAREHOUSE,          // store ore
+        LIBRARY,            // research arcana to level up goddessStatue and others
+        ARCHIVE,            // store arcana
         ALTAR,              // power up heroes of corresponding element
         ALCHEMIST,          // create items like healing potions or ascent stones
         SUMMONING_CIRCLE,   // do pulls for more heroes
@@ -40,13 +45,23 @@ public class Structure extends Image {
 
     private boolean readyToCollect;
 
-    public ItemNotifierBubble itemNotifierBubble; // Must be initialized by subclass
+    private HeroRosterPopup heroRosterPopup;
+
+    public ItemNotifierBubble itemNotifierBubble; // must be initialised by child class
 
     private CastleScreen parentScreen;
 
+    public Structure(Texture texture, CastleScreen parent) {
+        super(texture);
+        sharedInit(parent);
+    }
+
     public Structure(TextureRegion region, CastleScreen parent) {
         super(region);
+        sharedInit(parent);
+    }
 
+    private void sharedInit(CastleScreen parent) {
         this.readyToCollect = false;
 
         // base stats at level 1
@@ -55,7 +70,6 @@ public class Structure extends Image {
         this.storedResource = 0;
 
         this.parentScreen = parent;
-        this.setSize(40, 40); // TODO: update this once camera proportions set in CastleScreen
         this.bounds = new Rectangle((int) getX(), (int) getY(), (int) getWidth(), (int) getHeight());
         this.level = 1;
 
@@ -71,8 +85,18 @@ public class Structure extends Image {
             public void touchUp(InputEvent event, float x, float y, int point, int button) {
                 setColor(1.5f, 1.5f, 1.5f, 1);
 
-                final StructurePopUpMenu popUpMenu = new StructurePopUpMenu(self);
-                parentScreen.getStage().addActor(popUpMenu);
+                switch(structureType) {
+                    case FARM:
+                    case MINE:
+                    case LIBRARY:
+                        final StructurePopupMenu popUpMenu = new StructurePopupMenu(self);
+                        parentScreen.getStage().addActor(popUpMenu);
+                        break;
+                    case BARRACKS:
+                        heroRosterPopup = new HeroRosterPopup(self);
+                        parentScreen.getStage().addActor(heroRosterPopup);
+                        break;
+                }
             }
         });
     }
@@ -106,10 +130,12 @@ public class Structure extends Image {
         } else {
             this.storedResource = this.resourceCapacity;
         }
-        if(!this.readyToCollect && this.storedResource > (this.resourceCapacity / 10)) {
-            this.parentScreen.getStage().addActor(this.itemNotifierBubble);
-            this.itemNotifierBubble.setXY(this.getX(), this.getY() + 10f);
-            this.readyToCollect = true;
+        if(this.structureType == Type.FARM || this.structureType == Type.MINE || this.structureType == Type.LIBRARY) {
+            if(!this.readyToCollect && this.storedResource > (this.resourceCapacity / 10)) {
+                this.parentScreen.getStage().addActor(this.itemNotifierBubble);
+                this.itemNotifierBubble.setXY(this.getX(), this.getY() + 10f);
+                this.readyToCollect = true;
+            }
         }
     }
 
@@ -136,9 +162,6 @@ public class Structure extends Image {
     // GETTERS
     public int getLevel() {
         return level;
-    }
-    public Type getType() {
-        return structureType;
     }
     public Structure getSelf() {
         return self;

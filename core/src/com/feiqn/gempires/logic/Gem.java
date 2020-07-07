@@ -10,24 +10,30 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
 public class Gem extends Image {
     public Rectangle bounds;
-    final public int GemColor;
-    public int GemIndex;
+
+    public int GemColor;
+
+    public int GemIndex,
+               positionInRow,
+               positionInColumn;
+
     final public MatchScreen matchScreen;
 
 
     public Gem(final TextureRegion region, final int gemColor, int gemIndex, final MatchScreen parentMatchScreen) {
-        // GREEN 0
+        // GREEN  0
         // PURPLE 1
-        // RED 2
+        // RED    2
         // ORANGE 3
         // YELLOW 4
-        // BLUE 5
-        // CLEAR 6
+        // BLUE   5
+        // CLEAR  6
+        // BLANK  7
 
         super(region);
         this.setSize(1, 1);
         this.GemColor = gemColor;
-        this.GemIndex = gemIndex;
+        this.GemIndex = gemIndex; // TODO: getting gemIndex may be redundant with the addition of positionInRow/Column
         this.matchScreen = parentMatchScreen;
         this.bounds = new Rectangle((int) getX(), (int) getY(), (int) getWidth(), (int) getHeight());
 
@@ -42,9 +48,15 @@ public class Gem extends Image {
             public void touchUp(InputEvent event, float x, float y, int point, int button) {
                 Gdx.app.log("touchUP", "x: " + x + ", y: " + y);
                 setColor(1.5f, 1.5f, 1.5f, 1);
-                matchScreen.checkBoundsForSwap(x, y, GemIndex);
+                matchScreen.checkBoundsThenSwap(x, y, GemIndex);
             }
         });
+    }
+
+    public void setToBlank() {
+        this.GemColor = 7;
+        this.GemIndex = -1;
+        // this.removeListener(  );
     }
 
     public void setXY(float pX, float pY) {
