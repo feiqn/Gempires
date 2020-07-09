@@ -20,6 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 import com.badlogic.gdx.utils.Array;
 import com.feiqn.gempires.GempiresGame;
+import com.feiqn.gempires.logic.ui.BackButton;
 import com.feiqn.gempires.models.stats.CastleStats;
 import com.feiqn.gempires.models.stats.HeroRoster;
 import com.feiqn.gempires.models.stats.PlayerInventory;
@@ -33,6 +34,8 @@ public class CastleScreen extends ScreenAdapter {
     GempiresGame game;
 
     private Stage stage;
+
+    public Label.LabelStyle structureLabelStyle;
 
     final public CastleScreen self = this;
 
@@ -52,9 +55,12 @@ public class CastleScreen extends ScreenAdapter {
                          subMenuSprite,
                          heroRosterMenuSprite,
                          natureCardRegion,
-                         natureCardThumbnail;
+                         natureCardThumbnail,
+                         backButtonTexture;
 
-    Barracks barracks;
+    public Barracks barracks;
+
+    public BackButton backButton;
 
     Farm farm;
 
@@ -73,9 +79,9 @@ public class CastleScreen extends ScreenAdapter {
         camera = new OrthographicCamera();
 
         castleMap = new TmxMapLoader().load("castleMap.tmx");
-        isoMapRenderer = new IsometricTiledMapRenderer(castleMap, 1/32f);
+        isoMapRenderer = new IsometricTiledMapRenderer(castleMap, 1/32f); // TODO: why isn't unitScale working properly?
 
-        camera.setToOrtho(false, 12, 12);
+        camera.setToOrtho(false, 8, 8);
 
         camera.position.set(100, 0, 0);
 
@@ -95,6 +101,9 @@ public class CastleScreen extends ScreenAdapter {
         menuSprite = new TextureRegion(menuSpriteSheet, 96, 0 , 96, 96);
         subMenuSprite = new TextureRegion(menuSpriteSheet, 96, 96, 96, 96);
         heroRosterMenuSprite = new TextureRegion(menuSpriteSheet, 0, 192, 96, 96);
+        backButtonTexture = new TextureRegion(menuSpriteSheet, 192, 0 , 32, 32);
+
+        backButton = new BackButton(backButtonTexture);
 
         final Texture cardSpriteSheet = new Texture(Gdx.files.internal("ui/heroCards.png"));
         natureCardRegion = new TextureRegion(cardSpriteSheet, 0, 0, 96, 128);
@@ -116,7 +125,7 @@ public class CastleScreen extends ScreenAdapter {
         structureFont = fontGenerator.generateFont(structureFontParameter);
         fontGenerator.dispose();
 
-        Label.LabelStyle structureLabelStyle = new Label.LabelStyle();
+        structureLabelStyle = new Label.LabelStyle();
         structureLabelStyle.font = structureFont;
 
 //        farm = new Farm(farmTexture, self);
@@ -124,8 +133,8 @@ public class CastleScreen extends ScreenAdapter {
 //        stage.addActor(farm);
 
         barracks = new Barracks(barracksIcon, self);
-        barracks.setSize(32, 32);
-        barracks.setXY(camera.viewportWidth * .5f, camera.viewportHeight * .5f);
+        barracks.setSize(32f, 32f);
+        barracks.setXY(camera.viewportWidth * 1f, camera.viewportHeight * 1f);
         stage.addActor(barracks);
 
         final float camViewportHalfX = camera.viewportWidth * .5f;
@@ -133,6 +142,7 @@ public class CastleScreen extends ScreenAdapter {
         final float mapWidth = 100; // TODO: finish this
 
         camera.position.x = MathUtils.clamp(camera.position.x, camViewportHalfX, mapWidth - camViewportHalfX);
+        // camera.position.y = ...
 
         stage.addListener(new DragListener() {
             @Override
@@ -141,13 +151,8 @@ public class CastleScreen extends ScreenAdapter {
             }
             @Override
             public void touchDragged(InputEvent event, float screenX, float screenY, int pointer) {
-                final float x = Gdx.input.getDeltaX();
-                final float y = Gdx.input.getDeltaY();
-
-                Gdx.app.log("drag", "x: " + x);
-                Gdx.app.log("drag", "y: " + y);
-                Gdx.app.log("drag", "screenX: " + screenX);
-                Gdx.app.log("drag", "screenY: " + screenY);
+                final float x = Gdx.input.getDeltaX() * .25f;
+                final float y = Gdx.input.getDeltaY() * .25f;
 
                 camera.translate(-x,y);
                 camera.update();

@@ -34,7 +34,7 @@ public class HeroCard extends Image {
                 @Override
                 public void touchUp(InputEvent event, float x, float y, int point, int button) {
                     setColor(1.5f, 1.5f, 1.5f, 1);
-                    // TODO: show parentCard
+                    parentScreen.barracks.heroRosterPopup.addActor(parentCard);
                 }
             });
         }
@@ -93,6 +93,9 @@ public class HeroCard extends Image {
     }
 
     private void sharedInit() {
+        setSize(98,130);
+        setPosition(Gdx.graphics.getWidth() * .5f, Gdx.graphics.getWidth() * .5f);
+
         bounds = new Rectangle((int) getX(), (int) getY(), (int) getWidth(), (int) getHeight());
 
         // base stats

@@ -45,7 +45,7 @@ public class Structure extends Image {
 
     private boolean readyToCollect;
 
-    private HeroRosterPopup heroRosterPopup;
+    public HeroRosterPopup heroRosterPopup;
 
     public ItemNotifierBubble itemNotifierBubble; // must be initialised by child class
 

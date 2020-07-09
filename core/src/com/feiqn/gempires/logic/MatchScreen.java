@@ -111,6 +111,8 @@ public class MatchScreen extends ScreenAdapter {
     }
 
     public void swapGems(Gem origin, Gem destination) {
+
+        // TODO: animate
         final Vector2 originSlot = new Vector2(origin.getX(), origin.getY());
 
         origin.setXY(destination.getX(), destination.getY());
@@ -133,7 +135,7 @@ public class MatchScreen extends ScreenAdapter {
 
     public void checkBoundsThenSwap(final float mouseUpAtX, final float mouseUpAtY, int index) {
 
-        // TODO: animate :)
+        // TODO: refactor
         if (mouseUpAtX > 1.1f && mouseUpAtY < 1 && mouseUpAtY > -1 && index != gems.size() - 1 && index % columns != columns - 1) { // MOVE RIGHT ->
             swapGems(gems.get(index), gems.get(index + 1));
             matchFound = checkWholeBoardForMatches();
