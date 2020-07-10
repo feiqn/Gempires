@@ -9,6 +9,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
 
 public class Gem extends Image {
+    // What is a gem, but a miserable front for microtransactions?
+
     public Rectangle bounds;
 
     public int GemColor;

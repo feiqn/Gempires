@@ -25,6 +25,12 @@ public class HeroRosterPopup extends Group {
         header.setPosition(0, Gdx.graphics.getHeight() - header.getHeight());
         addActor(header);
 
+        final BackButton backButton = new BackButton(parentStructure.getParentScreen().backButtonTexture);
+        backButton.setSize(32, 32); // TODO: why aren't stage sizes working...
+        backButton.setPosition(Gdx.graphics.getHeight() * .7f, Gdx.graphics.getWidth() * .7f);
+        backButton.setParent(this);
+        addActor(backButton);
+
         // TODO: forEach HeroCard in parentStructure.parentScreen.HeroRoster....
         final Leif leif = new Leif(parentStructure.getParentScreen().natureCardRegion, parentStructure.getParentScreen());
         leif.thumbnail.setSize(64,96);

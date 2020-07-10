@@ -34,7 +34,8 @@ public class MatchScreen extends ScreenAdapter {
 
     public Group gemGroup;
 
-    public boolean matchFound;
+    public boolean matchFound,
+                   classicMode;
 
     public int rows,
                columns,

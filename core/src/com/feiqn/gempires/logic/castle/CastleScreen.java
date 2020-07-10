@@ -19,6 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.feiqn.gempires.GempiresGame;
 import com.feiqn.gempires.logic.ui.BackButton;
 import com.feiqn.gempires.models.stats.CastleStats;
@@ -27,11 +28,16 @@ import com.feiqn.gempires.models.stats.PlayerInventory;
 
 public class CastleScreen extends ScreenAdapter {
 
+    /*
+     * This is the base class for all of Adventure Mode.
+     * Everything refers back here in one way or another.
+    */
+
     public OrthographicCamera camera;
     public TiledMap castleMap;
     public IsometricTiledMapRenderer isoMapRenderer;
 
-    GempiresGame game;
+    final private GempiresGame game;
 
     private Stage stage;
 
@@ -43,9 +49,8 @@ public class CastleScreen extends ScreenAdapter {
     public CastleStats castleStats;
     public HeroRoster heroRoster;
 
-    public int goddessStatueLevel, goddessStatueExp;
-
     private Array<Plot> plots;
+
     public Array<Structure> structures;
 
     public Texture barracksIcon;
@@ -60,7 +65,6 @@ public class CastleScreen extends ScreenAdapter {
 
     public Barracks barracks;
 
-    public BackButton backButton;
 
     Farm farm;
 
@@ -79,19 +83,25 @@ public class CastleScreen extends ScreenAdapter {
         camera = new OrthographicCamera();
 
         castleMap = new TmxMapLoader().load("castleMap.tmx");
-        isoMapRenderer = new IsometricTiledMapRenderer(castleMap, 1/32f); // TODO: why isn't unitScale working properly?
+        isoMapRenderer = new IsometricTiledMapRenderer(castleMap, 1/32f);
 
-        camera.setToOrtho(false, 8, 8);
 
         camera.position.set(100, 0, 0);
 
         camera.update();
 
-        playerInventory = new PlayerInventory();
-        castleStats = new CastleStats();
+        playerInventory = new PlayerInventory(this);
+        castleStats = new CastleStats(this);
         heroRoster = new HeroRoster();
 
-        stage = new Stage();
+        final float worldWidth = Gdx.graphics.getWidth() / 32f; // TODO: should this be viewport instead?
+        final float worldHeight = Gdx.graphics.getHeight() / 32f;
+
+        camera.setToOrtho(false, worldWidth, worldHeight);
+
+        final FitViewport fitViewport = new FitViewport(worldWidth, worldHeight);
+
+        stage = new Stage(fitViewport);
 
         // TODO: move all this stuff to helper methods
 
@@ -102,8 +112,6 @@ public class CastleScreen extends ScreenAdapter {
         subMenuSprite = new TextureRegion(menuSpriteSheet, 96, 96, 96, 96);
         heroRosterMenuSprite = new TextureRegion(menuSpriteSheet, 0, 192, 96, 96);
         backButtonTexture = new TextureRegion(menuSpriteSheet, 192, 0 , 32, 32);
-
-        backButton = new BackButton(backButtonTexture);
 
         final Texture cardSpriteSheet = new Texture(Gdx.files.internal("ui/heroCards.png"));
         natureCardRegion = new TextureRegion(cardSpriteSheet, 0, 0, 96, 128);
@@ -133,16 +141,16 @@ public class CastleScreen extends ScreenAdapter {
 //        stage.addActor(farm);
 
         barracks = new Barracks(barracksIcon, self);
-        barracks.setSize(32f, 32f);
-        barracks.setXY(camera.viewportWidth * 1f, camera.viewportHeight * 1f);
+        barracks.setSize(1, 1);
+        // barracks.setXY(camera.viewportWidth * 1f, camera.viewportHeight * 1f);
         stage.addActor(barracks);
 
         final float camViewportHalfX = camera.viewportWidth * .5f;
         final float camViewportHalfY = camera.viewportHeight * .5f;
-        final float mapWidth = 100; // TODO: finish this
+        final float mapWidth = 100;
 
         camera.position.x = MathUtils.clamp(camera.position.x, camViewportHalfX, mapWidth - camViewportHalfX);
-        // camera.position.y = ...
+        // camera.position.y = ... // TODO: finish this
 
         stage.addListener(new DragListener() {
             @Override
@@ -175,6 +183,12 @@ public class CastleScreen extends ScreenAdapter {
 
         stage.act();
         stage.draw();
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+        stage.getCamera().update();
     }
 
     // GETTERS

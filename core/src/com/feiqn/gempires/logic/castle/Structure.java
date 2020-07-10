@@ -47,7 +47,7 @@ public class Structure extends Image {
 
     public HeroRosterPopup heroRosterPopup;
 
-    public ItemNotifierBubble itemNotifierBubble; // must be initialised by child class
+    public ItemNotifierBubble itemNotifierBubble; // must be initialised by child class if used
 
     private CastleScreen parentScreen;
 
@@ -77,7 +77,6 @@ public class Structure extends Image {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 setColor(.5f, .5f, .5f, 1);
-                Gdx.app.log("Structure", "stored: " + getStoredResource());
                 return true;
             }
 
@@ -124,8 +123,9 @@ public class Structure extends Image {
         this.readyToCollect = false;
     }
 
+    // this.is really unnecessary /)_.
     public void updateResource(float delta) {
-        if(this.storedResource +(this.productionRate*delta) < this.resourceCapacity) {
+        if(this.storedResource + (this.productionRate*delta) < this.resourceCapacity) {
             this.storedResource += (this.productionRate * delta);
         } else {
             this.storedResource = this.resourceCapacity;
@@ -142,16 +142,16 @@ public class Structure extends Image {
     //SETTERS
     public void levelUp() {
         level++;
-        this.setProductionRate(getLevel() * 1.25f);
-        this.setResourceCapacity(getLevel() * 1.25f);
+        this.increaseProductionRate(productionRate * .25f);
+        this.increaseResourceCapacity(resourceCapacity * .25f);
     }
 
-    public void setProductionRate(float productionRate) {
-        this.productionRate = productionRate;
+    public void increaseProductionRate(float productionRate) {
+        this.productionRate += productionRate;
     }
 
-    public void setResourceCapacity(float resourceCapacity) {
-        this.resourceCapacity = resourceCapacity;
+    public void increaseResourceCapacity(float resourceCapacity) {
+        this.resourceCapacity += resourceCapacity;
     }
 
     public void switchReadyToCollect() {
