@@ -77,11 +77,11 @@ public class HeroCard extends Image {
                   heroAbilityTitle,
                   heroAbilityDescription;
 
-//    public HeroCard(TextureRegion region, MatchScreen parentScreen) {
-//        super(region);
-//
-//        this.parentScreen = parentScreen;
-//    }
+    public HeroCard(TextureRegion region, MatchScreen parentScreen) {
+        super(region);
+
+        // this.parentScreen = parentScreen;
+    }
 
     // TODO: setup boolean paths for parentScreen type (Castle / Match)
 
@@ -93,8 +93,8 @@ public class HeroCard extends Image {
     }
 
     private void sharedInit() {
-        setSize(98,130);
-        setPosition(Gdx.graphics.getWidth() * .5f, Gdx.graphics.getWidth() * .5f);
+        setSize(3,4);
+        setPosition(Gdx.graphics.getWidth() * .5f, Gdx.graphics.getWidth() * .5f); // TODO
 
         bounds = new Rectangle((int) getX(), (int) getY(), (int) getWidth(), (int) getHeight());
 

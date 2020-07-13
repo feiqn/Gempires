@@ -20,21 +20,20 @@ public class HeroRosterPopup extends Group {
         addActor(background);
 
         final Image header = new Image(sender.getParentScreen().heroRosterMenuSprite);
-        header.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight() * .12f);
+        header.setSize(Gdx.graphics.getWidth(), 1.5f);
         header.setColor(.5f, .5f, .5f, 1);
-        header.setPosition(0, Gdx.graphics.getHeight() - header.getHeight());
+        header.setPosition(0, (Gdx.graphics.getHeight() / 32f) - 1.5f);
         addActor(header);
 
         final BackButton backButton = new BackButton(parentStructure.getParentScreen().backButtonTexture);
-        backButton.setSize(32, 32); // TODO: why aren't stage sizes working...
-        backButton.setPosition(Gdx.graphics.getHeight() * .7f, Gdx.graphics.getWidth() * .7f);
+        backButton.setPosition((Gdx.graphics.getWidth() / 32f) - 2f, (Gdx.graphics.getHeight() / 32f) - 2f);
         backButton.setParent(this);
         addActor(backButton);
 
         // TODO: forEach HeroCard in parentStructure.parentScreen.HeroRoster....
         final Leif leif = new Leif(parentStructure.getParentScreen().natureCardRegion, parentStructure.getParentScreen());
-        leif.thumbnail.setSize(64,96);
-        leif.thumbnail.setXY(Gdx.graphics.getWidth() * .5f, Gdx.graphics.getHeight() * .5f);
+        leif.thumbnail.setSize(2,3);
+        // leif.thumbnail.setXY(Gdx.graphics.getWidth() * .5f, Gdx.graphics.getHeight() * .5f);
 
         addActor(leif.thumbnail);
 

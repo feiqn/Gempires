@@ -14,6 +14,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.feiqn.gempires.GempiresGame;
+import com.feiqn.gempires.models.CampaignLevelID;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,10 +45,13 @@ public class MatchScreen extends ScreenAdapter {
 
     private TextureRegion[] gemTextures;
 
+    public CampaignLevelID campaignLevelID;
+
     // TODO: switch to Pooling for gems, and libGDX's Array<> data type
     public ArrayList<Gem> gems,
                           sendToDestroy,
                           matchesForThisGem,
+
                           leftMatches, // TODO: I know this is awful I'll fix it later
                           rightMatches,
                           upMatches,
@@ -55,20 +59,36 @@ public class MatchScreen extends ScreenAdapter {
 
     public ArrayList<Vector2> slots;
 
-    public MatchScreen(GempiresGame game) { this.game = game; }
+    public MatchScreen(GempiresGame game, Boolean classic, CampaignLevelID levelID){
+        this.game = game;
+        this.classicMode = classic;
+        this.campaignLevelID = levelID;
+    }
+    public MatchScreen(GempiresGame game) {
+        // new MatchScreen(game, true, CampaignLevelID.DEFAULT);
+        this.game = game;
+        this.classicMode = true;
+        this.campaignLevelID = CampaignLevelID.DEFAULT;
+    }
 
-    public void createAndFillSlots(int countRows, int countColumns) {
+    private void initAdventureMode() {
+
+    }
+
+    private void createAndFillSlots(final int countRows, final int countColumns) {
         // TODO: slots<> can probably be safely removed at this point
 
         int revolution = 0;
 
-        rows = countRows;
-        columns = countColumns;
+        final Vector2 firstPosition;
 
-        Gdx.app.log("rowsLength", "rows set to: " + rows);
-        Gdx.app.log("colLength", "columns set to: " + columns);
+        if(classicMode) {
+            firstPosition = new Vector2(.5f, .5f);
+        } else {
+            firstPosition = new Vector2(.5f, 3f);
+            initAdventureMode();
+        }
 
-        final Vector2 firstPosition = new Vector2(.5f, .5f);
         Vector2 previousPosition = firstPosition;
 
         for(int i = 0; i < countRows; i++) { // height
@@ -368,44 +388,80 @@ public class MatchScreen extends ScreenAdapter {
         return matchFound;
     }
 
+    private void loadMap() {
+        // by default, sizes default to 6 & 8 for adventure mode; but this can be changed for any given stage
+        rows = 6;
+        columns = 8;
+
+        switch (campaignLevelID) {
+            case ICE_1:
+            case ICE_2:
+                matchMap = new TmxMapLoader().load("maps/ice_debug.tmx");
+                break;
+            case FIRE_1:
+            case FIRE_2:
+            case VOID_1:
+            case VOID_2:
+            case STONE_1:
+            case STONE_2:
+            case NATURE_1:
+            case NATURE_2:
+            case CLASSIC_1:
+            case CLASSIC_2:
+            case ELECTRIC_1:
+            case ELECTRIC_2:
+
+            case DEFAULT:
+                matchMap = new TmxMapLoader().load("testMap.tmx");
+                rows = 5;
+                columns = 7;
+                break;
+        }
+
+    }
+
+    private void initTextures() {
+        Texture gemSpriteSheet = new Texture(Gdx.files.internal("gem_set.png"));
+        gemTextures = new TextureRegion[]{
+                new TextureRegion(gemSpriteSheet, 160, 0, 32, 32),  // GREEN 0
+                new TextureRegion(gemSpriteSheet, 128, 64, 32, 32), // PURPLE 1
+                new TextureRegion(gemSpriteSheet, 32, 128, 32, 32), // RED 2
+                new TextureRegion(gemSpriteSheet, 0, 192, 32, 32),  // ORANGE 3
+                new TextureRegion(gemSpriteSheet, 0, 288, 32, 32),  // YELLOW 4
+                new TextureRegion(gemSpriteSheet, 160, 320, 32, 32),// BLUE 5
+                new TextureRegion(gemSpriteSheet, 160, 384, 32, 32) // CLEAR 6
+        };
+    }
+
     @Override
     public void show() {
-        camera = new OrthographicCamera();
-
-        matchMap = new TmxMapLoader().load("testMap.tmx"); // TODO: have background map selected and loaded in via MatchScreen constructor
-        orthoMapRenderer = new OrthogonalTiledMapRenderer(matchMap, 1/32f);
-
-        mapProperties = matchMap.getProperties();
-        int mapWidth = mapProperties.get("width", Integer.class);
-        int mapHeight = mapProperties.get("height", Integer.class);
-
-        camera.setToOrtho(false, 8, 8);
-
-        // camera.position.set(mapWidth * .5f, camera.viewportHeight * .5f, 0);
-        camera.update();
-
         horizontalMatchLength = 0;
         verticalMatchLength = 0;
 
-        FitViewport fitViewport = new FitViewport(8, 8);
-
-        stage = new Stage(fitViewport);
-
-        Texture gemSpriteSheet = new Texture(Gdx.files.internal("gem_set.png"));
-        gemTextures = new TextureRegion[]{
-                new TextureRegion(gemSpriteSheet, 160, 0, 32, 32), // GREEN 0
-                new TextureRegion(gemSpriteSheet, 128, 64, 32, 32), // PURPLE 1
-                new TextureRegion(gemSpriteSheet, 32, 128, 32, 32), // RED 2
-                new TextureRegion(gemSpriteSheet, 0, 192, 32, 32), // ORANGE 3
-                new TextureRegion(gemSpriteSheet, 0, 288, 32, 32), // YELLOW 4
-                new TextureRegion(gemSpriteSheet, 160, 320, 32, 32), // BLUE 5
-                new TextureRegion(gemSpriteSheet, 160, 384, 32, 32) // CLEAR 6
-        };
-
+        camera = new OrthographicCamera();
         slots = new ArrayList<Vector2>();
         gems = new ArrayList<Gem>();
 
-        createAndFillSlots(5, 7);
+        classicMode=false; // debug
+        campaignLevelID = CampaignLevelID.ICE_1; // debug
+
+        initTextures();
+
+        loadMap();
+
+        orthoMapRenderer = new OrthogonalTiledMapRenderer(matchMap, 1/32f);
+
+        final int worldWidth = columns + 1;
+        final double worldHeight = Math.floor(worldWidth * 1.77777778f); // approx 9:16
+
+        FitViewport fitViewport = new FitViewport(worldWidth, (int) worldHeight);
+        camera.setToOrtho(false, worldWidth, (int) worldHeight);
+
+        stage = new Stage(fitViewport);
+
+        createAndFillSlots(rows, columns);
+
+        camera.update();
 
         Gdx.input.setInputProcessor(stage);
 

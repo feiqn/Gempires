@@ -10,5 +10,7 @@ public class Barracks extends Structure {
         super(region, parent);
 
         structureType = Type.BARRACKS;
+
+        this.setSize(1,1);
     }
 }

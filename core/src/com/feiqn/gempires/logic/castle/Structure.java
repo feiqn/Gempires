@@ -28,7 +28,7 @@ public class Structure extends Image {
         TURRET,             // attack nearby enemies
         GARRISON,           // station heroes to attack nearby enemies
         BARRICADE,          // block enemies from passing through
-        GODDESS_STATUE      // base structure at the center of base. everybody always has only one.
+        GODDESS_STATUE      // base structure at the center of castle. everybody always has only one.
     }
 
     public Rectangle bounds;
