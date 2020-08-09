@@ -1,7 +1,6 @@
 package com.feiqn.gempires.logic.heroes;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -9,8 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.feiqn.gempires.logic.MatchScreen;
 import com.feiqn.gempires.logic.castle.CastleScreen;
-import com.feiqn.gempires.logic.ui.HeroRosterPopup;
-import com.feiqn.gempires.logic.ui.StructurePopupMenu;
 
 public class HeroCard extends Image {
 

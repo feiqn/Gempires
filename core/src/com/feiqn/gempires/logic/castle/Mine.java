@@ -7,7 +7,7 @@ public class Mine extends Structure {
     public Mine(TextureRegion region, CastleScreen parent) {
         super(region, parent);
 
-        structureType = Type.MINE;
+        structureType = StructureType.MINE;
 
         // itemNotifierBubble = new ItemNotifierBubble(parent.oreIcon, this);
     }

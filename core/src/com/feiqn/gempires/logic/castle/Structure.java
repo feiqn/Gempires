@@ -1,18 +1,17 @@
 package com.feiqn.gempires.logic.castle;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.feiqn.gempires.logic.ui.HeroRosterPopup;
+import com.feiqn.gempires.logic.ui.PopupMenu;
 import com.feiqn.gempires.logic.ui.ItemNotifierBubble;
-import com.feiqn.gempires.logic.ui.StructurePopupMenu;
 
 public class Structure extends Image {
-    public enum Type {
+
+    public enum StructureType {
         FARM,               // grow food to feed troops
         SILO,               // store food
         MINE,               // mine ore to build things
@@ -37,15 +36,15 @@ public class Structure extends Image {
 
     final private Structure self = this;
 
-    public Type structureType;
+    public StructureType structureType;
 
     private float productionRate;
     private float resourceCapacity;
     private float storedResource;
 
-    private boolean readyToCollect;
+    public PopupMenu heroRosterPopup;
 
-    public HeroRosterPopup heroRosterPopup;
+    private boolean readyToCollect;
 
     public ItemNotifierBubble itemNotifierBubble; // must be initialised by child class if used
 
@@ -88,12 +87,16 @@ public class Structure extends Image {
                     case FARM:
                     case MINE:
                     case LIBRARY:
-                        final StructurePopupMenu popUpMenu = new StructurePopupMenu(self);
-                        parentScreen.getStage().addActor(popUpMenu);
+                        final PopupMenu resourcePopupMenu = new PopupMenu(self, PopupMenu.MenuType.RESOURCE_STRUCTURE);
+                        parentScreen.getStage().addActor(resourcePopupMenu);
                         break;
                     case BARRACKS:
-                        heroRosterPopup = new HeroRosterPopup(self);
+                        heroRosterPopup = new PopupMenu(self, PopupMenu.MenuType.HERO_ROSTER);
                         parentScreen.getStage().addActor(heroRosterPopup);
+                        break;
+                    case GODDESS_STATUE:
+                        final PopupMenu goddessPopUpMenu = new PopupMenu(self, PopupMenu.MenuType.GODDESS_STATUE);
+                        parentScreen.getStage().addActor(goddessPopUpMenu);
                         break;
                 }
             }
@@ -130,7 +133,7 @@ public class Structure extends Image {
         } else {
             this.storedResource = this.resourceCapacity;
         }
-        if(this.structureType == Type.FARM || this.structureType == Type.MINE || this.structureType == Type.LIBRARY) {
+        if(this.structureType == StructureType.FARM || this.structureType == StructureType.MINE || this.structureType == StructureType.LIBRARY) {
             if(!this.readyToCollect && this.storedResource > (this.resourceCapacity / 10)) {
                 this.parentScreen.getStage().addActor(this.itemNotifierBubble);
                 this.itemNotifierBubble.setXY(this.getX(), this.getY() + 10f);

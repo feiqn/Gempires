@@ -1,7 +1,5 @@
 package com.feiqn.gempires.logic.ui;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -12,16 +10,14 @@ public class BackButton extends Image {
     private enum ParentType {
         GROUP,
         HEROCARD,
-        HEROROSTERPOPUP,
-        STRUCTUREPOPUPMENU
+        MENUPOPUP,
     }
 
     private ParentType parentType;
 
     private HeroCard parentHeroCard;
     private Group parentGroup;
-    private HeroRosterPopup parentRosterPopup;
-    private StructurePopupMenu parentStructurePopup;
+    private PopupMenu parentPopup;
 
     public BackButton(TextureRegion region) {
         super(region);
@@ -53,14 +49,9 @@ public class BackButton extends Image {
         parentGroup = group;
     }
 
-    public void setParent(HeroRosterPopup heroRosterPopup) {
-        parentType = ParentType.HEROROSTERPOPUP;
-        parentRosterPopup = heroRosterPopup;
-    }
-
-    public void setParent(StructurePopupMenu structurePopupMenu) {
-        parentType = ParentType.STRUCTUREPOPUPMENU;
-        parentStructurePopup = structurePopupMenu;
+    public void setParent(PopupMenu popupMenu) {
+        parentType = ParentType.MENUPOPUP;
+        parentPopup = popupMenu;
     }
 
     public void closeParent() {
@@ -71,11 +62,8 @@ public class BackButton extends Image {
             case HEROCARD:
                 parentHeroCard.remove();
                 break;
-            case HEROROSTERPOPUP:
-                parentRosterPopup.remove();
-                break;
-            case STRUCTUREPOPUPMENU:
-                parentStructurePopup.remove();
+            case MENUPOPUP:
+                parentPopup.remove();
                 break;
         }
     }

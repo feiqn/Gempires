@@ -11,22 +11,16 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.feiqn.gempires.GempiresGame;
-import com.feiqn.gempires.logic.ui.HeroRosterPopup;
-import com.feiqn.gempires.logic.ui.StructurePopupMenu;
 import com.feiqn.gempires.models.stats.CastleStats;
 import com.feiqn.gempires.models.stats.HeroRoster;
 import com.feiqn.gempires.models.stats.PlayerInventory;
@@ -50,7 +44,7 @@ public class CastleScreen extends ScreenAdapter {
 
     public Label.LabelStyle structureLabelStyle;
 
-    final public CastleScreen self = this;
+    final private CastleScreen self = this;
 
     public PlayerInventory playerInventory;
     public CastleStats castleStats;
@@ -60,7 +54,7 @@ public class CastleScreen extends ScreenAdapter {
 
     public Array<Structure> structures;
 
-    public Texture barracksIcon;
+    public Texture barracksTexture;
 
     public TextureRegion foodIcon,
                          oreIcon,
@@ -72,15 +66,23 @@ public class CastleScreen extends ScreenAdapter {
                          siloTexture,
                          warehouseTexture,
                          archivesTexture,
+                         goddessStatueTexture,
 
-                         menuSprite,
-                         subMenuSprite,
-                         heroRosterMenuSprite,
+                         campaignSelectorVoid,
+                         campaignSelectorIce,
+                         campaignSelectorFire,
+                         campaignSelectorElectric,
+                         campaignSelectorNature,
+                         campaignSelectorEarth,
+
+                         menuTexture,
                          natureCardRegion,
                          natureCardThumbnail,
                          backButtonTexture;
 
     public Barracks barracks;
+
+    public GoddessStatue goddessStatue;
 
     public BitmapFont structureFont;
 
@@ -90,17 +92,18 @@ public class CastleScreen extends ScreenAdapter {
 
     public void initialiseTextures() {
 
-        barracksIcon = new Texture(Gdx.files.internal("structures/barracks.png"));
+        final Texture goddessSpriteSheet = new Texture(Gdx.files.internal("structures/goddessSpriteSheet.png"));
+        goddessStatueTexture = new TextureRegion(goddessSpriteSheet,672, 64, 32, 64);
+
+        barracksTexture = new Texture(Gdx.files.internal("structures/barracks.png"));
 
         final Texture menuSpriteSheet = new Texture(Gdx.files.internal("ui/menu.png"));
-        menuSprite = new TextureRegion(menuSpriteSheet, 96, 0 , 96, 96);
-        subMenuSprite = new TextureRegion(menuSpriteSheet, 96, 96, 96, 96);
-        heroRosterMenuSprite = new TextureRegion(menuSpriteSheet, 0, 192, 96, 96);
-        backButtonTexture = new TextureRegion(menuSpriteSheet, 192, 0 , 32, 32);
+        menuTexture =  new TextureRegion(menuSpriteSheet, 0,  192,96, 96);
+        backButtonTexture =     new TextureRegion(menuSpriteSheet, 192,0 , 32, 32);
 
         final Texture cardSpriteSheet = new Texture(Gdx.files.internal("ui/heroCards.png"));
-        natureCardRegion = new TextureRegion(cardSpriteSheet, 0, 0, 96, 128);
-        natureCardThumbnail = new TextureRegion(cardSpriteSheet, 96, 0, 64, 96);
+        natureCardRegion =    new TextureRegion(cardSpriteSheet, 0, 0, 96, 128);
+        natureCardThumbnail = new TextureRegion(cardSpriteSheet, 96,0, 64, 96);
 
         final Texture iconSpriteSheet = new Texture(Gdx.files.internal("icon-pack.png"));
         foodIcon = new TextureRegion(iconSpriteSheet, 256, 0, 32, 32);
@@ -108,6 +111,25 @@ public class CastleScreen extends ScreenAdapter {
         final Texture buildingSpriteSheet = new Texture(Gdx.files.internal("structures/buildingSpriteSheet.png"));
         farmTexture = new TextureRegion(buildingSpriteSheet, 0, 128, 32, 32);
 
+        final Texture itemSpriteSheet = new Texture(Gdx.files.internal("ui/RPG_Item_Pack.png"));
+        campaignSelectorVoid =      new TextureRegion(itemSpriteSheet,128,0,  32,32);
+        campaignSelectorIce =       new TextureRegion(itemSpriteSheet,128,32, 32,32);
+        campaignSelectorElectric =  new TextureRegion(itemSpriteSheet,128,64, 32,32);
+        campaignSelectorFire =      new TextureRegion(itemSpriteSheet,128,96, 32,32);
+        campaignSelectorNature =    new TextureRegion(itemSpriteSheet,128,128,32,32);
+        campaignSelectorEarth =     new TextureRegion(itemSpriteSheet,128,160,32,32);
+    }
+
+    public void initialiseStructures() {
+        barracks = new Barracks(barracksTexture, self);
+        barracks.setSize(2, 2);
+        barracks.setPosition(59.5f,64.5f);
+        rootGroup.addActor(barracks);
+
+        goddessStatue = new GoddessStatue(goddessStatueTexture, self);
+        goddessStatue.setSize(1, 2);
+        goddessStatue.setPosition(55.5f, 64.5f);
+        rootGroup.addActor(goddessStatue);
     }
 
     @Override
@@ -131,11 +153,15 @@ public class CastleScreen extends ScreenAdapter {
 
         stage = new Stage(fitViewport);
 
+        camera.position.set(0,0,0);
+
         final MapProperties mapProperties = castleMap.getProperties();
         final int mapWidth = mapProperties.get("width", Integer.class);
         final int mapHeight = mapProperties.get("height", Integer.class);
 
         rootGroup.setSize(mapWidth, mapHeight);
+
+        rootGroup.setPosition(0,0,0);
 
         stage.addActor(rootGroup);
 
@@ -155,43 +181,17 @@ public class CastleScreen extends ScreenAdapter {
         structureLabelStyle = new Label.LabelStyle();
         structureLabelStyle.font = structureFont;
 
-        Label debugLabel = new Label("Adventure onwards" , structureLabelStyle);
+        // TODO: debug campaign selectors
 
-        debugLabel.addListener(new InputListener() {
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                return true;
-            }
-
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int point, int button) {
-                // later we should select stage, etc
-
-            }
-        });
-
-         // rootGroup.addActor(debugLabel);
-
-//        farm = new Farm(farmTexture, self);
-//        farm.setXY(Gdx.graphics.getWidth() * .5f, Gdx.graphics.getHeight() * .5f);
-//        stage.addActor(farm);
-
-        barracks = new Barracks(barracksIcon, self);
-
-        rootGroup.addActor(barracks);
-
-        barracks.setSize(2, 2);
+        initialiseStructures();
 
         camera.position.set(100, 0, 0);
-        barracks.setPosition(0,0);
 
-//
 //        Vector2 vector = new Vector2(-30, -30);
 //        vector = stage.screenToStageCoordinates(vector);
 //        vector = rootGroup.stageToLocalCoordinates(vector);
 //        barracks.setPosition(vector.x, vector.y);
 //        camera.position.set(vector.x, vector.y, 0);
-
 
         final float camViewportHalfX = camera.viewportWidth * .5f;
         final float camViewportHalfY = camera.viewportHeight * .5f;

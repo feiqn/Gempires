@@ -7,7 +7,7 @@ public class Silo extends Structure {
     public Silo(TextureRegion region, CastleScreen parent) {
         super(region, parent);
 
-        structureType = Type.SILO;
+        structureType = StructureType.SILO;
 
         increaseResourceCapacity(getResourceCapacity() * 5f); // 500
     }

@@ -8,7 +8,7 @@ public class Farm extends Structure {
     public Farm(TextureRegion region, CastleScreen parent) {
         super(region, parent);
 
-        structureType = Type.FARM;
+        structureType = StructureType.FARM;
 
         itemNotifierBubble = new ItemNotifierBubble(parent.foodIcon, this);
     }

@@ -7,7 +7,7 @@ public class Warehouse extends Structure{
     public Warehouse(TextureRegion region, CastleScreen parent) {
         super(region, parent);
 
-        structureType = Type.WAREHOUSE;
+        structureType = StructureType.WAREHOUSE;
 
         increaseResourceCapacity(getResourceCapacity() * 5f); // 500
     }
