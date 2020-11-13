@@ -15,12 +15,11 @@ public class Gem extends Image {
 
     public int GemColor;
 
-    public int GemIndex,
+    public int GemIndex, // all positions indexed from 0
                positionInRow,
                positionInColumn;
 
     final public MatchScreen matchScreen;
-
 
     public Gem(final TextureRegion region, final int gemColor, int gemIndex, final MatchScreen parentMatchScreen) {
         // GREEN  0
@@ -48,7 +47,7 @@ public class Gem extends Image {
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int point, int button) {
-                Gdx.app.log("touchUP", "x: " + x + ", y: " + y);
+                // Gdx.app.log("touchUP", "x: " + x + ", y: " + y);
                 setColor(1.5f, 1.5f, 1.5f, 1);
                 matchScreen.checkBoundsThenSwap(x, y, GemIndex);
             }
@@ -57,7 +56,9 @@ public class Gem extends Image {
 
     public void setToBlank() {
         this.GemColor = 7;
-        this.GemIndex = -1;
+        // this.GemIndex = -1;
+        // this.positionInColumn = -1;
+        // this.positionInRow = -1;
         // this.removeListener(  );
     }
 

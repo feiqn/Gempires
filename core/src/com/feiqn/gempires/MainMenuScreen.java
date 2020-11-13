@@ -21,12 +21,12 @@ public class MainMenuScreen extends ScreenAdapter {
 
     public BitmapFont mainMenuFont;
 
-    private Label ClassicModeLabel, AdventureModeLabel;
-
     public MainMenuScreen(GempiresGame game) { this.game = game; }
 
     @Override
     public void show() {
+        Label ClassicModeLabel, AdventureModeLabel;
+
         stage = new Stage();
 
         mainMenuFont = new BitmapFont();

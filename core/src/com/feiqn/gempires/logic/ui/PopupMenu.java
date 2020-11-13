@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.feiqn.gempires.logic.castle.Structure;
+import com.feiqn.gempires.logic.heroes.nature.Leif;
 
 public class PopupMenu extends Group {
 
@@ -29,7 +30,7 @@ public class PopupMenu extends Group {
                 background.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
                 break;
             case RESOURCE_STRUCTURE:
-                background.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getWidth() * .3f);
+                background.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight() * .3f);
                 break;
         }
 
@@ -46,12 +47,21 @@ public class PopupMenu extends Group {
         backButton.setParent(this);
         addActor(backButton);
 
-//        // TODO: forEach HeroCard in parentStructure.parentScreen.HeroRoster....
-//        final Leif leif = new Leif(parentStructure.getParentScreen().natureCardRegion, parentStructure.getParentScreen());
-//        leif.thumbnail.setSize(2,3);
-//        // leif.thumbnail.setXY(Gdx.graphics.getWidth() * .5f, Gdx.graphics.getHeight() * .5f);
-//
-//        addActor(leif.thumbnail);
+        switch(menuType) {
+            case HERO_ROSTER:
+            // TODO: forEach HeroCard in parentStructure.parentScreen.HeroRoster....
+
+            final Leif leif = new Leif(parentStructure.getParentScreen().natureCardRegion, parentStructure.getParentScreen());
+            leif.thumbnail.setSize(2,3);
+            leif.thumbnail.setXY(Gdx.graphics.getWidth() * .5f, Gdx.graphics.getHeight() * .5f);
+            addActor(leif.thumbnail);
+
+            case GODDESS_STATUE:
+            case RESOURCE_STRUCTURE:
+                break;
+        }
+
+
 
     }
 }

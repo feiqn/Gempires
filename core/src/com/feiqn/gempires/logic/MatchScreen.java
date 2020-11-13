@@ -30,7 +30,7 @@ public class MatchScreen extends ScreenAdapter {
 
     public MapProperties mapProperties;
 
-    private GempiresGame game;
+    GempiresGame game;
     private Stage stage;
 
     public Group gemGroup;
@@ -157,25 +157,29 @@ public class MatchScreen extends ScreenAdapter {
     public void checkBoundsThenSwap(final float mouseUpAtX, final float mouseUpAtY, int index) {
 
         // TODO: refactor
-        if (mouseUpAtX > 1.1f && mouseUpAtY < 1 && mouseUpAtY > -1 && index != gems.size() - 1 && index % columns != columns - 1) { // MOVE RIGHT ->
+        if (mouseUpAtX > 1.1f && mouseUpAtY < 1 && mouseUpAtY > -1 && index != gems.size() - 1 && index % columns != columns - 1) {
+            // MOVE RIGHT ->
             swapGems(gems.get(index), gems.get(index + 1));
             matchFound = checkWholeBoardForMatches();
             if(!matchFound) {
                 swapGems(gems.get(index), gems.get(index + 1));
             }
-        } else if (mouseUpAtX < -0.1f && mouseUpAtY < 1 && mouseUpAtY > -1 && index % columns != 0) { // MOVE LEFT <-
+        } else if (mouseUpAtX < -0.1f && mouseUpAtY < 1 && mouseUpAtY > -1 && index % columns != 0) {
+            // MOVE LEFT <-
             swapGems(gems.get(index), gems.get(index - 1));
             matchFound = checkWholeBoardForMatches();
             if(!matchFound) {
                 swapGems(gems.get(index), gems.get(index - 1));
             }
-        } else if (mouseUpAtX < 1 && mouseUpAtX > -1 && mouseUpAtY < -0.3f && index - columns > 0) { // MOVE DOWN v
+        } else if (mouseUpAtX < 1 && mouseUpAtX > -1 && mouseUpAtY < -0.3f && index - columns > 0) {
+            // MOVE DOWN v
             swapGems(gems.get(index), gems.get(index - columns));
             matchFound = checkWholeBoardForMatches();
             if(!matchFound) {
                 swapGems(gems.get(index), gems.get(index - columns));
             }
-        } else if (mouseUpAtX < 1 && mouseUpAtX > -1 && mouseUpAtY > 0.5f && index + columns < gems.size() -1) { // MOVE UP ^
+        } else if (mouseUpAtX < 1 && mouseUpAtX > -1 && mouseUpAtY > 0.5f && index + columns < gems.size() -1) {
+            // MOVE UP ^
             swapGems(gems.get(index), gems.get(index + columns));
             matchFound = checkWholeBoardForMatches();
             if(!matchFound) {
@@ -188,16 +192,90 @@ public class MatchScreen extends ScreenAdapter {
 
         for(Gem gem : gemsToDestroy) {
 
-            final int gemToDestroy = gem.GemIndex;
-
             gem.remove();
             gem.setToBlank();
 
         }
-        drop();
+
+        checkIfGemsShouldBeDropped();
+
     }
 
-    public void drop() {
+    public void checkIfGemsShouldBeDropped() {
+        for(Gem gem : gems) {
+            if(gem.GemColor == 7) {
+
+                if(classicMode) {
+                    // drop(gem.GemIndex, gem.GemIndex + columns);
+
+                } else {
+                    // adventure mode, gems come from the bottom up
+                    if(gem.positionInColumn == 0) {
+                        // need to spawn a new gem,
+                        // swap the blank gem with the new gem,
+                        // and safely remove the blank gem to end the loop!
+
+                    } else {
+                        // just swap the blank gem with the gem below it and repeat loop
+                        swapGems(gems.get(gem.GemIndex), gems.get(gem.GemIndex - columns));
+                    }
+                    // drop(gem.GemIndex, gem.GemIndex - columns);
+                }
+
+                // gems.remove(gem);
+
+            }
+        }
+
+        // purgeGemsArrayOfBlankGems();
+    }
+
+    public void safelyRemoveGem(Gem gem) {
+        // safely remove a single gem from gems<>
+        // todo: ...SOMEHOW!
+
+        // gems.remove(gem);
+    }
+
+    public void purgeGemsArrayOfBlankGems() {
+        for(Gem gem : gems) {
+            if(gem.GemColor == 7) {
+                safelyRemoveGem(gem);
+            }
+        }
+    }
+
+    public void drop(int indexOfBlankSpace, int indexOfGemToDrop) {
+
+        if(indexOfGemToDrop > (rows * columns) || indexOfGemToDrop < 0) {
+            // need to spawn in a new gem
+            // Gdx.app.log("", "need to spawn a new gem ");
+
+            if(classicMode) {
+
+            } else {
+
+            }
+        } else {
+            // just move the existing gem at this location
+            if(classicMode) {
+                // move down
+
+            } else {
+                // move up
+
+                Gdx.app.log("", "attempting to move gem " + indexOfGemToDrop + " up");
+
+                for(Gem gem : gems) {
+                    if(gem.positionInRow == gems.get(indexOfGemToDrop).positionInRow && gem.GemIndex > gems.get(indexOfGemToDrop).GemIndex) {
+
+                    }
+                }
+
+                // swapGems(gems.get(indexOfBlankSpace), gems.get(indexOfGemToDrop));
+
+            }
+        }
 
     }
 
@@ -236,8 +314,8 @@ public class MatchScreen extends ScreenAdapter {
 
         final String color = gemColorAsString(gem.GemColor);
 
-        Gdx.app.log("reader", "I'm looking for " + color + " gems now.");
-        Gdx.app.log("reader", "From index " + gem.GemIndex + ", I see: ");
+//        Gdx.app.log("reader", "I'm looking for " + color + " gems now.");
+//        Gdx.app.log("reader", "From index " + gem.GemIndex + ", I see: ");
 
         // TODO: these should all be folded into one neat little function
         lookLeft(gem);
@@ -252,14 +330,14 @@ public class MatchScreen extends ScreenAdapter {
 
         if(horizontalMatchLength >= 2) {
             matchFound = true;
-            Gdx.app.log("matchFound", "Good horizontal matches.");
+//            Gdx.app.log("matchFound", "Good horizontal matches.");
             sendToDestroy.addAll(leftMatches);
             sendToDestroy.addAll(rightMatches);
         }
 
         if(verticalMatchLength >= 2) {
             matchFound = true;
-            Gdx.app.log("matchFound", "Good vertical matches.");
+//            Gdx.app.log("matchFound", "Good vertical matches.");
             sendToDestroy.addAll(upMatches);
             sendToDestroy.addAll(downMatches);
         }
@@ -278,14 +356,14 @@ public class MatchScreen extends ScreenAdapter {
                 final Gem target = gems.get(gem.GemIndex + (u * columns));
 
                 if(target.GemIndex != gem.GemIndex) {
-                    Gdx.app.log("reader", "up: " + target.GemIndex + ", and it's " + gemColorAsString(target.GemColor));
+//                    Gdx.app.log("reader", "up: " + target.GemIndex + ", and it's " + gemColorAsString(target.GemColor));
                 }
                 if(target.GemColor == gem.GemColor && target.GemIndex != gem.GemIndex) {
-                        Gdx.app.log("reader", "I call that an up match!");
+//                        Gdx.app.log("reader", "I call that an up match!");
                         verticalMatchLength++;
                         upMatches.add(target);
                 } else if(target.GemIndex != gem.GemIndex) {
-                    Gdx.app.log("reader", "No match up.");
+//                    Gdx.app.log("reader", "No match up.");
                     break;
                 }
             } catch(Exception e) { /* uwu */ }
@@ -304,18 +382,18 @@ public class MatchScreen extends ScreenAdapter {
                 final Gem target = gems.get(gem.GemIndex - (b * columns));
 
                 if(target.GemIndex != gem.GemIndex) {
-                    Gdx.app.log("reader", "down: " + target.GemIndex + ", and it's " + gemColorAsString(target.GemColor));
+//                    Gdx.app.log("reader", "down: " + target.GemIndex + ", and it's " + gemColorAsString(target.GemColor));
                 }
                 if(target.GemColor == gem.GemColor && target.GemIndex != gem.GemIndex) {
-                    Gdx.app.log("reader", "I call that a down match!");
+//                    Gdx.app.log("reader", "I call that a down match!");
                     verticalMatchLength++;
                     downMatches.add(target);
                 } else if(target.GemIndex != gem.GemIndex) {
-                    Gdx.app.log("reader", "No match down.");
+//                    Gdx.app.log("reader", "No match down.");
                     break;
                 }
             } catch(Exception e) {
-                Gdx.app.log("reader", "broke down :(");
+//                Gdx.app.log("reader", "broke down :(");
             }
         }
     }
@@ -325,7 +403,7 @@ public class MatchScreen extends ScreenAdapter {
         final int distanceToRightBound = columns - distanceToLeftBound - 1;
         rightMatches = new ArrayList<>();
 
-        Gdx.app.log("lookRight", "There are " + distanceToRightBound + " gems to my right.");
+//        Gdx.app.log("lookRight", "There are " + distanceToRightBound + " gems to my right.");
 
         for(int r = 0; r <= distanceToRightBound; r ++) {
 
@@ -333,14 +411,14 @@ public class MatchScreen extends ScreenAdapter {
                 final Gem target = gems.get(gem.GemIndex + r);
 
                 if(target.GemIndex != gem.GemIndex) {
-                    Gdx.app.log("reader", "right: " + target.GemIndex + ", and it's " + gemColorAsString(target.GemColor));
+//                    Gdx.app.log("reader", "right: " + target.GemIndex + ", and it's " + gemColorAsString(target.GemColor));
                 }
                 if (target.GemColor == gem.GemColor && target.GemIndex != gem.GemIndex) {
-                        Gdx.app.log("reader", "I call that a right-match!");
+//                        Gdx.app.log("reader", "I call that a right-match!");
                         horizontalMatchLength++;
                         rightMatches.add(target);
                 } else if(target.GemIndex != gem.GemIndex) {
-                    Gdx.app.log("reader", "No match to the right.");
+//                    Gdx.app.log("reader", "No match to the right.");
                     break;
                 }
             } catch (Exception e) { /* uwu */ }
@@ -359,18 +437,18 @@ public class MatchScreen extends ScreenAdapter {
                 final Gem target = gems.get(gem.GemIndex - l);
 
                 if(target.GemIndex != gem.GemIndex) {
-                    Gdx.app.log("reader", "left: " + target.GemIndex + ", and it's " + gemColorAsString(target.GemColor));
+//                    Gdx.app.log("reader", "left: " + target.GemIndex + ", and it's " + gemColorAsString(target.GemColor));
                 }
                 if (target.GemColor == gem.GemColor && target.GemIndex != gem.GemIndex) {
-                    Gdx.app.log("reader", "I call that a left match!");
+//                    Gdx.app.log("reader", "I call that a left match!");
                     horizontalMatchLength++;
                     leftMatches.add(target);
                 } else if(target.GemIndex != gem.GemIndex) {
-                    Gdx.app.log("reader", "No match to the left.");
+//                    Gdx.app.log("reader", "No match to the left.");
                     break;
                 }
             } catch(Exception e) {
-                Gdx.app.log("break", "loop broken on revolution: " + l );
+//                Gdx.app.log("break", "loop broken on revolution: " + l );
             }
         }
     }

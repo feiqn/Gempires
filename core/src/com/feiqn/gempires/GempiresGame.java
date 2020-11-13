@@ -13,6 +13,8 @@ import com.feiqn.gempires.logic.castle.CastleScreen;
 public class GempiresGame extends Game {
 	public SpriteBatch batch;
 
+	// Entrance to the program.
+
 	@Override
 	public void create () {
 		batch = new SpriteBatch();

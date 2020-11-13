@@ -16,14 +16,17 @@ import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.feiqn.gempires.GempiresGame;
+import com.feiqn.gempires.models.CampaignLevelID;
 import com.feiqn.gempires.models.stats.CastleStats;
 import com.feiqn.gempires.models.stats.HeroRoster;
 import com.feiqn.gempires.models.stats.PlayerInventory;
+import com.feiqn.gempires.logic.ui.T3AButton;
 
 public class CastleScreen extends ScreenAdapter {
 
@@ -40,7 +43,8 @@ public class CastleScreen extends ScreenAdapter {
 
     private Stage stage;
 
-    private Group rootGroup;
+    private Group rootGroup,
+                  uiGroup;
 
     public Label.LabelStyle structureLabelStyle;
 
@@ -56,7 +60,8 @@ public class CastleScreen extends ScreenAdapter {
 
     public Texture barracksTexture;
 
-    public TextureRegion foodIcon,
+    public TextureRegion T3AIcon,
+                         foodIcon,
                          oreIcon,
                          arcanaIcon,
 
@@ -81,8 +86,14 @@ public class CastleScreen extends ScreenAdapter {
                          backButtonTexture;
 
     public Barracks barracks;
-
     public GoddessStatue goddessStatue;
+    public Farm farm;
+    public Mine mine;
+    public Library library;
+    public Silo silo;
+    public Warehouse warehouse;
+
+    public T3AButton t3ATestButton;
 
     public BitmapFont structureFont;
 
@@ -110,19 +121,29 @@ public class CastleScreen extends ScreenAdapter {
 
         final Texture buildingSpriteSheet = new Texture(Gdx.files.internal("structures/buildingSpriteSheet.png"));
         farmTexture = new TextureRegion(buildingSpriteSheet, 0, 128, 32, 32);
+        mineTexture = new TextureRegion(buildingSpriteSheet, 160, 96, 32, 32);
 
         final Texture itemSpriteSheet = new Texture(Gdx.files.internal("ui/RPG_Item_Pack.png"));
-        campaignSelectorVoid =      new TextureRegion(itemSpriteSheet,128,0,  32,32);
-        campaignSelectorIce =       new TextureRegion(itemSpriteSheet,128,32, 32,32);
-        campaignSelectorElectric =  new TextureRegion(itemSpriteSheet,128,64, 32,32);
-        campaignSelectorFire =      new TextureRegion(itemSpriteSheet,128,96, 32,32);
-        campaignSelectorNature =    new TextureRegion(itemSpriteSheet,128,128,32,32);
-        campaignSelectorEarth =     new TextureRegion(itemSpriteSheet,128,160,32,32);
+        campaignSelectorVoid      = new TextureRegion(itemSpriteSheet,64, 0,  16,16);
+        campaignSelectorIce       = new TextureRegion(itemSpriteSheet,64, 16, 16,16);
+        campaignSelectorElectric  = new TextureRegion(itemSpriteSheet,64, 32, 16,16);
+        campaignSelectorFire      = new TextureRegion(itemSpriteSheet,64, 48, 16,16);
+        campaignSelectorNature    = new TextureRegion(itemSpriteSheet,64, 64, 16,16);
+        campaignSelectorEarth     = new TextureRegion(itemSpriteSheet,64, 70, 16,16);
+        T3AIcon                   = new TextureRegion(itemSpriteSheet,128,368,16,16);
+
     }
 
+    // TODO: initialiseUI() , set a ui group to be added to stage
+
     public void initialiseStructures() {
+
+        t3ATestButton = new T3AButton(T3AIcon);
+        // t3ATestButton.setPosition(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        uiGroup.addActor((t3ATestButton));
+
         barracks = new Barracks(barracksTexture, self);
-        barracks.setSize(2, 2);
+        barracks.setSize(1.5f, 1.5f);
         barracks.setPosition(59.5f,64.5f);
         rootGroup.addActor(barracks);
 
@@ -130,12 +151,28 @@ public class CastleScreen extends ScreenAdapter {
         goddessStatue.setSize(1, 2);
         goddessStatue.setPosition(55.5f, 64.5f);
         rootGroup.addActor(goddessStatue);
+
+        mine = new Mine(mineTexture, self);
+        mine.setSize(1.5f,1.5f);
+        mine.setPosition(51.5f, 64f);
+        rootGroup.addActor(mine);
+
+        farm = new Farm(farmTexture, self);
+        farm.setSize(1.5f,1.5f);
+        farm.setPosition(52.5f, 63.5f);
+        rootGroup.addActor(farm);
+
+        CampaignSelector debugSelector = new CampaignSelector(campaignSelectorFire, CampaignLevelID.FIRE_1);
+        debugSelector.setSize(1.5f,1.5f);
+        debugSelector.setPosition(60, 60);
+        rootGroup.addActor(debugSelector);
     }
 
     @Override
     public void show() {
         camera = new OrthographicCamera();
         rootGroup = new Group();
+        uiGroup = new Group();
 
         castleMap = new TmxMapLoader().load("castleMap.tmx");
         isoMapRenderer = new IsometricTiledMapRenderer(castleMap, 1/32f);
@@ -160,9 +197,12 @@ public class CastleScreen extends ScreenAdapter {
         final int mapHeight = mapProperties.get("height", Integer.class);
 
         rootGroup.setSize(mapWidth, mapHeight);
+        // uiGroup.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         rootGroup.setPosition(0,0,0);
+        uiGroup.setPosition(0,0);
 
+        stage.addActor(uiGroup);
         stage.addActor(rootGroup);
 
         // TODO: move all this stuff to helper methods
