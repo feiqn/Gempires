@@ -56,6 +56,7 @@ public class Gem extends Image {
 
     public void setToBlank() {
         this.GemColor = 7;
+        setColor(.1f, .1f, .1f, 0f);
         // this.GemIndex = -1;
         // this.positionInColumn = -1;
         // this.positionInRow = -1;
