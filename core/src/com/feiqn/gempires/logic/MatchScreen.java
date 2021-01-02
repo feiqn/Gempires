@@ -37,6 +37,7 @@ public class MatchScreen extends ScreenAdapter {
     public MapProperties mapProperties;
 
     public final float gemSwapTime = 0.2f;
+    float timeToCompleteSwaps = 0f;
 
     GempiresGame game;
     private Stage stage;
@@ -104,7 +105,7 @@ public class MatchScreen extends ScreenAdapter {
         for(int i = 0; i < countRows; i++) { // height
             for (int x = 0; x < countColumns; x++) { // width
 
-                Vector2 nextPosition;
+                final Vector2 nextPosition;
 
                 if(x != 0) {
                     nextPosition = new Vector2(previousPosition.x + 1, previousPosition.y);
@@ -112,7 +113,7 @@ public class MatchScreen extends ScreenAdapter {
                     nextPosition = previousPosition;
                 }
 
-                slots.add(nextPosition);
+                slots.add(new Vector2(nextPosition.x, nextPosition.y));
 
                 final Random random = new Random();
                 final int gemColor = random.nextInt(7);
@@ -141,15 +142,15 @@ public class MatchScreen extends ScreenAdapter {
 
     public void swapGems(Gem origin, Gem destination) {
 
-        final Vector2 originSlot = new Vector2(origin.getX(), origin.getY());
+        final Vector2 originSlot = slots.get(origin.GemIndex);
+        final Vector2 destinationSlot;
 
-        final Vector2 destinationSlot = new Vector2(destination.getX(), destination.getY());
-
-//        if(destination.GemIndex > (rows * columns)) {
-//
-//        } else {
-//
-//        }
+        if(destination.GemIndex > (rows * columns)) {
+            // out of slots<> bounds
+            destinationSlot = new Vector2(destination.getX(), destination.getY());
+        } else {
+            destinationSlot = slots.get(destination.GemIndex);
+        }
 
         gems.swap(gems.indexOf(origin, true), gems.indexOf(destination, true));
 
@@ -257,9 +258,20 @@ public class MatchScreen extends ScreenAdapter {
 
         checkIfGemsShouldBeDropped();
 
+        int swapTimer = (int) Math.ceil(timeToCompleteSwaps);
+
+        Timer.schedule(new Timer.Task(){
+            @Override
+            public void run() {
+                Gdx.app.log("timer", "fired");
+                checkWholeBoardForMatches();
+                timeToCompleteSwaps = 0f;
+            }
+        }, swapTimer);
     }
 
     public void checkIfGemsShouldBeDropped() {
+
         for(final Gem gem : gems) {
             if(gem.GemColor == 7) {
 
@@ -280,15 +292,14 @@ public class MatchScreen extends ScreenAdapter {
                         newGem.positionInColumn = gem.positionInColumn;
                         newGem.positionInRow = gem.positionInRow;
 
-                        newGem.setXY(gem.getX(), gem.getY() - 1f);
+                        newGem.setXY(gem.getX(), gem.getY() - 2f);
 
                         gems.add(newGem);
                         stage.addActor(newGem);
 
-                        // slots.add(new Vector2(newGem.getX(), newGem.getY()));
-
                         // swap() the blank gem with the new gem below it,
                         swapGems(gem, newGem);
+                        timeToCompleteSwaps += gemSwapTime;
 
                         // and safely remove() the blank gem to end the loop!
 
@@ -301,22 +312,35 @@ public class MatchScreen extends ScreenAdapter {
                     } else {
                         // just swap the blank gem with the gem below it and repeat loop
                         swapGems(gem, gems.get(gem.GemIndex - columns));
+                        timeToCompleteSwaps += gemSwapTime;
 
                          Timer.schedule(new Timer.Task(){
                             @Override
                             public void run() {
                                 checkIfGemsShouldBeDropped();
                             }
-                        }, gemSwapTime);
+                        }, 0.06f);
 
                         break;
                     }
                 }
             }
         }
+
+//        timeToCompleteSwaps *= gemSwapTime;
+//
+//        // checkWholeBoardForMatches();
+//        Timer.schedule(new Timer.Task(){
+//            @Override
+//            public void run() {
+//                Gdx.app.log("timer", "fired");
+//                checkWholeBoardForMatches();
+//            }
+//        }, 5);
+
     }
 
-    public String gemColorAsString(int color) {
+    public String gemColorAsString(int color) { // primarily for human-readable debugging
         String colorAsString = "";
         switch(color) {
             case 0:
@@ -497,6 +521,7 @@ public class MatchScreen extends ScreenAdapter {
 
         if(matchFound) {
             destroy(sendToDestroy);
+           // checkWholeBoardForMatches();
         }
 
         return matchFound;
@@ -580,7 +605,12 @@ public class MatchScreen extends ScreenAdapter {
 
         camera.update();
 
-        checkWholeBoardForMatches();
+        Timer.schedule(new Timer.Task(){
+            @Override
+            public void run() {
+                checkWholeBoardForMatches();
+            }
+        }, 1);
     }
 
     @Override
