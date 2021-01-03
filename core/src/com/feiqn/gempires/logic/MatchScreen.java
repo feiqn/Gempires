@@ -18,6 +18,7 @@ import com.badlogic.gdx.utils.DelayedRemovalArray;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.feiqn.gempires.GempiresGame;
+import com.feiqn.gempires.logic.items.Tornado;
 import com.feiqn.gempires.models.CampaignLevelID;
 import org.jetbrains.annotations.NotNull;
 
@@ -96,7 +97,7 @@ public class MatchScreen extends ScreenAdapter {
         if(classicMode) {
             firstPosition = new Vector2(.5f, .5f);
         } else {
-            firstPosition = new Vector2(.5f, 3.1f);
+            firstPosition = new Vector2(.5f, 3.05f);
             initAdventureMode();
         }
 
@@ -258,7 +259,7 @@ public class MatchScreen extends ScreenAdapter {
 
         checkIfGemsShouldBeDropped();
 
-        int swapTimer = (int) Math.ceil(timeToCompleteSwaps);
+        int swapTimer = (int) Math.ceil(timeToCompleteSwaps); // TODO: not perfect
 
         Timer.schedule(new Timer.Task(){
             @Override
@@ -517,11 +518,11 @@ public class MatchScreen extends ScreenAdapter {
         matchFound = false;
         sendToDestroy = new ArrayList<>();
 
+        // TODO: check for No Possible Matches
         for(Gem gem : gems) { look(gem); }
 
         if(matchFound) {
             destroy(sendToDestroy);
-           // checkWholeBoardForMatches();
         }
 
         return matchFound;
@@ -600,6 +601,11 @@ public class MatchScreen extends ScreenAdapter {
         stage = new Stage(fitViewport);
 
         createAndFillSlots(rows, columns);
+
+        final Tornado debugShuffler = new Tornado(gemTextures[1], this); // debug
+        debugShuffler.setY(12);
+        debugShuffler.setX(1);
+        stage.addActor(debugShuffler);
 
         Gdx.input.setInputProcessor(stage);
 

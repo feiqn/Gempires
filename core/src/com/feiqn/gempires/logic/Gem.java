@@ -1,6 +1,5 @@
 package com.feiqn.gempires.logic;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -19,7 +18,7 @@ public class Gem extends Image {
                positionInRow,
                positionInColumn;
 
-    final public MatchScreen matchScreen;
+    final private MatchScreen matchScreen;
 
     public Gem(final TextureRegion region, final int gemColor, int gemIndex, final MatchScreen parentMatchScreen) {
         // GREEN  0
@@ -57,10 +56,6 @@ public class Gem extends Image {
     public void setToBlank() {
         this.GemColor = 7;
         setColor(.1f, .1f, .1f, 0f);
-        // this.GemIndex = -1;
-        // this.positionInColumn = -1;
-        // this.positionInRow = -1;
-        // this.removeListener(  );
     }
 
     public void setXY(float pX, float pY) {
