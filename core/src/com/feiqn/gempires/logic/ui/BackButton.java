@@ -3,7 +3,7 @@ package com.feiqn.gempires.logic.ui;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.feiqn.gempires.logic.heroes.HeroCard;
+import com.feiqn.gempires.logic.characters.heroes.HeroCard;
 
 public class BackButton extends Image {
 

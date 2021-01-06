@@ -1,8 +1,8 @@
 package com.feiqn.gempires.models;
 
 public enum CampaignLevelID {
-    ICE_1,
-    ICE_2,
+    WATER_1,
+    WATER_2,
 
     FIRE_1,
     FIRE_2,

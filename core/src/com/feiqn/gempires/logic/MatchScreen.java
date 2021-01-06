@@ -13,18 +13,18 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.actions.MoveToAction;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.DelayedRemovalArray;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.feiqn.gempires.GempiresGame;
+import com.feiqn.gempires.logic.characters.enemies.Bestiary;
 import com.feiqn.gempires.logic.items.Tornado;
 import com.feiqn.gempires.models.CampaignLevelID;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Random;
 
 public class MatchScreen extends ScreenAdapter {
@@ -70,6 +70,10 @@ public class MatchScreen extends ScreenAdapter {
     // TODO: Current implementation of Gems<> is poor. Switch to POOLING will be mandatory soon.
     public DelayedRemovalArray<Gem> gems;
 
+    public DelayedRemovalArray<DelayedRemovalArray> enemies;
+
+    public HashMap<String, Boolean> EnemyIsInitialized;
+
     public ArrayList<Vector2> slots;
 
     public MatchScreen(GempiresGame game, Boolean classic, CampaignLevelID levelID){
@@ -85,6 +89,35 @@ public class MatchScreen extends ScreenAdapter {
     }
 
     private void initAdventureMode() {
+        enemies = new DelayedRemovalArray<>();
+        EnemyIsInitialized = new HashMap<String, Boolean>(Bestiary.values().length);
+
+        // TODO: for each beast in bestiary, create isXInitialized bool in isEnemyInit'ed
+        for(int i = 0; i < Bestiary.values().length; i++) {
+            final String newBoolName = "" + Bestiary.values()[i];
+
+            EnemyIsInitialized.put(newBoolName, false);
+        }
+    }
+
+    private void initEnemies(ArrayList<Bestiary> beasts) {
+        // Called by LoadMap()
+
+//        for(Bestiary beast : beasts) {
+//            switch(beast) {
+//                case WATER_WIZARD:
+//                    if(!EnemyIsInitialized.get("WATER_WIZARD")) {
+//
+//                        final Texture wizardSpriteSheet = new Texture(Gdx.files.internal("characters/enemies/wizard_spritesheet.png"));
+//                        // TODO:
+//
+//                    }
+//                    break;
+//
+//                case ICE_FIEND:
+//                    break;
+//            }
+//        }
 
     }
 
@@ -529,14 +562,18 @@ public class MatchScreen extends ScreenAdapter {
     }
 
     private void loadMap() {
-        // Sizes default to 6 & 8 in adventure mode; but this can be changed for any given stage
+        // Sizes default to 6 & 8 for adventure mode; but this can be changed for any given stage
         rows = 6;
         columns = 8;
 
+        ArrayList<Bestiary> neededEnemies = new ArrayList<>();
+
         switch (campaignLevelID) {
-            case ICE_1:
-            case ICE_2:
+            case WATER_1:
+            case WATER_2:
                 matchMap = new TmxMapLoader().load("maps/ice_debug.tmx");
+                neededEnemies.add(Bestiary.WATER_WIZARD);
+                initEnemies(neededEnemies);
                 break;
             case FIRE_1:
             case FIRE_2:
@@ -546,10 +583,10 @@ public class MatchScreen extends ScreenAdapter {
             case STONE_2:
             case NATURE_1:
             case NATURE_2:
-            case CLASSIC_1:
-            case CLASSIC_2:
             case ELECTRIC_1:
             case ELECTRIC_2:
+            case CLASSIC_1:
+            case CLASSIC_2:
 
             case DEFAULT:
                 matchMap = new TmxMapLoader().load("testMap.tmx");
@@ -560,8 +597,8 @@ public class MatchScreen extends ScreenAdapter {
 
     }
 
-    private void initTextures() {
-        Texture gemSpriteSheet = new Texture(Gdx.files.internal("gem_set.png"));
+    private void initGemTextures() {
+        final Texture gemSpriteSheet = new Texture(Gdx.files.internal("gem_set.png"));
         gemTextures = new TextureRegion[]{
                 new TextureRegion(gemSpriteSheet, 160, 0, 32, 32),  // GREEN 0
                 new TextureRegion(gemSpriteSheet, 128, 64, 32, 32), // PURPLE 1
@@ -584,9 +621,9 @@ public class MatchScreen extends ScreenAdapter {
         sendToDestroy = new ArrayList<Gem>();
 
         classicMode=false; // debug
-        campaignLevelID = CampaignLevelID.ICE_1; // debug
+        campaignLevelID = CampaignLevelID.WATER_1; // debug
 
-        initTextures();
+        initGemTextures();
 
         loadMap();
 

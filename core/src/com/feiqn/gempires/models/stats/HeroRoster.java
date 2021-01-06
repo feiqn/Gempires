@@ -3,7 +3,7 @@ package com.feiqn.gempires.models.stats;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.utils.Array;
-import com.feiqn.gempires.logic.heroes.HeroCard;
+import com.feiqn.gempires.logic.characters.heroes.HeroCard;
 
 
 public class HeroRoster {

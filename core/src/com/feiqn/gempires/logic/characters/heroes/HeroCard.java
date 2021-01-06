@@ -1,4 +1,4 @@
-package com.feiqn.gempires.logic.heroes;
+package com.feiqn.gempires.logic.characters.heroes;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -12,7 +12,7 @@ import com.feiqn.gempires.logic.castle.CastleScreen;
 public class HeroCard extends Image {
 
     public class HeroCardThumbnail extends Image {
-        private HeroCard parentCard;
+        private final HeroCard parentCard;
 
         public Rectangle bounds;
 
@@ -42,13 +42,15 @@ public class HeroCard extends Image {
         }
     }
 
+    // TODO: public class HeroBattleCard
+
     public enum Element {
         NATURE,      // GREEN, 0
         VOID,        // PURPLE, 1
         FIRE,        // RED, 2
         STONE,       // ORANGE, 3
         ELECTRIC,    // YELLOW, 4
-        ICE,         // BLUE, 5
+        WATER,       // BLUE, 5
         PURE         // CLEAR, 6
     }
 
@@ -76,6 +78,7 @@ public class HeroCard extends Image {
 
     public HeroCard(TextureRegion region, MatchScreen parentScreen) {
         super(region);
+        // battle\ mode enters here
 
         // this.parentScreen = parentScreen;
     }
@@ -91,7 +94,7 @@ public class HeroCard extends Image {
 
     private void sharedInit() {
         setSize(3,4);
-        setPosition(Gdx.graphics.getWidth() * .5f, Gdx.graphics.getWidth() * .5f); // TODO
+        setPosition(Gdx.graphics.getWidth() * .5f, Gdx.graphics.getWidth() * .5f); // TODO: put somewhere
 
         bounds = new Rectangle((int) getX(), (int) getY(), (int) getWidth(), (int) getHeight());
 
@@ -111,7 +114,7 @@ public class HeroCard extends Image {
             case NATURE:
                 thumbnail = new HeroCardThumbnail(parentScreen.natureCardThumbnail, self);
                 break;
-            case ICE:
+            case WATER:
                 break;
             case FIRE:
                 break;
@@ -129,7 +132,7 @@ public class HeroCard extends Image {
     public void heroAbility() {}
 
     // SETTERS
-    // TODO: add method for setting stats to previous values store in HeroRoster, and arbitrarily for instances
+    // TODO: add method for setting stats to previous values stored in HeroRoster, and arbitrarily for instances
     public void initializeStats(float strength, float defense, float maxHealth) {
         this.strength = strength;
         this.defense = defense;
@@ -139,9 +142,9 @@ public class HeroCard extends Image {
         if(bravery < 5) {
             bravery++;
             level = 1;
-            strength *= 1.75f;
-            defense *= 1.75f;
-            maxHealth *= 1.75f;
+            strength *= 1.25f;
+            defense *= 1.25f;
+            maxHealth *= 1.25f;
         }
     }
     public void levelUp() {

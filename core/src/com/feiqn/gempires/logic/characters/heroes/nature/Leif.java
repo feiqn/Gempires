@@ -1,8 +1,8 @@
-package com.feiqn.gempires.logic.heroes.nature;
+package com.feiqn.gempires.logic.characters.heroes.nature;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.feiqn.gempires.logic.castle.CastleScreen;
-import com.feiqn.gempires.logic.heroes.HeroCard;
+import com.feiqn.gempires.logic.characters.heroes.HeroCard;
 
 public class Leif extends HeroCard {
 
@@ -11,7 +11,7 @@ public class Leif extends HeroCard {
 
         heroName = "Leif";
         heroTitle = "Flighty Planeswalker";
-        heroDescription = "A youth from the Western lands of Rivaile. A natural leader who is skilled with animals.";
+        heroDescription = "A youth from the West. A natural leader who is skilled with animals.";
         heroAbilityTitle = "";
         heroAbilityDescription = "";
 
