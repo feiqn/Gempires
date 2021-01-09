@@ -3,6 +3,9 @@ package com.feiqn.gempires.models;
 public enum CampaignLevelID {
     WATER_1,
     WATER_2,
+    WATER_3,
+    WATER_4,
+    WATER_5,
 
     FIRE_1,
     FIRE_2,
@@ -23,5 +26,5 @@ public enum CampaignLevelID {
     CLASSIC_2,
     // etc...
 
-    DEFAULT
+    DEBUG
 }

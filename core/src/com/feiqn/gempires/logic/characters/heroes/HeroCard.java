@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.feiqn.gempires.models.Element;
 import com.feiqn.gempires.logic.MatchScreen;
 import com.feiqn.gempires.logic.castle.CastleScreen;
 
@@ -43,16 +44,6 @@ public class HeroCard extends Image {
     }
 
     // TODO: public class HeroBattleCard
-
-    public enum Element {
-        NATURE,      // GREEN, 0
-        VOID,        // PURPLE, 1
-        FIRE,        // RED, 2
-        STONE,       // ORANGE, 3
-        ELECTRIC,    // YELLOW, 4
-        WATER,       // BLUE, 5
-        PURE         // CLEAR, 6
-    }
 
     private final HeroCard self = this;
 

@@ -45,6 +45,8 @@ public class Tornado extends Image {
             unusedSlots.add(i);
         }
 
+        // TODO: fix
+
         for(int x = 0; x < unusedSlots.size; x+=2) {
             final Random random = new Random();
             final int gemToMove = random.nextInt(unusedSlots.size);

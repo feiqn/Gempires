@@ -1,6 +1,7 @@
 package com.feiqn.gempires.logic.characters.heroes.nature;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.feiqn.gempires.models.Element;
 import com.feiqn.gempires.logic.castle.CastleScreen;
 import com.feiqn.gempires.logic.characters.heroes.HeroCard;
 

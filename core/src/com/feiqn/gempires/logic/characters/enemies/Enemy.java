@@ -3,24 +3,31 @@ package com.feiqn.gempires.logic.characters.enemies;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.feiqn.gempires.logic.characters.heroes.HeroCard;
+import com.feiqn.gempires.models.Element;
 
 public class Enemy extends Image {
     // TODO: this class shares a fair bit of code with HeroCard class. Eventually the shared code should be combined into a mutual superclass.
 
     public Rectangle bounds;
 
+    // Every enemy subclass must define base stats in its constructor method
     private float strength,
                   defense,
                   maxHealth,
                   currentHealth;
 
-    public HeroCard.Element element;
+    public Element element;
+    public Bestiary beastType;
 
-    public Enemy(TextureRegion region) {
+    public Enemy(TextureRegion region, float baseStr, float baseDef, float baseHP) {
         super(region);
 
         bounds = new Rectangle((int) getX(), (int) getY(), (int) getWidth(), (int) getHeight());
+
+        this.strength = baseStr;
+        this.defense = baseDef;
+        this.maxHealth = baseHP;
+        this.currentHealth = maxHealth;
     }
 
     public void scaleToLevel(int level) {

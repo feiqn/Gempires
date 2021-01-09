@@ -13,14 +13,16 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.DelayedRemovalArray;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.feiqn.gempires.GempiresGame;
 import com.feiqn.gempires.logic.characters.enemies.Bestiary;
+import com.feiqn.gempires.logic.characters.enemies.Enemy;
+import com.feiqn.gempires.logic.characters.enemies.water.WaterWizard;
 import com.feiqn.gempires.logic.items.Tornado;
 import com.feiqn.gempires.models.CampaignLevelID;
+import com.feiqn.gempires.models.Formation;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -54,6 +56,9 @@ public class MatchScreen extends ScreenAdapter {
                horizontalMatchLength,
                verticalMatchLength;
 
+    private int wavesCleared,
+                enemiesOnScreen;
+
     private TextureRegion[] gemTextures;
 
     public CampaignLevelID campaignLevelID;
@@ -70,11 +75,16 @@ public class MatchScreen extends ScreenAdapter {
     // TODO: Current implementation of Gems<> is poor. Switch to POOLING will be mandatory soon.
     public DelayedRemovalArray<Gem> gems;
 
-    public DelayedRemovalArray<DelayedRemovalArray> enemies;
+    private DelayedRemovalArray<Enemy> enemies;
 
-    public HashMap<String, Boolean> EnemyIsInitialized;
+    private HashMap<Bestiary, Boolean> enemyIsInitialized;
+    private HashMap<Integer, Formation> waveFormations;
+
+    private ArrayList<Integer> waves;
 
     public ArrayList<Vector2> slots;
+
+    private TextureRegion waterWizardTextureRegion;
 
     public MatchScreen(GempiresGame game, Boolean classic, CampaignLevelID levelID){
         this.game = game;
@@ -85,43 +95,52 @@ public class MatchScreen extends ScreenAdapter {
         // new MatchScreen(game, true, CampaignLevelID.DEFAULT);
         this.game = game;
         this.classicMode = true;
-        this.campaignLevelID = CampaignLevelID.DEFAULT;
+        this.campaignLevelID = CampaignLevelID.DEBUG;
     }
 
-    private void initAdventureMode() {
+    private void initAdventureMode(ArrayList<Bestiary> passToInitEnemies) {
+        // Called by loadMap()
+
+        enemiesOnScreen = 0;
+        wavesCleared = 0;
+        waves = new ArrayList<>();
+        waveFormations = new HashMap<>();
         enemies = new DelayedRemovalArray<>();
-        EnemyIsInitialized = new HashMap<String, Boolean>(Bestiary.values().length);
+        enemyIsInitialized = new HashMap<Bestiary, Boolean>(Bestiary.values().length);
 
-        // TODO: for each beast in bestiary, create isXInitialized bool in isEnemyInit'ed
         for(int i = 0; i < Bestiary.values().length; i++) {
-            final String newBoolName = "" + Bestiary.values()[i];
-
-            EnemyIsInitialized.put(newBoolName, false);
+            enemyIsInitialized.put(Bestiary.values()[i], false);
         }
+
+        initEnemies(passToInitEnemies);
     }
 
     private void initEnemies(ArrayList<Bestiary> beasts) {
-        // Called by LoadMap()
+        // Called by initAdventureMode()
 
-//        for(Bestiary beast : beasts) {
-//            switch(beast) {
-//                case WATER_WIZARD:
-//                    if(!EnemyIsInitialized.get("WATER_WIZARD")) {
-//
-//                        final Texture wizardSpriteSheet = new Texture(Gdx.files.internal("characters/enemies/wizard_spritesheet.png"));
-//                        // TODO:
-//
-//                    }
-//                    break;
-//
-//                case ICE_FIEND:
-//                    break;
-//            }
-//        }
+        for(Bestiary beast : beasts) {
+            switch(beast) {
+                case WATER_WIZARD:
+                    if(!enemyIsInitialized.get(Bestiary.WATER_WIZARD)) {
+                        final Texture wizardSpriteSheet = new Texture(Gdx.files.internal("characters/enemies/wizard_spritesheet.png"));
+                        waterWizardTextureRegion = new TextureRegion(wizardSpriteSheet, 64, 288, 64, 64);
+
+                        enemyIsInitialized.put(Bestiary.WATER_WIZARD, true);
+                    }
+
+                    final WaterWizard waterWizard = new WaterWizard(waterWizardTextureRegion);
+                    enemies.add(waterWizard);
+                    break;
+
+                case ICE_FIEND:
+                    break;
+            }
+        }
 
     }
 
     private void createAndFillSlots(final int countRows, final int countColumns) {
+        // Called by show()
 
         int revolution = 0;
 
@@ -131,7 +150,6 @@ public class MatchScreen extends ScreenAdapter {
             firstPosition = new Vector2(.5f, .5f);
         } else {
             firstPosition = new Vector2(.5f, 3.05f);
-            initAdventureMode();
         }
 
         Vector2 previousPosition = firstPosition;
@@ -562,6 +580,8 @@ public class MatchScreen extends ScreenAdapter {
     }
 
     private void loadMap() {
+        // Called by show()
+
         // Sizes default to 6 & 8 for adventure mode; but this can be changed for any given stage
         rows = 6;
         columns = 8;
@@ -572,9 +592,24 @@ public class MatchScreen extends ScreenAdapter {
             case WATER_1:
             case WATER_2:
                 matchMap = new TmxMapLoader().load("maps/ice_debug.tmx");
+
                 neededEnemies.add(Bestiary.WATER_WIZARD);
-                initEnemies(neededEnemies);
+                initAdventureMode(neededEnemies);
+
+                waves.add(1); // waves contains the NUMBER OF ENEMIES at each wave, with each index being 1 wave
+                waveFormations.put(0, Formation.ONE_CENTER); // waveFormations contains the layout / arrangement of enemies at each wave, with each key relating to wave number, indexed from zero
+
+                /*
+                 * The math for adding waves of enemies here must always add up.
+                 * For example, if 10 enemies are added, and 3 waves, the total
+                 * number of enemies deployed over 3 waves must equal 10. For example:
+                 * 3 + 3 + 4, 2 + 5 + 3, etc.
+                */
                 break;
+
+            case WATER_3:
+            case WATER_4:
+            case WATER_5:
             case FIRE_1:
             case FIRE_2:
             case VOID_1:
@@ -588,11 +623,71 @@ public class MatchScreen extends ScreenAdapter {
             case CLASSIC_1:
             case CLASSIC_2:
 
-            case DEFAULT:
+            case DEBUG:
                 matchMap = new TmxMapLoader().load("testMap.tmx");
                 rows = 5;
                 columns = 7;
                 break;
+        }
+
+    }
+
+    private void destroyEnemy(Enemy enemy) {
+        // TODO: destroy enemy
+
+        enemies.removeValue(enemy, true);
+
+        enemiesOnScreen--;
+        if(enemiesOnScreen <= 0) {
+            wavesCleared++;
+            deployEnemyWave();
+        }
+    }
+
+    private void deployEnemyWave() {
+        // Called by show()
+        // Called by destroyEnemy() when a wave is cleared
+
+
+        if(waves.size() > 0) {
+
+            final int enemiesLeftToDeploy = waves.get(0);
+            final ArrayList<Enemy> thisWave = new ArrayList<>();
+            final Formation thisFormation = waveFormations.get(wavesCleared);
+
+            enemiesOnScreen = enemiesLeftToDeploy;
+
+            for(int i = 0; i < waves.get(0); i++) {
+                final Enemy enemyToDeploy = enemies.get(i);
+                stage.addActor(enemyToDeploy);
+            }
+
+             switch (thisFormation) {
+                 case ONE_CENTER:
+                     enemies.get(0).setSize(6,6);
+                     enemies.get(0).setXY(1.5f, 9.5f);
+                     break;
+                 case TWO_IN_BACK:
+                 case TWO_IN_FRONT:
+                 case TWO_STAGGERED_LEFT:
+                 case TWO_STAGGERED_RIGHT:
+                 case THREE_ASCENDING:
+                 case THREE_DESCENDING:
+                 case THREE_IN_FRONT:
+                 case FOUR_IN_FRONT:
+                 case FOUR_REVERSE_N_SHAPE:
+                 case FOUR_WITH_BACK_SIDE_FLANKS:
+                 case FOUR_WITH_FRONT_SIDE_FLANKS:
+                 case FOUR_N_SHAPE:
+                 case FIVE_M_SHAPE:
+                 case FIVE_W_SHAPE:
+                 case FIVE_PROTECTING_CENTER:
+                 case FIVE_DESCENDING:
+                 case FIVE_ASCENDING:
+                     break;
+             }
+
+            waves.remove(0);
         }
 
     }
@@ -620,8 +715,10 @@ public class MatchScreen extends ScreenAdapter {
         gems = new DelayedRemovalArray<Gem>();
         sendToDestroy = new ArrayList<Gem>();
 
+        //
         classicMode=false; // debug
         campaignLevelID = CampaignLevelID.WATER_1; // debug
+        //
 
         initGemTextures();
 
@@ -639,10 +736,17 @@ public class MatchScreen extends ScreenAdapter {
 
         createAndFillSlots(rows, columns);
 
+        if(!classicMode) {
+            deployEnemyWave();
+        }
+
+        //
         final Tornado debugShuffler = new Tornado(gemTextures[1], this); // debug
-        debugShuffler.setY(12);
-        debugShuffler.setX(1);
-        stage.addActor(debugShuffler);
+        debugShuffler.setY(12); //
+        debugShuffler.setX(1); //
+        stage.addActor(debugShuffler); //
+        //
+
 
         Gdx.input.setInputProcessor(stage);
 
