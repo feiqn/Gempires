@@ -32,7 +32,7 @@ public class Gem extends Image {
 
         super(region);
         this.setSize(1, 1);
-        this.GemColor = gemColor;
+        this.GemColor = gemColor; // TODO: refactor to use Element enum
         this.GemIndex = gemIndex; // TODO: getting gemIndex may be redundant with the addition of positionInRow/Column
         this.matchScreen = parentMatchScreen;
         this.bounds = new Rectangle((int) getX(), (int) getY(), (int) getWidth(), (int) getHeight());

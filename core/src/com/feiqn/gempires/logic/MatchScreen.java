@@ -22,6 +22,7 @@ import com.feiqn.gempires.logic.characters.enemies.Enemy;
 import com.feiqn.gempires.logic.characters.enemies.water.WaterWizard;
 import com.feiqn.gempires.logic.items.Tornado;
 import com.feiqn.gempires.models.CampaignLevelID;
+import com.feiqn.gempires.models.Element;
 import com.feiqn.gempires.models.Formation;
 import org.jetbrains.annotations.NotNull;
 
@@ -45,7 +46,8 @@ public class MatchScreen extends ScreenAdapter {
     GempiresGame game;
     private Stage stage;
 
-    public Group gemGroup;
+    public Group gemGroup,
+                 topLayer; // TODO: set top layer for attack tokens to display on
 
     public boolean matchFound,
                    classicMode,
@@ -56,10 +58,18 @@ public class MatchScreen extends ScreenAdapter {
                horizontalMatchLength,
                verticalMatchLength;
 
-    private int wavesCleared,
+    private int naturePower,
+                voidPower,
+                firePower,
+                waterPower,
+                stonePower,
+                electricPower,
+                enemyDifficulty,
+                wavesCleared,
                 enemiesOnScreen;
 
-    private TextureRegion[] gemTextures;
+    private TextureRegion[] gemTextures,
+                            attackTokenTextures;
 
     public CampaignLevelID campaignLevelID;
 
@@ -101,6 +111,14 @@ public class MatchScreen extends ScreenAdapter {
     private void initAdventureMode(ArrayList<Bestiary> passToInitEnemies) {
         // Called by loadMap()
 
+        waterPower = 0;
+        firePower = 0;
+        stonePower = 0;
+        electricPower = 0;
+        voidPower = 0;
+        naturePower = 0;
+
+        enemyDifficulty = 0;
         enemiesOnScreen = 0;
         wavesCleared = 0;
         waves = new ArrayList<>();
@@ -135,6 +153,10 @@ public class MatchScreen extends ScreenAdapter {
                 case ICE_FIEND:
                     break;
             }
+        }
+
+        for(Enemy enemy : enemies) {
+            enemy.scaleToLevel(enemyDifficulty);
         }
 
     }
@@ -300,12 +322,70 @@ public class MatchScreen extends ScreenAdapter {
         }
     }
 
+    private Element translateGemColorToElement(Integer color) {
+        // this class solely exists as a stop-gap until Gem class refactor is complete
+
+        switch (color) {
+            case 0:
+                return Element.NATURE;
+            case 1:
+                return Element.VOID;
+            case 2:
+                return Element.FIRE;
+            case 3:
+                return Element.STONE;
+            case 4:
+                return Element.ELECTRIC;
+            case 5:
+                return Element.WATER;
+            case 6:
+                return Element.PURE;
+            case 7:
+                break;
+        }
+
+        return null;
+    }
+
     public void destroy(ArrayList<Gem> gemsToDestroy) {
 
         for(Gem gem : gemsToDestroy) {
+            final Element gemElement = translateGemColorToElement(gem.GemColor);
+            if(gem.GemColor != 7) {
+                final AttackToken token = new AttackToken(attackTokenTextures[gem.GemColor], gemElement);
 
+//            switch (gem.GemColor) {
+//                // TODO: create attack tokens and send them up at the enemies
+//
+//                case 0:
+//                    break;
+//                case 1:
+//                    break;
+//                case 2:
+//                    break;
+//                case 3:
+//                case 4:
+//                case 5:
+//                case 6:
+//                    break;
+//            }
+
+
+                token.setX(gem.getX());
+                token.setY(gem.getY());
+
+                stage.addActor(token);
+
+                token.addAction(Actions.moveTo(token.getX(), Gdx.graphics.getHeight(), gemSwapTime));
+
+                Timer.schedule(new Timer.Task() {
+                    @Override
+                    public void run() {
+                        token.remove();
+                    }
+                }, gemSwapTime);
+            }
             gem.setToBlank();
-
         }
 
         checkIfGemsShouldBeDropped();
@@ -378,18 +458,6 @@ public class MatchScreen extends ScreenAdapter {
                 }
             }
         }
-
-//        timeToCompleteSwaps *= gemSwapTime;
-//
-//        // checkWholeBoardForMatches();
-//        Timer.schedule(new Timer.Task(){
-//            @Override
-//            public void run() {
-//                Gdx.app.log("timer", "fired");
-//                checkWholeBoardForMatches();
-//            }
-//        }, 5);
-
     }
 
     public String gemColorAsString(int color) { // primarily for human-readable debugging
@@ -592,6 +660,7 @@ public class MatchScreen extends ScreenAdapter {
             case WATER_1:
             case WATER_2:
                 matchMap = new TmxMapLoader().load("maps/ice_debug.tmx");
+                enemyDifficulty = 2;
 
                 neededEnemies.add(Bestiary.WATER_WIZARD);
                 initAdventureMode(neededEnemies);
@@ -692,6 +761,14 @@ public class MatchScreen extends ScreenAdapter {
 
     }
 
+    private void calculateGemPower() {
+        // TODO
+    }
+
+    private void layOutTeamCards() {
+        // TODO
+    }
+
     private void initGemTextures() {
         final Texture gemSpriteSheet = new Texture(Gdx.files.internal("gem_set.png"));
         gemTextures = new TextureRegion[]{
@@ -703,6 +780,18 @@ public class MatchScreen extends ScreenAdapter {
                 new TextureRegion(gemSpriteSheet, 160, 320, 32, 32),// BLUE 5
                 new TextureRegion(gemSpriteSheet, 160, 384, 32, 32) // CLEAR 6, not to be confused with BLANK 7
         };
+
+        if(!classicMode) {
+            attackTokenTextures = new TextureRegion[] {
+                new TextureRegion(gemSpriteSheet, 128, 0, 32, 32),
+                new TextureRegion(gemSpriteSheet, 160, 64, 32, 32),
+                new TextureRegion(gemSpriteSheet, 0, 128, 32, 32),
+                new TextureRegion(gemSpriteSheet, 32, 192, 32, 32),
+                new TextureRegion(gemSpriteSheet, 0, 256, 32, 32),
+                new TextureRegion(gemSpriteSheet, 128, 320, 32,32),
+                new TextureRegion(gemSpriteSheet, 128, 384, 32, 32)
+            };
+        }
     }
 
     @Override
@@ -738,6 +827,7 @@ public class MatchScreen extends ScreenAdapter {
 
         if(!classicMode) {
             deployEnemyWave();
+            calculateGemPower();
         }
 
         //
