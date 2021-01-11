@@ -93,7 +93,7 @@ public class CastleScreen extends ScreenAdapter {
     public Silo silo;
     public Warehouse warehouse;
 
-    public T3AButton t3ATestButton;
+//    public T3AButton t3ATestButton;
 
     public BitmapFont structureFont;
 
@@ -101,7 +101,7 @@ public class CastleScreen extends ScreenAdapter {
 
     public CastleScreen(GempiresGame game) { this.game = game; }
 
-    public void initialiseTextures() {
+    private void initialiseTextures() {
 
         final Texture goddessSpriteSheet = new Texture(Gdx.files.internal("structures/goddessSpriteSheet.png"));
         goddessStatueTexture = new TextureRegion(goddessSpriteSheet,672, 64, 32, 64);
@@ -134,13 +134,17 @@ public class CastleScreen extends ScreenAdapter {
 
     }
 
-    // TODO: initialiseUI() , set a ui group to be added to stage
+    private void initialiseUI() {
+        Label foodLabel = new Label( "Food: " /* + playerInventory.getFoodCount() */ , structureLabelStyle );
+//        foodLabel.setFontScale(0.08f);
+        uiGroup.addActor(foodLabel);
+    }
 
-    public void initialiseStructures() {
+    private void initialiseStructures() {
 
-        t3ATestButton = new T3AButton(T3AIcon);
+//        t3ATestButton = new T3AButton(T3AIcon);
         // t3ATestButton.setPosition(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        uiGroup.addActor((t3ATestButton));
+//        uiGroup.addActor((t3ATestButton));
 
         barracks = new Barracks(barracksTexture, self);
         barracks.setSize(1.5f, 1.5f);
@@ -163,23 +167,12 @@ public class CastleScreen extends ScreenAdapter {
         rootGroup.addActor(farm);
 
         CampaignSelector debugSelector = new CampaignSelector(campaignSelectorFire, CampaignLevelID.FIRE_1);
-        debugSelector.setSize(1.5f,1.5f);
+        debugSelector.setSize(1,1);
         debugSelector.setPosition(60, 60);
         rootGroup.addActor(debugSelector);
     }
 
-    @Override
-    public void show() {
-        camera = new OrthographicCamera();
-        rootGroup = new Group();
-        uiGroup = new Group();
-
-        castleMap = new TmxMapLoader().load("castleMap.tmx");
-        isoMapRenderer = new IsometricTiledMapRenderer(castleMap, 1/32f);
-
-        playerInventory = new PlayerInventory(this);
-        castleStats = new CastleStats(this);
-        heroRoster = new HeroRoster();
+    private void initialiseMap() {
 
         final float worldWidth = Gdx.graphics.getWidth() / 32f; // TODO: should this be viewport instead?
         final float worldHeight = Gdx.graphics.getHeight() / 32f;
@@ -202,28 +195,56 @@ public class CastleScreen extends ScreenAdapter {
         rootGroup.setPosition(0,0,0);
         uiGroup.setPosition(0,0);
 
-        stage.addActor(uiGroup);
         stage.addActor(rootGroup);
+        stage.addActor(uiGroup);
 
-        // TODO: move all this stuff to helper methods
+    }
 
-        initialiseTextures();
+    private void initialiseFont() {
+        final Texture fontTexture = new Texture(Gdx.files.internal("ui/tinyFont.png"), true);
+        fontTexture.setFilter(Texture.TextureFilter.MipMapNearestNearest, Texture.TextureFilter.Linear);
 
-        structureFont = new BitmapFont();
+        structureFont = new BitmapFont(Gdx.files.internal("ui/tinyFont.fnt"), new TextureRegion(fontTexture), false);
         FreeTypeFontGenerator fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("COPPERPLATE.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter structureFontParameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         structureFontParameter.color = Color.WHITE;
         structureFontParameter.borderWidth = 2;
         structureFontParameter.borderColor = Color.BLACK;
+        structureFontParameter.size = 12;
+        structureFontParameter.incremental = true;
+//        structureFontParameter.characters = Hiero.EXTENDED_CHARS;
         structureFont = fontGenerator.generateFont(structureFontParameter);
+        structureFont.getData().setScale(0.09f, 0.09f);// TODO: how do i make this super tiny?
         fontGenerator.dispose();
 
         structureLabelStyle = new Label.LabelStyle();
         structureLabelStyle.font = structureFont;
+    }
+
+    @Override
+    public void show() {
+        camera = new OrthographicCamera();
+        rootGroup = new Group();
+        uiGroup = new Group();
+
+        castleMap = new TmxMapLoader().load("castleMap.tmx");
+        isoMapRenderer = new IsometricTiledMapRenderer(castleMap, 1/32f);
+
+        playerInventory = new PlayerInventory(this);
+        castleStats = new CastleStats(this);
+        heroRoster = new HeroRoster();
+
+        initialiseMap();
+
+        initialiseTextures();
+
+       initialiseFont();
 
         // TODO: debug campaign selectors
 
         initialiseStructures();
+
+        initialiseUI();
 
         camera.position.set(100, 0, 0);
 

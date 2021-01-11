@@ -15,7 +15,7 @@ public class HeroRoster {
     private Array<HeroCard> heroes;
 
     public HeroRoster() {
-        pref = Gdx.app.getPreferences("Player Hero Roster");
+        pref = Gdx.app.getPreferences("PlayerHeroRoster");
 
     }
 
