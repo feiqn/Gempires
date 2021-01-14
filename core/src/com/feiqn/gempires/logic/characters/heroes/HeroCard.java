@@ -21,6 +21,7 @@ public class HeroCard extends Image {
             super(region);
             this.parentCard = parent;
             bounds = new Rectangle((int) getX(), (int) getY(), (int) getWidth(), (int) getHeight());
+            this.setSize(3,4);
 
             addListener(new InputListener() {
                 @Override
@@ -56,6 +57,8 @@ public class HeroCard extends Image {
     private int bravery,
                 level;
 
+    private boolean isPure;
+
     private float strength,
                   defense,
                   maxHealth,
@@ -66,6 +69,8 @@ public class HeroCard extends Image {
                   heroDescription,
                   heroAbilityTitle,
                   heroAbilityDescription;
+
+    public Heroes heroID;
 
     public HeroCard(TextureRegion region, MatchScreen parentScreen) {
         super(region);
@@ -84,14 +89,15 @@ public class HeroCard extends Image {
     }
 
     private void sharedInit() {
-        setSize(3,4);
-        setPosition(Gdx.graphics.getWidth() * .5f, Gdx.graphics.getWidth() * .5f); // TODO: put somewhere
+
+        this.setSize(parentScreen.camera.viewportWidth, parentScreen.camera.viewportHeight);
 
         bounds = new Rectangle((int) getX(), (int) getY(), (int) getWidth(), (int) getHeight());
 
         // base stats
         level = 1;
         bravery = 1;
+        isPure = false;
     }
 
     public void setXY(float pX, float pY) {
@@ -123,12 +129,22 @@ public class HeroCard extends Image {
     public void heroAbility() {}
 
     // SETTERS
-    // TODO: add method for setting stats to previous values stored in HeroRoster, and arbitrarily for instances
     public void initializeStats(float strength, float defense, float maxHealth) {
         this.strength = strength;
         this.defense = defense;
         this.maxHealth = maxHealth;
     }
+
+    public void scaleToTrueLevel(int goalTrueLevel) {
+        while(getTrueLevel() < goalTrueLevel) {
+            if(level < 99) {
+                levelUp();
+            } else {
+                increaseBravery();
+            }
+        }
+    }
+
     public void increaseBravery() {
         if(bravery < 5) {
             bravery++;
@@ -138,6 +154,7 @@ public class HeroCard extends Image {
             maxHealth *= 1.25f;
         }
     }
+
     public void levelUp() {
         if(level < 99) {
             level++;
@@ -146,10 +163,12 @@ public class HeroCard extends Image {
             maxHealth *= 1.25f;
         }
     }
+
     public void healPercentage(float percentage) {
         final float heal = maxHealth * percentage;
         healStaticAmount(heal);
     }
+
     public void healStaticAmount(float heal) {
         if(currentHealth + heal < maxHealth) {
             currentHealth += heal;
@@ -157,14 +176,24 @@ public class HeroCard extends Image {
             resetCurrentHealth();
         }
     }
+
     public void resetCurrentHealth() {
         currentHealth = maxHealth;
     }
+
     public void applyDamage(float damage) {
         currentHealth -= damage;
     }
 
     // GETTERS
+    public int getTrueLevel() {
+        // isPure ?
+        final int braveryBonus = (bravery * 100) - 100;
+        return braveryBonus + level;
+    }
+    public boolean getPurity() {
+        return isPure;
+    }
     public int getBravery() {
         return bravery;
     }

@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.feiqn.gempires.logic.castle.Structure;
-import com.feiqn.gempires.logic.characters.heroes.nature.Leif;
+import com.feiqn.gempires.logic.characters.heroes.HeroCard;
 
 public class PopupMenu extends Group {
 
@@ -49,19 +49,27 @@ public class PopupMenu extends Group {
 
         switch(menuType) {
             case HERO_ROSTER:
-            // TODO: forEach HeroCard in parentStructure.parentScreen.HeroRoster....
-
-            final Leif leif = new Leif(parentStructure.getParentScreen().natureCardRegion, parentStructure.getParentScreen());
-            leif.thumbnail.setSize(2,3);
-            leif.thumbnail.setXY(Gdx.graphics.getWidth() * .5f, Gdx.graphics.getHeight() * .5f);
-            addActor(leif.thumbnail);
-
+                int xRevs = 0;
+                int yRevs = 0;
+                for(HeroCard hero : parentStructure.getParentScreen().heroRoster.getHeroList()) {
+                    hero.thumbnail.setPosition(3 * xRevs, 4 * yRevs);
+                    // addActor(hero.thumbnail);
+                    xRevs++;
+                    if(xRevs > 3) {
+                        yRevs++;
+                        xRevs = 0;
+                    }
+                }
+                break;
             case GODDESS_STATUE:
+                // SUMMON HERO
+                // TODO: make a button
+                parentStructure.getParentScreen().heroRoster.goddessSummon();
+                break;
             case RESOURCE_STRUCTURE:
+                // display resource available, capacity,
+                // level up button,
                 break;
         }
-
-
-
     }
 }

@@ -28,6 +28,8 @@ import com.feiqn.gempires.models.stats.HeroRoster;
 import com.feiqn.gempires.models.stats.PlayerInventory;
 import com.feiqn.gempires.logic.ui.T3AButton;
 
+import java.util.ArrayList;
+
 public class CastleScreen extends ScreenAdapter {
 
     /*
@@ -43,8 +45,8 @@ public class CastleScreen extends ScreenAdapter {
 
     private Stage stage;
 
-    private Group rootGroup,
-                  uiGroup;
+    public Group rootGroup,
+                 uiGroup;
 
     public Label.LabelStyle structureLabelStyle;
 
@@ -56,7 +58,7 @@ public class CastleScreen extends ScreenAdapter {
 
     private Array<Plot> plots;
 
-    public Array<Structure> structures;
+    public ArrayList<Structure> structures;
 
     public Texture barracksTexture;
 
@@ -141,15 +143,17 @@ public class CastleScreen extends ScreenAdapter {
     }
 
     private void initialiseStructures() {
+        structures = new ArrayList<>();
 
 //        t3ATestButton = new T3AButton(T3AIcon);
-        // t3ATestButton.setPosition(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+//        t3ATestButton.setPosition(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 //        uiGroup.addActor((t3ATestButton));
 
         barracks = new Barracks(barracksTexture, self);
         barracks.setSize(1.5f, 1.5f);
         barracks.setPosition(59.5f,64.5f);
         rootGroup.addActor(barracks);
+        structures.add(barracks);
 
         goddessStatue = new GoddessStatue(goddessStatueTexture, self);
         goddessStatue.setSize(1, 2);
@@ -160,11 +164,13 @@ public class CastleScreen extends ScreenAdapter {
         mine.setSize(1.5f,1.5f);
         mine.setPosition(51.5f, 64f);
         rootGroup.addActor(mine);
+        structures.add(mine);
 
         farm = new Farm(farmTexture, self);
         farm.setSize(1.5f,1.5f);
         farm.setPosition(52.5f, 63.5f);
         rootGroup.addActor(farm);
+        structures.add(farm);
 
         CampaignSelector debugSelector = new CampaignSelector(campaignSelectorFire, CampaignLevelID.FIRE_1);
         debugSelector.setSize(1,1);
@@ -232,13 +238,13 @@ public class CastleScreen extends ScreenAdapter {
 
         playerInventory = new PlayerInventory(this);
         castleStats = new CastleStats(this);
-        heroRoster = new HeroRoster();
+        heroRoster = new HeroRoster(this);
 
         initialiseMap();
 
         initialiseTextures();
 
-       initialiseFont();
+        initialiseFont();
 
         // TODO: debug campaign selectors
 
@@ -293,7 +299,11 @@ public class CastleScreen extends ScreenAdapter {
         Gdx.gl.glClearColor(0,0,1,1);
 
         // TODO: add all structures to an Array<Structure> and iterate through them
-        // farm.updateResource(Gdx.graphics.getDeltaTime());
+
+        for(Structure struct : structures) {
+            struct.updateResource(Gdx.graphics.getDeltaTime());
+        }
+
 
         isoMapRenderer.setView(camera);
         isoMapRenderer.render();

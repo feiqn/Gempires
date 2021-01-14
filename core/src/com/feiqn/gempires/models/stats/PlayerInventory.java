@@ -2,8 +2,12 @@ package com.feiqn.gempires.models.stats;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.utils.DelayedRemovalArray;
 import com.feiqn.gempires.logic.castle.CastleScreen;
 import com.feiqn.gempires.logic.castle.Structure;
+import com.feiqn.gempires.logic.characters.heroes.Heroes;
+
+import java.util.HashMap;
 
 public class PlayerInventory {
     // includes: all resources a player owns, combat and ascension items, and how many of them
@@ -11,6 +15,10 @@ public class PlayerInventory {
     private final Preferences pref;
 
     private final CastleScreen parentCastle;
+
+    private int pureGemCount;
+
+    private HashMap<Heroes, Integer> commonUnits;
 
     private float foodCount,
                   maxFood,
@@ -23,6 +31,7 @@ public class PlayerInventory {
     public PlayerInventory(CastleScreen parent) {
         parentCastle = parent;
         pref         = Gdx.app.getPreferences("PlayerInventory");
+        commonUnits = new HashMap<>();
 
         if(!pref.contains("foodCount")) {
             pref.putFloat("foodCount", 100);
@@ -54,6 +63,8 @@ public class PlayerInventory {
         }
         maxArcana    = pref.getFloat("maxArcana");
 
+        fillCommonUnits();
+
         pref.flush();
     }
 
@@ -71,6 +82,31 @@ public class PlayerInventory {
                 case LIBRARY:
                 case ARCHIVE:
                     maxArcana += structure.getResourceCapacity();
+                default:
+                    break;
+            }
+        }
+    }
+
+    private void fillCommonUnits() {
+        for(int i = 0; i < Heroes.values().length; i++) {
+            final Heroes hero = Heroes.values()[i];
+            switch (hero) {
+                case DARING_CHEF:
+                case DREAMY_DRUID:
+                case LAZY_LABORER:
+                case ORPHANED_YOUTH:
+                case SEASICK_SAILOR:
+                case VENGEFUL_FARMER:
+                case DISPARATE_DIGGER:
+                case CUNNING_CRAFTSMAN:
+                    if(pref.contains("count" + hero)) {
+                        final int count = pref.getInteger("count" + hero);
+                        for(int c = 0; c < count; c++) {
+                            addCommonUnit(hero);
+                        }
+                    }
+                    break;
                 default:
                     break;
             }
@@ -117,6 +153,19 @@ public class PlayerInventory {
         }
     }
 
+    public void addCommonUnit(Heroes unitToAdd) {
+        if(!commonUnits.containsKey(unitToAdd)) {
+            commonUnits.put(unitToAdd, 1);
+        } else {
+            final int currentInt = commonUnits.get(unitToAdd);
+            commonUnits.put(unitToAdd, currentInt + 1);
+        }
+
+        final int i = commonUnits.get(unitToAdd);
+        pref.putInteger("count" + unitToAdd, i);
+        pref.flush();
+    }
+
     // SUBTRACTING
     public void subtractFood(float foodToSubtract) {
         if(this.foodCount - foodToSubtract >= 0) {
@@ -151,9 +200,17 @@ public class PlayerInventory {
         pref.flush();
     }
 
+    public void subtractCommonUnit(Heroes unitToSubtract) {
+        final int currentInt = commonUnits.get(unitToSubtract);
+        commonUnits.put(unitToSubtract, currentInt - 1);
+        pref.putInteger("count" + unitToSubtract, currentInt - 1);
+        pref.flush();
+    }
+
     // GETTERS
     public float getFoodCount() { return foodCount; }
     public float getArcanaCount() { return arcanaCount; }
     public float getOreCount() { return oreCount; }
+    public int getCommonUnitCount(Heroes unit) { return commonUnits.get(unit); }
 
 }

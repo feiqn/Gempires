@@ -21,8 +21,8 @@ public class ItemNotifierBubble extends Image {
         super(region);
 
         this.parentStructure = parent;
-
         this.bounds = new Rectangle((int) getX(), (int) getY(), (int) getWidth(), (int) getHeight());
+        this.setSize(1,1);
 
         addListener(new InputListener() {
             @Override

@@ -1,5 +1,6 @@
 package com.feiqn.gempires.logic.castle;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
@@ -42,6 +43,7 @@ public class Structure extends Image {
     private float resourceCapacity;
     private float storedResource;
 
+    // This needs to remain public for HeroCard
     public PopupMenu heroRosterPopup;
 
     private boolean readyToCollect;
@@ -136,7 +138,8 @@ public class Structure extends Image {
         if(this.structureType == StructureType.FARM || this.structureType == StructureType.MINE || this.structureType == StructureType.LIBRARY) {
             if(!this.readyToCollect && this.storedResource > (this.resourceCapacity / 10)) {
                 this.parentScreen.getStage().addActor(this.itemNotifierBubble);
-                this.itemNotifierBubble.setXY(this.getX(), this.getY() + 10f);
+                this.parentScreen.rootGroup.addActor(this.itemNotifierBubble);
+                this.itemNotifierBubble.setXY(this.getX() + .25f, this.getY() + .5f);
                 this.readyToCollect = true;
             }
         }

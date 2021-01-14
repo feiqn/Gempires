@@ -376,7 +376,7 @@ public class MatchScreen extends ScreenAdapter {
 
                 stage.addActor(token);
 
-                token.addAction(Actions.moveTo(token.getX(), Gdx.graphics.getHeight(), 2));
+                token.addAction(Actions.moveTo(token.getX(), 20, 4));
 
                 Timer.schedule(new Timer.Task() {
                     @Override

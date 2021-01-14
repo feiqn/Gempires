@@ -1,6 +1,7 @@
 package com.feiqn.gempires.logic.castle;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.feiqn.gempires.logic.ui.ItemNotifierBubble;
 
 public class Mine extends Structure {
 
@@ -9,6 +10,7 @@ public class Mine extends Structure {
 
         structureType = StructureType.MINE;
 
-        // itemNotifierBubble = new ItemNotifierBubble(parent.oreIcon, this);
+        // TODO: update this to oreIcon
+        itemNotifierBubble = new ItemNotifierBubble(parent.foodIcon, this);
     }
 }

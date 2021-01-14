@@ -11,5 +11,6 @@ public class AttackToken extends Image {
     public AttackToken(TextureRegion region, Element e){
         super(region);
         this.element = e;
+        this.setSize(1,1);
     }
 }
