@@ -5,6 +5,8 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.feiqn.gempires.logic.castle.Structure;
 import com.feiqn.gempires.logic.characters.heroes.HeroCard;
+import com.feiqn.gempires.logic.characters.heroes.nature.Leif;
+import com.feiqn.gempires.models.Element;
 
 public class PopupMenu extends Group {
 
@@ -30,7 +32,8 @@ public class PopupMenu extends Group {
                 background.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
                 break;
             case RESOURCE_STRUCTURE:
-                background.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight() * .3f);
+                // TODO: finish this
+                background.setSize(Gdx.graphics.getWidth(), parentStructure.getParentScreen().camera.viewportHeight * .3f);
                 break;
         }
 
@@ -53,9 +56,9 @@ public class PopupMenu extends Group {
                 int yRevs = 0;
                 for(HeroCard hero : parentStructure.getParentScreen().heroRoster.getHeroList()) {
                     hero.thumbnail.setPosition(3 * xRevs, 4 * yRevs);
-                    // addActor(hero.thumbnail);
+                    addActor(hero.thumbnail);
                     xRevs++;
-                    if(xRevs > 3) {
+                    if(xRevs > 4) {
                         yRevs++;
                         xRevs = 0;
                     }

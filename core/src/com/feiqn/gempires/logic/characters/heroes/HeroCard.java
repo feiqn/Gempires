@@ -21,7 +21,7 @@ public class HeroCard extends Image {
             super(region);
             this.parentCard = parent;
             bounds = new Rectangle((int) getX(), (int) getY(), (int) getWidth(), (int) getHeight());
-            this.setSize(3,4);
+            this.setSize(2,3);
 
             addListener(new InputListener() {
                 @Override
@@ -74,9 +74,9 @@ public class HeroCard extends Image {
 
     public HeroCard(TextureRegion region, MatchScreen parentScreen) {
         super(region);
-        // battle\ mode enters here
+        // battle mode enters here
 
-        // this.parentScreen = parentScreen;
+//         this.parentScreen = parentScreen;
     }
 
     // TODO: setup boolean paths for parentScreen type (Castle / Match)
@@ -134,7 +134,6 @@ public class HeroCard extends Image {
         this.defense = defense;
         this.maxHealth = maxHealth;
     }
-
     public void scaleToTrueLevel(int goalTrueLevel) {
         while(getTrueLevel() < goalTrueLevel) {
             if(level < 99) {
@@ -144,7 +143,6 @@ public class HeroCard extends Image {
             }
         }
     }
-
     public void increaseBravery() {
         if(bravery < 5) {
             bravery++;
@@ -154,7 +152,6 @@ public class HeroCard extends Image {
             maxHealth *= 1.25f;
         }
     }
-
     public void levelUp() {
         if(level < 99) {
             level++;
@@ -163,12 +160,10 @@ public class HeroCard extends Image {
             maxHealth *= 1.25f;
         }
     }
-
     public void healPercentage(float percentage) {
         final float heal = maxHealth * percentage;
         healStaticAmount(heal);
     }
-
     public void healStaticAmount(float heal) {
         if(currentHealth + heal < maxHealth) {
             currentHealth += heal;
@@ -176,18 +171,16 @@ public class HeroCard extends Image {
             resetCurrentHealth();
         }
     }
-
     public void resetCurrentHealth() {
         currentHealth = maxHealth;
     }
-
     public void applyDamage(float damage) {
         currentHealth -= damage;
     }
 
     // GETTERS
     public int getTrueLevel() {
-        // isPure ?
+        // TODO: isPure ?
         final int braveryBonus = (bravery * 100) - 100;
         return braveryBonus + level;
     }

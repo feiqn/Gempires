@@ -180,7 +180,7 @@ public class CastleScreen extends ScreenAdapter {
 
     private void initialiseMap() {
 
-        final float worldWidth = Gdx.graphics.getWidth() / 32f; // TODO: should this be viewport instead?
+        final float worldWidth = Gdx.graphics.getWidth() / 32f;
         final float worldHeight = Gdx.graphics.getHeight() / 32f;
 
         camera.setToOrtho(false, worldWidth, worldHeight);
@@ -238,7 +238,6 @@ public class CastleScreen extends ScreenAdapter {
 
         playerInventory = new PlayerInventory(this);
         castleStats = new CastleStats(this);
-        heroRoster = new HeroRoster(this);
 
         initialiseMap();
 
@@ -266,6 +265,8 @@ public class CastleScreen extends ScreenAdapter {
 
        // camera.position.x = MathUtils.clamp(camera.position.x, camViewportHalfX, mapWidth - camViewportHalfX);
         // camera.position.y = ... // TODO: finish this
+
+        heroRoster = new HeroRoster(this);
 
         stage.addListener(new DragListener() {
             @Override

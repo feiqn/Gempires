@@ -1,5 +1,6 @@
 package com.feiqn.gempires.logic.characters.heroes.nature;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.feiqn.gempires.logic.characters.heroes.Heroes;
 import com.feiqn.gempires.models.Element;

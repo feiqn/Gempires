@@ -106,7 +106,6 @@ public class PlayerInventory {
                             addCommonUnit(hero);
                         }
                     }
-                    break;
                 default:
                     break;
             }
@@ -114,6 +113,9 @@ public class PlayerInventory {
     }
 
     // ADDING
+
+    // TODO: store bravery tokens
+    
     public void addFood(float foodToAdd) {
         if(this.foodCount != maxFood) {
             if(this.foodCount + foodToAdd <= maxFood) {

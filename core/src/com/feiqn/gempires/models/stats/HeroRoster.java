@@ -12,9 +12,8 @@ import java.util.Random;
 
 public class HeroRoster {
     // includes: which heroes are owned, and the levels / stats / equipment of said heroes
-    // TODO: serialise pref to Json for storage, write Json parser
 
-    private Preferences pref;
+    private final Preferences pref;
 
     private DelayedRemovalArray<HeroCard> heroList;
 
@@ -38,7 +37,9 @@ public class HeroRoster {
         if(numberOfHeroes > 0) {
             fillHeroes();
         } else {
-            addHero(new Leif(parentCastle.natureCardRegion, parentCastle));
+            Gdx.app.log("HeroRoster", "New Player");
+            // TODO: add starter heroes
+            // addHero(new Leif(parentCastle.natureCardRegion, parentCastle));
         }
 
         pref.flush();
@@ -90,7 +91,7 @@ public class HeroRoster {
                         break;
                     case LEIF:
                         Gdx.app.log("restore", "restored leif");
-                        Leif leif = new Leif(parentCastle.natureCardRegion, parentCastle);
+                        final Leif leif = new Leif(parentCastle.natureCardRegion, parentCastle);
                         restoreHero(leif);
                         break;
                 }

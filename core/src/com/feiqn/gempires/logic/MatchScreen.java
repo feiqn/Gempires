@@ -354,36 +354,19 @@ public class MatchScreen extends ScreenAdapter {
             if(gem.GemColor != 7) {
                 final AttackToken token = new AttackToken(attackTokenTextures[gem.GemColor], gemElement);
 
-//            switch (gem.GemColor) {
-//                // TODO: create attack tokens and send them up at the enemies
-//
-//                case 0:
-//                    break;
-//                case 1:
-//                    break;
-//                case 2:
-//                    break;
-//                case 3:
-//                case 4:
-//                case 5:
-//                case 6:
-//                    break;
-//            }
-
-
                 token.setX(gem.getX());
                 token.setY(gem.getY());
 
                 stage.addActor(token);
 
-                token.addAction(Actions.moveTo(token.getX(), 20, 4));
+                token.addAction(Actions.moveTo(token.getX(), camera.viewportHeight, 1));
 
                 Timer.schedule(new Timer.Task() {
                     @Override
                     public void run() {
                         token.remove();
                     }
-                }, gemSwapTime);
+                }, 2);
             }
             gem.setToBlank();
         }
