@@ -115,7 +115,7 @@ public class PlayerInventory {
     // ADDING
 
     // TODO: store bravery tokens
-    
+
     public void addFood(float foodToAdd) {
         if(this.foodCount != maxFood) {
             if(this.foodCount + foodToAdd <= maxFood) {
