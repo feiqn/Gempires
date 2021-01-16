@@ -50,8 +50,23 @@ public class CastleStats {
         if(!pref.contains("NewGame?")) {
             pref.putBoolean("NewGame?", false);
             // do first time setup stuff here
+            final Barracks barracks = new Barracks(parentCastle.barracksTexture, parentCastle);
+            barracks.setPosition(59.5f,64.5f);
+            addStructure(barracks);
 
+            final GoddessStatue goddessStatue = new GoddessStatue(parentCastle.goddessStatueTexture, parentCastle);
+            goddessStatue.setPosition(55.5f, 64.5f);
+            addStructure(goddessStatue);
+
+            final Mine mine = new Mine(parentCastle.mineTexture, parentCastle);
+            mine.setPosition(51.5f, 64f);
+            addStructure(mine);
+
+            final Farm farm = new Farm(parentCastle.farmTexture, parentCastle);
+            farm.setPosition(52.5f, 63.5f);
+            addStructure(farm);
         } else {
+            Gdx.app.log("fill", "trying to fill structures");
             fillStructures();
         }
 
@@ -70,15 +85,19 @@ public class CastleStats {
             }
             for(int s = 0; s <= structNum; s++) {
                 if(pref.contains("UniqueStructureName" + structType + s)) {
-                    final int goalLevel = pref.getInteger("UniqueStructureNameLevel" + structNum + s);
-                    final float destinationX = pref.getFloat("UniqueStructureNameX" + structNum + s);
-                    final float destinationY = pref.getFloat("UniqueStructureNameY" + structNum + s);
+                    final int goalLevel = pref.getInteger("UniqueStructureNameLevel" + structType + s);
+                    final float destinationX = pref.getFloat("UniqueStructureNameX" + structType + s);
+                    final float destinationY = pref.getFloat("UniqueStructureNameY" + structType + s);
+
+                    Gdx.app.log("fillStructs", "Trying to place a structure at, x: " + destinationX + ", y: " + destinationY);
+
                     final Structure str;
 
                     switch(structType) {
                         case FARM:
                             str = new Farm(parentCastle.farmTexture, parentCastle);
 
+                            Gdx.app.log("fillStructs", "farm");
                             str.setX(destinationX);// TO BE DELETED
                             str.setY(destinationY);// TO BE DELETED
                             while(str.getLevel() < goalLevel) {// TO BE DELETED
@@ -90,6 +109,7 @@ public class CastleStats {
                         case MINE:
                             str = new Mine(parentCastle.mineTexture, parentCastle);
 
+                            Gdx.app.log("fillStructs", "mine");
                             str.setX(destinationX);// TO BE DELETED
                             str.setY(destinationY);// TO BE DELETED
                             while(str.getLevel() < goalLevel) {// TO BE DELETED
@@ -147,21 +167,11 @@ public class CastleStats {
 
     private void flushStructures() {
         // save
-        pref.putInteger("NumberOfStructureType" + Structure.StructureType.FARM, 0);
-        pref.putInteger("NumberOfStructureType" + Structure.StructureType.MINE, 0);
-        pref.putInteger("NumberOfStructureType" + Structure.StructureType.SILO, 0);
-        pref.putInteger("NumberOfStructureType" + Structure.StructureType.ACADEMY, 0);
-        pref.putInteger("NumberOfStructureType" + Structure.StructureType.LIBRARY, 0);
-        pref.putInteger("NumberOfStructureType" + Structure.StructureType.ALCHEMIST, 0);
-        pref.putInteger("NumberOfStructureType" + Structure.StructureType.ALTAR, 0);
-        pref.putInteger("NumberOfStructureType" + Structure.StructureType.ARCHIVE, 0);
-        pref.putInteger("NumberOfStructureType" + Structure.StructureType.BARRACKS, 0);
-        pref.putInteger("NumberOfStructureType" + Structure.StructureType.BARRICADE, 0);
-        pref.putInteger("NumberOfStructureType" + Structure.StructureType.CLAN_TOWER, 0);
-        pref.putInteger("NumberOfStructureType" + Structure.StructureType.WAREHOUSE, 0);
-        pref.putInteger("NumberOfStructureType" + Structure.StructureType.TURRET, 0);
-        pref.putInteger("NumberOfStructureType" + Structure.StructureType.SUMMONING_CIRCLE, 0);
-        pref.putInteger("NumberOfStructureType" + Structure.StructureType.GARRISON, 0);
+        for(Structure.StructureType t : Structure.StructureType.values()) {
+            if(pref.contains("NumberOfStructureType" + t)) {
+                pref.putInteger("NumberOfStructureType" + t, 0);
+            }
+        }
 
         for(Structure struct : structures) {
             final int numberOfStructureType = pref.getInteger("NumberOfStructureType" + struct.structureType);

@@ -144,26 +144,6 @@ public class CastleScreen extends ScreenAdapter {
 
         // TODO: move to CastleStates and delete local pref files
 
-        barracks = new Barracks(barracksTexture, self);
-        barracks.setSize(1.5f, 1.5f);
-        barracks.setPosition(59.5f,64.5f);
-        castleStats.addStructure(barracks);
-
-        goddessStatue = new GoddessStatue(goddessStatueTexture, self);
-        goddessStatue.setSize(1, 2);
-        goddessStatue.setPosition(55.5f, 64.5f);
-        rootGroup.addActor(goddessStatue);
-
-        mine = new Mine(mineTexture, self);
-        mine.setSize(1.5f,1.5f);
-        mine.setPosition(51.5f, 64f);
-        castleStats.addStructure(mine);
-
-        farm = new Farm(farmTexture, self);
-        farm.setSize(1.5f,1.5f);
-        farm.setPosition(52.5f, 63.5f);
-        castleStats.addStructure(farm);
-
         CampaignSelector debugSelector = new CampaignSelector(campaignSelectorFire, CampaignLevelID.FIRE_1);
         debugSelector.setSize(1,1);
         debugSelector.setPosition(60, 60);
@@ -248,12 +228,6 @@ public class CastleScreen extends ScreenAdapter {
         initialiseUI();
 
         camera.position.set(100, 0, 0);
-
-//        Vector2 vector = new Vector2(-30, -30);
-//        vector = stage.screenToStageCoordinates(vector);
-//        vector = rootGroup.stageToLocalCoordinates(vector);
-//        barracks.setPosition(vector.x, vector.y);
-//        camera.position.set(vector.x, vector.y, 0);
 
         final float camViewportHalfX = camera.viewportWidth * .5f;
         final float camViewportHalfY = camera.viewportHeight * .5f;

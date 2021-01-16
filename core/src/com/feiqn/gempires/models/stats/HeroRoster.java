@@ -39,7 +39,7 @@ public class HeroRoster {
         } else {
             Gdx.app.log("HeroRoster", "New Player");
             // TODO: add starter heroes
-            // addHero(new Leif(parentCastle.natureCardRegion, parentCastle));
+             addHero(new Leif(parentCastle.natureCardRegion, parentCastle));
         }
 
         pref.flush();
