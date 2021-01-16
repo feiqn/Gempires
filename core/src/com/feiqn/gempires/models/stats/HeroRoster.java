@@ -73,7 +73,6 @@ public class HeroRoster {
 
     private void fillHeroes() {
         // Load
-        Gdx.app.log("restore", "restoring...");
 
         for(int i = 0; i < Heroes.values().length; i++) {
             final Heroes h = Heroes.values()[i];
@@ -90,7 +89,6 @@ public class HeroRoster {
                         // ZERO-STAR, COMMON-NOUN UNITS ARE LOADED BY PlayerInventory
                         break;
                     case LEIF:
-                        Gdx.app.log("restore", "restored leif");
                         final Leif leif = new Leif(parentCastle.natureCardRegion, parentCastle);
                         restoreHero(leif);
                         break;

@@ -10,5 +10,6 @@ public class Warehouse extends Structure{
         structureType = StructureType.WAREHOUSE;
 
         increaseResourceCapacity(getResourceCapacity() * 5f); // 500
+        this.setSize(1.5f, 1.5f);
     }
 }

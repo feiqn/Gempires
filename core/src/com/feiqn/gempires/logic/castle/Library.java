@@ -10,6 +10,7 @@ public class Library extends Structure {
         structureType = StructureType.LIBRARY;
 
         // itemNotifierBubble = new ItemNotifierBubble(parent.arcanaIcon, this);
+        this.setSize(1.5f, 1.5f);
     }
 
 }

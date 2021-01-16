@@ -10,6 +10,7 @@ public class Silo extends Structure {
         structureType = StructureType.SILO;
 
         increaseResourceCapacity(getResourceCapacity() * 5f); // 500
+        this.setSize(1.5f, 1.5f);
     }
 
 }

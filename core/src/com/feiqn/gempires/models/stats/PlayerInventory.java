@@ -69,7 +69,7 @@ public class PlayerInventory {
     }
 
     public void calculateMaximums() {
-        for(Structure structure : parentCastle.castleStats.structures) {
+        for(Structure structure : parentCastle.castleStats.getStructures()) {
             switch (structure.structureType) {
                 case FARM:
                 case SILO:

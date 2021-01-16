@@ -8,5 +8,6 @@ public class GoddessStatue extends Structure {
         super(region, parent);
 
         this.structureType = StructureType.GODDESS_STATUE;
+        this.setSize(1,2);
     }
 }

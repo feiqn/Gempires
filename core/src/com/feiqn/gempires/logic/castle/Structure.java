@@ -151,19 +151,15 @@ public class Structure extends Image {
         this.increaseProductionRate(productionRate * .25f);
         this.increaseResourceCapacity(resourceCapacity * .25f);
     }
-
     public void increaseProductionRate(float productionRate) {
         this.productionRate += productionRate;
     }
-
     public void increaseResourceCapacity(float resourceCapacity) {
         this.resourceCapacity += resourceCapacity;
     }
-
     public void switchReadyToCollect() {
         this.readyToCollect = !readyToCollect;
     }
-
 
     // GETTERS
     public int getLevel() {

@@ -12,5 +12,6 @@ public class Mine extends Structure {
 
         // TODO: update this to oreIcon
         itemNotifierBubble = new ItemNotifierBubble(parent.foodIcon, this);
+        this.setSize(1.5f, 1.5f);
     }
 }

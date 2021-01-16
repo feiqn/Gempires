@@ -20,6 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.DelayedRemovalArray;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.feiqn.gempires.GempiresGame;
 import com.feiqn.gempires.models.CampaignLevelID;
@@ -56,9 +57,7 @@ public class CastleScreen extends ScreenAdapter {
     public CastleStats castleStats;
     public HeroRoster heroRoster;
 
-    private Array<Plot> plots;
-
-    public ArrayList<Structure> structures;
+    private DelayedRemovalArray<Plot> plots;
 
     public Texture barracksTexture;
 
@@ -91,15 +90,10 @@ public class CastleScreen extends ScreenAdapter {
     public GoddessStatue goddessStatue;
     public Farm farm;
     public Mine mine;
-    public Library library;
-    public Silo silo;
-    public Warehouse warehouse;
 
 //    public T3AButton t3ATestButton;
 
     public BitmapFont structureFont;
-
-    // TODO: read from and write to: CastleStats, HeroRoster, and PlayerInventory
 
     public CastleScreen(GempiresGame game) { this.game = game; }
 
@@ -143,17 +137,17 @@ public class CastleScreen extends ScreenAdapter {
     }
 
     private void initialiseStructures() {
-        structures = new ArrayList<>();
 
 //        t3ATestButton = new T3AButton(T3AIcon);
 //        t3ATestButton.setPosition(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 //        uiGroup.addActor((t3ATestButton));
 
+        // TODO: move to CastleStates and delete local pref files
+
         barracks = new Barracks(barracksTexture, self);
         barracks.setSize(1.5f, 1.5f);
         barracks.setPosition(59.5f,64.5f);
-        rootGroup.addActor(barracks);
-        structures.add(barracks);
+        castleStats.addStructure(barracks);
 
         goddessStatue = new GoddessStatue(goddessStatueTexture, self);
         goddessStatue.setSize(1, 2);
@@ -163,19 +157,22 @@ public class CastleScreen extends ScreenAdapter {
         mine = new Mine(mineTexture, self);
         mine.setSize(1.5f,1.5f);
         mine.setPosition(51.5f, 64f);
-        rootGroup.addActor(mine);
-        structures.add(mine);
+        castleStats.addStructure(mine);
 
         farm = new Farm(farmTexture, self);
         farm.setSize(1.5f,1.5f);
         farm.setPosition(52.5f, 63.5f);
-        rootGroup.addActor(farm);
-        structures.add(farm);
+        castleStats.addStructure(farm);
 
         CampaignSelector debugSelector = new CampaignSelector(campaignSelectorFire, CampaignLevelID.FIRE_1);
         debugSelector.setSize(1,1);
         debugSelector.setPosition(60, 60);
         rootGroup.addActor(debugSelector);
+
+
+        for(Structure s : castleStats.getStructures()) {
+            rootGroup.addActor(s);
+        }
     }
 
     private void initialiseMap() {
@@ -236,12 +233,11 @@ public class CastleScreen extends ScreenAdapter {
         castleMap = new TmxMapLoader().load("castleMap.tmx");
         isoMapRenderer = new IsometricTiledMapRenderer(castleMap, 1/32f);
 
-        playerInventory = new PlayerInventory(this);
+        initialiseTextures();
+
         castleStats = new CastleStats(this);
 
         initialiseMap();
-
-        initialiseTextures();
 
         initialiseFont();
 
@@ -267,6 +263,8 @@ public class CastleScreen extends ScreenAdapter {
         // camera.position.y = ... // TODO: finish this
 
         heroRoster = new HeroRoster(this);
+        playerInventory = new PlayerInventory(this);
+
 
         stage.addListener(new DragListener() {
             @Override
@@ -299,12 +297,10 @@ public class CastleScreen extends ScreenAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         Gdx.gl.glClearColor(0,0,1,1);
 
-        // TODO: add all structures to an Array<Structure> and iterate through them
 
-        for(Structure struct : structures) {
+        for(Structure struct : castleStats.getStructures()) {
             struct.updateResource(Gdx.graphics.getDeltaTime());
         }
-
 
         isoMapRenderer.setView(camera);
         isoMapRenderer.render();
