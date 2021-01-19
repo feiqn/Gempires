@@ -1,0 +1,59 @@
+package com.feiqn.gempires.logic.items;
+
+public enum ItemList {
+    THYME,
+    BASIL,
+    MINT,
+    PARSLEY,
+    SAGE,
+    SAFFRON,
+    PURE_GEM,
+
+    // ASCENSION ITEMS
+    // 1*
+    WORK_CLOTHES,
+    TOOLS,
+
+    // 2*
+    LEATHER_ARMOR,
+    IRON_WEAPONS,
+    COLDSTONE,
+    EMBERSTONE,
+    LUCKY_CLOVER,
+    FLINT,
+    COPPER_WIRE,
+    BROKEN_PROMISE,
+
+    // 3*
+    PLATE_ARMOR,
+    REINFORCED_WEAPONS,
+    NEVERMELT_ICE,
+    LAVACOAL,
+    ANGELFRUIT,
+    TITANITE,
+    GROUNDING_POLE,
+    LAMENTING_POEM,
+
+    // 4*
+    DAMASCUS_ARMOR,
+    RUNEITE_WEAPONS,
+    HOLY_WATER,
+    HOLY_INCENSE_ASH,
+    REDWOOD_SEED,
+    OBSIDIAN_GEODE,
+    LIGHTNING_ROD,
+    MARTYRS_DIARY,
+
+    // 5*
+    BLESSED_ARMOR,
+    BLESSED_WEAPONS,
+    GODDESS_TEARS,
+    VOLCANO_HEART,
+    REDWOOD_ROOTS,
+    TITAN_FOSSIL,
+    STORMS_EYE,
+    NIGHTMARE_DRAWING,
+
+    // BATTLE ITEMS:
+    TORNADO,
+}

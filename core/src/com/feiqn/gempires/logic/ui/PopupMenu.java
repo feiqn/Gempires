@@ -5,8 +5,6 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.feiqn.gempires.logic.castle.Structure;
 import com.feiqn.gempires.logic.characters.heroes.HeroCard;
-import com.feiqn.gempires.logic.characters.heroes.nature.Leif;
-import com.feiqn.gempires.models.Element;
 
 public class PopupMenu extends Group {
 
@@ -33,7 +31,7 @@ public class PopupMenu extends Group {
                 break;
             case RESOURCE_STRUCTURE:
                 // TODO: finish this
-                background.setSize(Gdx.graphics.getWidth(), parentStructure.getParentScreen().camera.viewportHeight * .3f);
+                background.setSize(Gdx.graphics.getWidth(), parentStructure.getParentScreen().gameCamera.viewportHeight * .3f);
                 break;
         }
 
@@ -66,13 +64,24 @@ public class PopupMenu extends Group {
                 break;
             case GODDESS_STATUE:
                 // SUMMON HERO
-                // TODO: make a button
-                parentStructure.getParentScreen().heroRoster.goddessSummon();
+                final SummonButton summonButton = new SummonButton(this);
+                summonButton.setX(parentStructure.getParentScreen().gameCamera.viewportWidth * .5f);
+                summonButton.setY(5);
+                addActor(summonButton);
+                addLevelUpButton();
                 break;
             case RESOURCE_STRUCTURE:
                 // display resource available, capacity,
-                // level up button,
+                addLevelUpButton();
                 break;
         }
     }
+
+    private void addLevelUpButton() {
+        final LevelUpButton levelUpButton = new LevelUpButton(this);
+        levelUpButton.setX(parentStructure.getParentScreen().gameCamera.viewportWidth * .5f);
+        levelUpButton.setY(1);
+        addActor(levelUpButton);
+    }
+    public Structure getParentStructure() { return parentStructure; }
 }

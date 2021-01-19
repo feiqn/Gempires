@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.DelayedRemovalArray;
 import com.feiqn.gempires.logic.castle.CastleScreen;
 import com.feiqn.gempires.logic.castle.Structure;
 import com.feiqn.gempires.logic.characters.heroes.Heroes;
+import com.feiqn.gempires.logic.items.ItemList;
 
 import java.util.HashMap;
 
@@ -16,9 +17,9 @@ public class PlayerInventory {
 
     private final CastleScreen parentCastle;
 
-    private int pureGemCount;
+    private final HashMap<ItemList, Integer> items;
 
-    private HashMap<Heroes, Integer> commonUnits;
+    private final HashMap<Heroes, Integer> commonUnits;
 
     private float foodCount,
                   maxFood,
@@ -27,11 +28,11 @@ public class PlayerInventory {
                   arcanaCount,
                   maxArcana;
 
-
     public PlayerInventory(CastleScreen parent) {
         parentCastle = parent;
         pref         = Gdx.app.getPreferences("PlayerInventory");
         commonUnits = new HashMap<>();
+        items = new HashMap<>();
 
         if(!pref.contains("foodCount")) {
             pref.putFloat("foodCount", 100);
@@ -64,6 +65,7 @@ public class PlayerInventory {
         maxArcana    = pref.getFloat("maxArcana");
 
         fillCommonUnits();
+        fillItems();
 
         pref.flush();
     }
@@ -84,6 +86,18 @@ public class PlayerInventory {
                     maxArcana += structure.getResourceCapacity();
                 default:
                     break;
+            }
+        }
+    }
+
+    private void fillItems() {
+        for(int i = 0; i < ItemList.values().length; i++) {
+            final ItemList item = ItemList.values()[i];
+            if(pref.contains("count" + item)) {
+                final int count = pref.getInteger("count" + item);
+                for(int c = 0; c < count; c++) {
+                    addItem(item);
+                }
             }
         }
     }
@@ -114,8 +128,6 @@ public class PlayerInventory {
 
     // ADDING
 
-    // TODO: store bravery tokens
-
     public void addFood(float foodToAdd) {
         if(this.foodCount != maxFood) {
             if(this.foodCount + foodToAdd <= maxFood) {
@@ -128,7 +140,6 @@ public class PlayerInventory {
             pref.flush();
         }
     }
-
     public void addOre(float oreToAdd) {
         if(this.oreCount != maxOre) {
             if(this.oreCount + oreToAdd <= maxOre) {
@@ -141,7 +152,6 @@ public class PlayerInventory {
             pref.flush();
         }
     }
-
     public void addArcana(float arcanaToAdd) {
         if(this.arcanaCount != maxArcana) {
             if (this.arcanaCount + arcanaToAdd <= maxArcana) {
@@ -154,7 +164,18 @@ public class PlayerInventory {
             pref.flush();
         }
     }
+    public void addItem(ItemList item) {
+        if(!items.containsKey(item)) {
+            items.put(item, 1);
+        } else {
+            final int currentInt = items.get(item);
+            items.put(item, currentInt + 1);
+        }
 
+        final int i = items.get(item);
+        pref.putInteger("count" + item, i);
+        pref.flush();
+    }
     public void addCommonUnit(Heroes unitToAdd) {
         if(!commonUnits.containsKey(unitToAdd)) {
             commonUnits.put(unitToAdd, 1);
@@ -179,7 +200,6 @@ public class PlayerInventory {
         pref.putFloat("foodCount", this.foodCount);
         pref.flush();
     }
-
     public void subtractOre(float oreToSubtract) {
         if(this.oreCount - oreToSubtract >= 0) {
             this.oreCount -= oreToSubtract;
@@ -190,7 +210,6 @@ public class PlayerInventory {
         pref.putFloat("oreCount", oreCount);
         pref.flush();
     }
-
     public void subtractArcana(float arcanaToSubtract) {
         if(this.arcanaCount - arcanaToSubtract >= 0) {
             this.arcanaCount -= arcanaToSubtract;
@@ -201,11 +220,16 @@ public class PlayerInventory {
         pref.putFloat("arcanaCount", arcanaCount);
         pref.flush();
     }
-
     public void subtractCommonUnit(Heroes unitToSubtract) {
         final int currentInt = commonUnits.get(unitToSubtract);
         commonUnits.put(unitToSubtract, currentInt - 1);
         pref.putInteger("count" + unitToSubtract, currentInt - 1);
+        pref.flush();
+    }
+    public void subtractItem(ItemList itemToSubtract) {
+        final int currentInt = items.get(itemToSubtract);
+        items.put(itemToSubtract, currentInt - 1);
+        pref.putInteger("count" + itemToSubtract, currentInt - 1);
         pref.flush();
     }
 

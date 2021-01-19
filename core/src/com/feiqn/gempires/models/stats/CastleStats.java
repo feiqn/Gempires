@@ -66,7 +66,6 @@ public class CastleStats {
             farm.setPosition(52.5f, 63.5f);
             addStructure(farm);
         } else {
-            Gdx.app.log("fill", "trying to fill structures");
             fillStructures();
         }
 
@@ -88,8 +87,6 @@ public class CastleStats {
                     final int goalLevel = pref.getInteger("UniqueStructureNameLevel" + structType + s);
                     final float destinationX = pref.getFloat("UniqueStructureNameX" + structType + s);
                     final float destinationY = pref.getFloat("UniqueStructureNameY" + structType + s);
-
-                    Gdx.app.log("fillStructs", "Trying to place a structure at, x: " + destinationX + ", y: " + destinationY);
 
                     final Structure str;
 

@@ -1,6 +1,5 @@
 package com.feiqn.gempires.logic.castle;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
@@ -90,15 +89,15 @@ public class Structure extends Image {
                     case MINE:
                     case LIBRARY:
                         final PopupMenu resourcePopupMenu = new PopupMenu(self, PopupMenu.MenuType.RESOURCE_STRUCTURE);
-                        parentScreen.getStage().addActor(resourcePopupMenu);
+                        parentScreen.getGameStage().addActor(resourcePopupMenu);
                         break;
                     case BARRACKS:
                         heroRosterPopup = new PopupMenu(self, PopupMenu.MenuType.HERO_ROSTER);
-                        parentScreen.getStage().addActor(heroRosterPopup);
+                        parentScreen.getGameStage().addActor(heroRosterPopup);
                         break;
                     case GODDESS_STATUE:
                         final PopupMenu goddessPopUpMenu = new PopupMenu(self, PopupMenu.MenuType.GODDESS_STATUE);
-                        parentScreen.getStage().addActor(goddessPopUpMenu);
+                        parentScreen.getGameStage().addActor(goddessPopUpMenu);
                         break;
                 }
             }
@@ -137,7 +136,7 @@ public class Structure extends Image {
         }
         if(this.structureType == StructureType.FARM || this.structureType == StructureType.MINE || this.structureType == StructureType.LIBRARY) {
             if(!this.readyToCollect && this.storedResource > (this.resourceCapacity / 10)) {
-                this.parentScreen.getStage().addActor(this.itemNotifierBubble);
+                this.parentScreen.getGameStage().addActor(this.itemNotifierBubble);
                 this.parentScreen.rootGroup.addActor(this.itemNotifierBubble);
                 this.itemNotifierBubble.setXY(this.getX() + .25f, this.getY() + .5f);
                 this.readyToCollect = true;
@@ -150,6 +149,7 @@ public class Structure extends Image {
         level++;
         this.increaseProductionRate(productionRate * .25f);
         this.increaseResourceCapacity(resourceCapacity * .25f);
+        parentScreen.playerInventory.calculateMaximums();
     }
     public void increaseProductionRate(float productionRate) {
         this.productionRate += productionRate;

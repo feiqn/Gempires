@@ -1,6 +1,5 @@
 package com.feiqn.gempires.logic.characters.heroes;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -90,7 +89,7 @@ public class HeroCard extends Image {
 
     private void sharedInit() {
 
-        this.setSize(parentScreen.camera.viewportWidth, parentScreen.camera.viewportHeight);
+        this.setSize(parentScreen.gameCamera.viewportWidth, parentScreen.gameCamera.viewportHeight);
 
         bounds = new Rectangle((int) getX(), (int) getY(), (int) getWidth(), (int) getHeight());
 

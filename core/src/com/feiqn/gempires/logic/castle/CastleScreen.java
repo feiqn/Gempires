@@ -16,20 +16,16 @@ import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.DelayedRemovalArray;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.feiqn.gempires.GempiresGame;
+import com.feiqn.gempires.logic.ui.ResourceDisplay;
 import com.feiqn.gempires.models.CampaignLevelID;
 import com.feiqn.gempires.models.stats.CastleStats;
 import com.feiqn.gempires.models.stats.HeroRoster;
 import com.feiqn.gempires.models.stats.PlayerInventory;
-import com.feiqn.gempires.logic.ui.T3AButton;
-
-import java.util.ArrayList;
 
 public class CastleScreen extends ScreenAdapter {
 
@@ -38,13 +34,17 @@ public class CastleScreen extends ScreenAdapter {
      * Everything refers back here in one way or another.
     */
 
-    public OrthographicCamera camera;
+    public OrthographicCamera gameCamera,
+                              uiCamera;
     public TiledMap castleMap;
     public IsometricTiledMapRenderer isoMapRenderer;
 
     final private GempiresGame game;
 
-    private Stage stage;
+    // TODO: use an AssetManager
+
+    private Stage gameStage,
+                  uiStage;
 
     public Group rootGroup,
                  uiGroup;
@@ -60,6 +60,8 @@ public class CastleScreen extends ScreenAdapter {
     private DelayedRemovalArray<Plot> plots;
 
     public Texture barracksTexture;
+
+    private ResourceDisplay foodDisplay;
 
     public TextureRegion T3AIcon,
                          foodIcon,
@@ -87,9 +89,6 @@ public class CastleScreen extends ScreenAdapter {
                          backButtonTexture;
 
     public Barracks barracks;
-    public GoddessStatue goddessStatue;
-    public Farm farm;
-    public Mine mine;
 
 //    public T3AButton t3ATestButton;
 
@@ -131,9 +130,21 @@ public class CastleScreen extends ScreenAdapter {
     }
 
     private void initialiseUI() {
-        Label foodLabel = new Label( "Food: " /* + playerInventory.getFoodCount() */ , structureLabelStyle );
-//        foodLabel.setFontScale(0.08f);
-        uiGroup.addActor(foodLabel);
+        uiCamera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        final FitViewport fitViewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
+        uiStage = new Stage(fitViewport);
+
+        uiCamera.position.set(0,0,0);
+        uiGroup.setPosition(0,0);
+        uiStage.addActor(uiGroup);
+
+    }
+
+    private void layoutUI() {
+        foodDisplay = new ResourceDisplay(this);
+        foodDisplay.move(32, 32); // todo
+        uiGroup.addActor(foodDisplay);
     }
 
     private void initialiseStructures() {
@@ -141,8 +152,6 @@ public class CastleScreen extends ScreenAdapter {
 //        t3ATestButton = new T3AButton(T3AIcon);
 //        t3ATestButton.setPosition(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 //        uiGroup.addActor((t3ATestButton));
-
-        // TODO: move to CastleStates and delete local pref files
 
         CampaignSelector debugSelector = new CampaignSelector(campaignSelectorFire, CampaignLevelID.FIRE_1);
         debugSelector.setSize(1,1);
@@ -160,26 +169,23 @@ public class CastleScreen extends ScreenAdapter {
         final float worldWidth = Gdx.graphics.getWidth() / 32f;
         final float worldHeight = Gdx.graphics.getHeight() / 32f;
 
-        camera.setToOrtho(false, worldWidth, worldHeight);
+        gameCamera.setToOrtho(false, worldWidth, worldHeight);
 
         final FitViewport fitViewport = new FitViewport(worldWidth, worldHeight);
 
-        stage = new Stage(fitViewport);
+        gameStage = new Stage(fitViewport);
 
-        camera.position.set(0,0,0);
+        gameCamera.position.set(0,0,0);
 
         final MapProperties mapProperties = castleMap.getProperties();
         final int mapWidth = mapProperties.get("width", Integer.class);
         final int mapHeight = mapProperties.get("height", Integer.class);
 
         rootGroup.setSize(mapWidth, mapHeight);
-        // uiGroup.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         rootGroup.setPosition(0,0,0);
-        uiGroup.setPosition(0,0);
 
-        stage.addActor(rootGroup);
-        stage.addActor(uiGroup);
+        gameStage.addActor(rootGroup);
 
     }
 
@@ -193,11 +199,9 @@ public class CastleScreen extends ScreenAdapter {
         structureFontParameter.color = Color.WHITE;
         structureFontParameter.borderWidth = 2;
         structureFontParameter.borderColor = Color.BLACK;
-        structureFontParameter.size = 12;
+        structureFontParameter.size = 16;
         structureFontParameter.incremental = true;
-//        structureFontParameter.characters = Hiero.EXTENDED_CHARS;
         structureFont = fontGenerator.generateFont(structureFontParameter);
-        structureFont.getData().setScale(0.09f, 0.09f);// TODO: how do i make this super tiny?
         fontGenerator.dispose();
 
         structureLabelStyle = new Label.LabelStyle();
@@ -206,7 +210,8 @@ public class CastleScreen extends ScreenAdapter {
 
     @Override
     public void show() {
-        camera = new OrthographicCamera();
+        gameCamera = new OrthographicCamera();
+        uiCamera = new OrthographicCamera();
         rootGroup = new Group();
         uiGroup = new Group();
 
@@ -225,12 +230,10 @@ public class CastleScreen extends ScreenAdapter {
 
         initialiseStructures();
 
-        initialiseUI();
+        gameCamera.position.set(100, 0, 0);
 
-        camera.position.set(100, 0, 0);
-
-        final float camViewportHalfX = camera.viewportWidth * .5f;
-        final float camViewportHalfY = camera.viewportHeight * .5f;
+        final float camViewportHalfX = gameCamera.viewportWidth * .5f;
+        final float camViewportHalfY = gameCamera.viewportHeight * .5f;
         // final float mapWidth = 100;
 
        // camera.position.x = MathUtils.clamp(camera.position.x, camViewportHalfX, mapWidth - camViewportHalfX);
@@ -239,8 +242,10 @@ public class CastleScreen extends ScreenAdapter {
         heroRoster = new HeroRoster(this);
         playerInventory = new PlayerInventory(this);
 
+        initialiseUI();
+        layoutUI();
 
-        stage.addListener(new DragListener() {
+        gameStage.addListener(new DragListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 return true;
@@ -250,20 +255,21 @@ public class CastleScreen extends ScreenAdapter {
                 final float x = Gdx.input.getDeltaX() * .05f;
                 final float y = Gdx.input.getDeltaY() * .05f;
 
-                camera.translate(-x,y);
-                camera.update();
+                gameCamera.translate(-x,y);
+                gameCamera.update();
 
                 final float destinationX = rootGroup.getX() + x;
                 final float destinationY = rootGroup.getY() - y;
 
                 rootGroup.setPosition(destinationX, destinationY);
-                stage.act();
-                stage.draw();
+                gameStage.act();
+                gameStage.draw();
             }
         });
 
-        camera.update();
-        Gdx.input.setInputProcessor(stage);
+        gameCamera.update();
+        // TODO: inputMultiplexer
+        Gdx.input.setInputProcessor(gameStage);
     }
 
     @Override
@@ -276,19 +282,23 @@ public class CastleScreen extends ScreenAdapter {
             struct.updateResource(Gdx.graphics.getDeltaTime());
         }
 
-        isoMapRenderer.setView(camera);
+        isoMapRenderer.setView(gameCamera);
         isoMapRenderer.render();
 
-        stage.act();
-        stage.draw();
+        foodDisplay.updateText();
+
+        gameStage.act();
+        gameStage.draw();
+        uiStage.act();
+        uiStage.draw();
     }
 
     @Override
     public void resize(int width, int height) {
-        stage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
-        stage.getCamera().update();
+        gameStage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+        gameStage.getCamera().update();
     }
 
     // GETTERS
-    public Stage getStage() { return stage; }
+    public Stage getGameStage() { return gameStage; }
 }

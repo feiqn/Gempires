@@ -8,6 +8,7 @@ import com.feiqn.gempires.logic.characters.heroes.HeroCard;
 import com.feiqn.gempires.logic.characters.heroes.Heroes;
 import com.feiqn.gempires.logic.characters.heroes.nature.Leif;
 
+import java.util.HashMap;
 import java.util.Random;
 
 public class HeroRoster {
@@ -17,6 +18,8 @@ public class HeroRoster {
 
     private DelayedRemovalArray<HeroCard> heroList;
 
+    private HashMap<Heroes, Integer> braveryTokens;
+
     public int numberOfHeroes;
 
     private final CastleScreen parentCastle;
@@ -24,6 +27,7 @@ public class HeroRoster {
     public HeroRoster(CastleScreen parent) {
         pref = Gdx.app.getPreferences("PlayerHeroRoster");
         heroList = new DelayedRemovalArray<>();
+        braveryTokens = new HashMap<>();
 
         parentCastle = parent;
 
@@ -36,6 +40,7 @@ public class HeroRoster {
 
         if(numberOfHeroes > 0) {
             fillHeroes();
+            fillBraveryTokens();
         } else {
             Gdx.app.log("HeroRoster", "New Player");
             // TODO: add starter heroes
@@ -99,6 +104,18 @@ public class HeroRoster {
         pref.flush();
     }
 
+    private void fillBraveryTokens() {
+        for(int i = 0; i < Heroes.values().length; i++) {
+            final Heroes hero = Heroes.values()[i];
+            if(pref.contains("countBraveryToken" + hero)) {
+                final int count = pref.getInteger("countBraveryToken" + hero);
+                for(int c = 0; c < count; c++) {
+                    addBraveryToken(hero);
+                }
+            }
+        }
+    }
+
     public void goddessSummon() {
         final Random random = new Random();
         final int randomIndex = random.nextInt(Heroes.values().length);
@@ -121,13 +138,26 @@ public class HeroRoster {
                 if(!pref.contains("name" + newHero)) {
                     addHero(new Leif(parentCastle.natureCardRegion, parentCastle));
                 } else {
-                    // TODO: add braveryToken
+                    addBraveryToken(newHero);
                 }
                 break;
             default:
                 break;
         }
 
+    }
+
+    public void addBraveryToken(Heroes hero) {
+        if(!braveryTokens.containsKey(hero)) {
+            braveryTokens.put(hero, 1);
+        } else {
+            final int currentInt = braveryTokens.get(hero);
+            braveryTokens.put(hero, currentInt + 1);
+        }
+
+        final int i = braveryTokens.get(hero);
+        pref.putInteger("countBraveryToken" + hero, i);
+        pref.flush();
     }
 
     public void addHero(HeroCard hero) {
@@ -153,8 +183,7 @@ public class HeroRoster {
         pref.flush();
     }
 
-    public DelayedRemovalArray<HeroCard> getHeroList(){
-        return heroList;
-    }
+    public DelayedRemovalArray<HeroCard> getHeroList(){ return heroList; }
+    public int getBraveryTokenCount(Heroes hero) { return braveryTokens.get(hero); }
 
 }
