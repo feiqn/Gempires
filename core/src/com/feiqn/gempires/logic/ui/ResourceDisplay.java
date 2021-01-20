@@ -7,16 +7,27 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.feiqn.gempires.logic.castle.CastleScreen;
+import com.feiqn.gempires.logic.items.ItemList;
 
-public class ResourceDisplay extends Actor {
+public class ResourceDisplay extends Image {
     private String text;
     private CastleScreen parentScreen;
     private Label.LabelStyle style;
     private Label label;
+    public DisplayType dType;
 
-    public ResourceDisplay(CastleScreen parent) {
-        super();
+    public enum DisplayType {
+        FOOD,
+        ORE,
+        ARCANA,
+        THYME,
+        PURE_GEMS
+    }
+
+    public ResourceDisplay(CastleScreen parent, DisplayType type) {
+        super(parent.menuTexture);
         this.parentScreen = parent;
+        dType = type;
         style = parent.structureLabelStyle;
         text = "";
         label = new Label(text, style);
@@ -24,18 +35,41 @@ public class ResourceDisplay extends Actor {
     }
 
     public void updateText() {
-        final int i = (int) parentScreen.playerInventory.getFoodCount();
-        this.text = "Food: " + i;
+        final int i;
+
+        switch(dType) {
+            case FOOD:
+                i = (int) parentScreen.playerInventory.getFoodCount();
+                break;
+            case ORE:
+                i = (int) parentScreen.playerInventory.getOreCount();
+                break;
+            case THYME:
+                i = parentScreen.playerInventory.getItemCount(ItemList.THYME);
+                break;
+            case ARCANA:
+                i = (int) parentScreen.playerInventory.getArcanaCount();
+                break;
+            case PURE_GEMS:
+                i = parentScreen.playerInventory.getItemCount(ItemList.PURE_GEM);
+                break;
+            default:
+                i = 0;
+        }
+
+        this.text = "" + i;
         label.setText(text);
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
+        super.draw(batch, parentAlpha);
         label.draw(batch, 1);
     }
 
     public void move(float x, float y) {
-        label.setPosition(x,y);
+        this.setPosition(x,y);
+        label.setPosition(x + this.getWidth() * .2f,y + this.getHeight() * .5f);
     }
 
 }

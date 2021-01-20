@@ -89,15 +89,15 @@ public class Structure extends Image {
                     case MINE:
                     case LIBRARY:
                         final PopupMenu resourcePopupMenu = new PopupMenu(self, PopupMenu.MenuType.RESOURCE_STRUCTURE);
-                        parentScreen.getGameStage().addActor(resourcePopupMenu);
+                        parentScreen.uiGroup.addActor(resourcePopupMenu);
                         break;
                     case BARRACKS:
                         heroRosterPopup = new PopupMenu(self, PopupMenu.MenuType.HERO_ROSTER);
-                        parentScreen.getGameStage().addActor(heroRosterPopup);
+                        parentScreen.uiGroup.addActor(heroRosterPopup);
                         break;
                     case GODDESS_STATUE:
                         final PopupMenu goddessPopUpMenu = new PopupMenu(self, PopupMenu.MenuType.GODDESS_STATUE);
-                        parentScreen.getGameStage().addActor(goddessPopUpMenu);
+                        parentScreen.uiGroup.addActor(goddessPopUpMenu);
                         break;
                 }
             }

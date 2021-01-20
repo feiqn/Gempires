@@ -22,8 +22,6 @@ public class BackButton extends Image {
     public BackButton(TextureRegion region) {
         super(region);
 
-        setSize(1,1);
-
         addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {

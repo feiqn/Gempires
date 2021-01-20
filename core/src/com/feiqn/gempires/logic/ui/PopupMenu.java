@@ -27,27 +27,27 @@ public class PopupMenu extends Group {
         switch(menuType) {
             case HERO_ROSTER:
             case GODDESS_STATUE:
-                background.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-                break;
             case RESOURCE_STRUCTURE:
                 // TODO: finish this
-                background.setSize(Gdx.graphics.getWidth(), parentStructure.getParentScreen().gameCamera.viewportHeight * .3f);
+                background.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
                 break;
         }
 
         addActor(background);
 
         final Image header = new Image(sender.getParentScreen().menuTexture);
-        header.setSize(Gdx.graphics.getWidth(), 1.5f);
+        header.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight() * .05f);
         header.setColor(.5f, .5f, .5f, 1);
-        header.setPosition(0, (Gdx.graphics.getHeight() / 32f) - 1.5f);
+        header.setPosition(0, Gdx.graphics.getHeight() - header.getHeight());
         addActor(header);
 
         final BackButton backButton = new BackButton(parentStructure.getParentScreen().backButtonTexture);
-        backButton.setPosition((Gdx.graphics.getWidth() / 32f) - 2f, (Gdx.graphics.getHeight() / 32f) - 2f);
+        backButton.setSize(Gdx.graphics.getHeight() * .04f, Gdx.graphics.getHeight() * .04f);
+        backButton.setPosition(Gdx.graphics.getWidth() * .85f, header.getY() - (backButton.getHeight() * .5f));
         backButton.setParent(this);
         addActor(backButton);
 
+        // TODO: update this switch
         switch(menuType) {
             case HERO_ROSTER:
                 int xRevs = 0;

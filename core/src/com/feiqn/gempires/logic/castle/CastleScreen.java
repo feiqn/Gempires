@@ -1,6 +1,8 @@
 package com.feiqn.gempires.logic.castle;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -16,9 +18,11 @@ import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 import com.badlogic.gdx.utils.DelayedRemovalArray;
+import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.feiqn.gempires.GempiresGame;
 import com.feiqn.gempires.logic.ui.ResourceDisplay;
@@ -44,7 +48,7 @@ public class CastleScreen extends ScreenAdapter {
     // TODO: use an AssetManager
 
     private Stage gameStage,
-                  uiStage;
+                  hudStage;
 
     public Group rootGroup,
                  uiGroup;
@@ -59,9 +63,16 @@ public class CastleScreen extends ScreenAdapter {
 
     private DelayedRemovalArray<Plot> plots;
 
-    public Texture barracksTexture;
+    public Texture barracksTexture,
+                   avatarTexture;
 
-    private ResourceDisplay foodDisplay;
+
+
+    private ResourceDisplay foodDisplay,
+                            oreDisplay,
+                            pureGemsDisplay,
+                            thymeDisplay,
+                            arcanaDisplay;
 
     public TextureRegion T3AIcon,
                          foodIcon,
@@ -97,6 +108,7 @@ public class CastleScreen extends ScreenAdapter {
     public CastleScreen(GempiresGame game) { this.game = game; }
 
     private void initialiseTextures() {
+        avatarTexture = new Texture(Gdx.files.internal("avatars/vivian.png"));
 
         final Texture goddessSpriteSheet = new Texture(Gdx.files.internal("structures/goddessSpriteSheet.png"));
         goddessStatueTexture = new TextureRegion(goddessSpriteSheet,672, 64, 32, 64);
@@ -133,18 +145,34 @@ public class CastleScreen extends ScreenAdapter {
         uiCamera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         final FitViewport fitViewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        uiStage = new Stage(fitViewport);
+        hudStage = new Stage(fitViewport);
 
         uiCamera.position.set(0,0,0);
         uiGroup.setPosition(0,0);
-        uiStage.addActor(uiGroup);
+
+        hudStage.addActor(uiGroup);
 
     }
 
     private void layoutUI() {
-        foodDisplay = new ResourceDisplay(this);
-        foodDisplay.move(32, 32); // todo
+        final Image avatar = new Image(avatarTexture);
+        // TODO: yikes
+        final float nine = Gdx.graphics.getWidth() * .2f;
+        final float sixteen = Gdx.graphics.getHeight() * .2f ;
+        avatar.setSize(sixteen, nine);
+        avatar.setScaling(Scaling.fit);
+        avatar.setPosition(Gdx.graphics.getWidth() * .02f, Gdx.graphics.getHeight() * 0.87f);
+        uiGroup.addActor(avatar);
+
+        foodDisplay = new ResourceDisplay(this, ResourceDisplay.DisplayType.FOOD);
+        foodDisplay.setSize(avatar.getWidth() * .5f, avatar.getHeight() * .4f);
+        foodDisplay.move(avatar.getX() + avatar.getWidth() + 5, avatar.getY()); // todo
         uiGroup.addActor(foodDisplay);
+
+        oreDisplay = new ResourceDisplay(this, ResourceDisplay.DisplayType.ORE);
+        oreDisplay. setSize(foodDisplay.getWidth(), foodDisplay.getHeight());
+        oreDisplay.move(foodDisplay.getX(), foodDisplay.getY() + oreDisplay.getHeight() + (oreDisplay.getHeight() * .5f));
+        uiGroup.addActor(oreDisplay);
     }
 
     private void initialiseStructures() {
@@ -268,8 +296,12 @@ public class CastleScreen extends ScreenAdapter {
         });
 
         gameCamera.update();
-        // TODO: inputMultiplexer
-        Gdx.input.setInputProcessor(gameStage);
+
+        // TODO: make game stage not clickable through hud stage
+        final InputMultiplexer multiplexer = new InputMultiplexer();
+        multiplexer.addProcessor(hudStage);
+        multiplexer.addProcessor(gameStage);
+        Gdx.input.setInputProcessor(multiplexer);
     }
 
     @Override
@@ -289,8 +321,9 @@ public class CastleScreen extends ScreenAdapter {
 
         gameStage.act();
         gameStage.draw();
-        uiStage.act();
-        uiStage.draw();
+
+        hudStage.act();
+        hudStage.draw();
     }
 
     @Override
@@ -301,4 +334,5 @@ public class CastleScreen extends ScreenAdapter {
 
     // GETTERS
     public Stage getGameStage() { return gameStage; }
+    public Stage getHUDStage() { return hudStage; }
 }

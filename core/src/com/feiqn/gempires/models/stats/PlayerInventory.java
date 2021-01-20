@@ -127,7 +127,6 @@ public class PlayerInventory {
     }
 
     // ADDING
-
     public void addFood(float foodToAdd) {
         if(this.foodCount != maxFood) {
             if(this.foodCount + foodToAdd <= maxFood) {
@@ -238,5 +237,6 @@ public class PlayerInventory {
     public float getArcanaCount() { return arcanaCount; }
     public float getOreCount() { return oreCount; }
     public int getCommonUnitCount(Heroes unit) { return commonUnits.get(unit); }
+    public int getItemCount(ItemList item) { return items.get(item);}
 
 }
