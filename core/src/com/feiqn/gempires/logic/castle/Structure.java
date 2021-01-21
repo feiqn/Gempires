@@ -6,8 +6,11 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.feiqn.gempires.logic.items.ItemList;
 import com.feiqn.gempires.logic.ui.PopupMenu;
 import com.feiqn.gempires.logic.ui.ItemNotifierBubble;
+
+import java.util.HashMap;
 
 public class Structure extends Image {
 
@@ -104,7 +107,264 @@ public class Structure extends Image {
         });
     }
 
-    void setXY(float pX, float pY) {
+    public HashMap<String, Integer> getLevelUpResourceRequirements() {
+        final HashMap<String, Integer> map = new HashMap<>();
+
+        final String food = "food";
+        final String ore = "ore";
+        final String arcana = "arcana";
+
+        switch(structureType) {
+            case FARM:
+                map.put(food, level * 100);
+                map.put(ore, level * 200);
+                map.put(arcana, level * 25);
+                break;
+            case MINE:
+                map.put(food, level * 200);
+                map.put(ore, level * 100);
+                map.put(arcana, level * 25);
+                break;
+            case LIBRARY:
+                map.put(food, level * 300);
+                map.put(ore, level * 300);
+                map.put(arcana, level * 100);
+                break;
+            case GODDESS_STATUE:
+                map.put(food, level * 2000);
+                map.put(ore, level * 2000);
+                map.put(arcana, level * 1000);
+                break;
+        }
+
+        return map;
+    }
+
+    public HashMap<ItemList, Integer> getLevelUpItemRequirements() {
+        final HashMap<ItemList, Integer> map = new HashMap<>();
+
+        switch(level) {
+            case 1:
+                switch(structureType) {
+                    case GODDESS_STATUE:
+                    case FARM:
+                    case SUMMONING_CIRCLE:
+                    case CLAN_TOWER:
+                    case WAREHOUSE:
+                    case BARRICADE:
+                    case ALCHEMIST:
+                    case GARRISON:
+                    case BARRACKS:
+                    case LIBRARY:
+                    case ARCHIVE:
+                    case ACADEMY:
+                    case TURRET:
+                    case ALTAR:
+                    case SILO:
+                    case MINE:
+                    default:
+                        map.put(ItemList.MINT, 1);
+                        break;
+                }
+            case 2:
+                switch(structureType) {
+                    case GODDESS_STATUE:
+                    case FARM:
+                    case SUMMONING_CIRCLE:
+                    case CLAN_TOWER:
+                    case WAREHOUSE:
+                    case BARRICADE:
+                    case ALCHEMIST:
+                    case GARRISON:
+                    case BARRACKS:
+                    case LIBRARY:
+                    case ARCHIVE:
+                    case ACADEMY:
+                    case TURRET:
+                    case ALTAR:
+                    case SILO:
+                    case MINE:
+                    default:
+                        break;
+                }
+            case 3:
+                switch(structureType) {
+                    case GODDESS_STATUE:
+                    case FARM:
+                    case SUMMONING_CIRCLE:
+                    case CLAN_TOWER:
+                    case WAREHOUSE:
+                    case BARRICADE:
+                    case ALCHEMIST:
+                    case GARRISON:
+                    case BARRACKS:
+                    case LIBRARY:
+                    case ARCHIVE:
+                    case ACADEMY:
+                    case TURRET:
+                    case ALTAR:
+                    case SILO:
+                    case MINE:
+                    default:
+                        break;
+                }
+            case 4:
+                switch(structureType) {
+                    case GODDESS_STATUE:
+                    case FARM:
+                    case SUMMONING_CIRCLE:
+                    case CLAN_TOWER:
+                    case WAREHOUSE:
+                    case BARRICADE:
+                    case ALCHEMIST:
+                    case GARRISON:
+                    case BARRACKS:
+                    case LIBRARY:
+                    case ARCHIVE:
+                    case ACADEMY:
+                    case TURRET:
+                    case ALTAR:
+                    case SILO:
+                    case MINE:
+                    default:
+                        break;
+                }
+            case 5:
+                switch(structureType) {
+                    case GODDESS_STATUE:
+                    case FARM:
+                    case SUMMONING_CIRCLE:
+                    case CLAN_TOWER:
+                    case WAREHOUSE:
+                    case BARRICADE:
+                    case ALCHEMIST:
+                    case GARRISON:
+                    case BARRACKS:
+                    case LIBRARY:
+                    case ARCHIVE:
+                    case ACADEMY:
+                    case TURRET:
+                    case ALTAR:
+                    case SILO:
+                    case MINE:
+                    default:
+                        break;
+                }
+            case 6:
+                switch(structureType) {
+                    case GODDESS_STATUE:
+                    case FARM:
+                    case SUMMONING_CIRCLE:
+                    case CLAN_TOWER:
+                    case WAREHOUSE:
+                    case BARRICADE:
+                    case ALCHEMIST:
+                    case GARRISON:
+                    case BARRACKS:
+                    case LIBRARY:
+                    case ARCHIVE:
+                    case ACADEMY:
+                    case TURRET:
+                    case ALTAR:
+                    case SILO:
+                    case MINE:
+                    default:
+                        break;
+                }
+            case 7:
+                switch(structureType) {
+                    case GODDESS_STATUE:
+                    case FARM:
+                    case SUMMONING_CIRCLE:
+                    case CLAN_TOWER:
+                    case WAREHOUSE:
+                    case BARRICADE:
+                    case ALCHEMIST:
+                    case GARRISON:
+                    case BARRACKS:
+                    case LIBRARY:
+                    case ARCHIVE:
+                    case ACADEMY:
+                    case TURRET:
+                    case ALTAR:
+                    case SILO:
+                    case MINE:
+                    default:
+                        break;
+                }
+            case 8:
+                switch(structureType) {
+                    case GODDESS_STATUE:
+                    case FARM:
+                    case SUMMONING_CIRCLE:
+                    case CLAN_TOWER:
+                    case WAREHOUSE:
+                    case BARRICADE:
+                    case ALCHEMIST:
+                    case GARRISON:
+                    case BARRACKS:
+                    case LIBRARY:
+                    case ARCHIVE:
+                    case ACADEMY:
+                    case TURRET:
+                    case ALTAR:
+                    case SILO:
+                    case MINE:
+                    default:
+                        break;
+                }
+            case 9:
+                switch(structureType) {
+                    case GODDESS_STATUE:
+                    case FARM:
+                    case SUMMONING_CIRCLE:
+                    case CLAN_TOWER:
+                    case WAREHOUSE:
+                    case BARRICADE:
+                    case ALCHEMIST:
+                    case GARRISON:
+                    case BARRACKS:
+                    case LIBRARY:
+                    case ARCHIVE:
+                    case ACADEMY:
+                    case TURRET:
+                    case ALTAR:
+                    case SILO:
+                    case MINE:
+                    default:
+                        break;
+                }
+
+            // 10..98
+
+            case 99:
+                switch(structureType) {
+                    case GODDESS_STATUE:
+                    case FARM:
+                    case SUMMONING_CIRCLE:
+                    case CLAN_TOWER:
+                    case WAREHOUSE:
+                    case BARRICADE:
+                    case ALCHEMIST:
+                    case GARRISON:
+                    case BARRACKS:
+                    case LIBRARY:
+                    case ARCHIVE:
+                    case ACADEMY:
+                    case TURRET:
+                    case ALTAR:
+                    case SILO:
+                    case MINE:
+                    default:
+                        break;
+                }
+                break;
+        }
+
+        return map;
+    }
+
+    public void setXY(float pX, float pY) {
         setPosition(pX, pY);
         bounds.setX((int)pX);
         bounds.setY((int)pY);

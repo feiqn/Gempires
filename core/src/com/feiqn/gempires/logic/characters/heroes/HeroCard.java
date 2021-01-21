@@ -32,7 +32,8 @@ public class HeroCard extends Image {
                 @Override
                 public void touchUp(InputEvent event, float x, float y, int point, int button) {
                     setColor(1.5f, 1.5f, 1.5f, 1);
-                    parentScreen.barracks.heroRosterPopup.addActor(parentCard);
+                    // TODO
+                    // parentScreen.barracks.heroRosterPopup.addActor(parentCard);
                 }
             });
         }

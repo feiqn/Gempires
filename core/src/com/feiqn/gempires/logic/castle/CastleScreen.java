@@ -56,6 +56,7 @@ public class CastleScreen extends ScreenAdapter {
 
     final private CastleScreen self = this;
 
+    // TODO: kinda feeling like these should have just all been one file
     public PlayerInventory playerInventory;
     public CastleStats castleStats;
     public HeroRoster heroRoster;
@@ -76,9 +77,11 @@ public class CastleScreen extends ScreenAdapter {
                          blueButtonTexture,
                          yellowButtonTexture,
                          T3AIcon,
-                         foodIcon,
-                         oreIcon,
-                         arcanaIcon,
+                         foodTexture,
+                         oreTexture,
+                         arcanaTexture,
+                         thymeTexture,
+                         pureGemTexture,
 
                          farmTexture,
                          mineTexture,
@@ -96,12 +99,12 @@ public class CastleScreen extends ScreenAdapter {
                          campaignSelectorEarth,
 
                          menuTexture,
-                                 stoneCardTexture,
-                                 waterCardTexture,
-                                 fireCardTexture,
-                                 electricCardTexture,
-                                 voidCardTexture,
-                                 natureCardTexture,
+                         stoneCardTexture,
+                         waterCardTexture,
+                         fireCardTexture,
+                         electricCardTexture,
+                         voidCardTexture,
+                         natureCardTexture,
                          natureCardThumbnail,
                          backButtonTexture;
 
@@ -116,6 +119,9 @@ public class CastleScreen extends ScreenAdapter {
     private void initialiseTextures() {
         avatarTexture = new Texture(Gdx.files.internal("avatars/vivian.png"));
 
+        final Texture gemSpriteSheet = new Texture(Gdx.files.internal("gem_set.png"));
+        pureGemTexture =               new TextureRegion(gemSpriteSheet, 0, 384, 32,32);
+
         final Texture goddessSpriteSheet = new Texture(Gdx.files.internal("structures/goddessSpriteSheet.png"));
         goddessStatueTexture =             new TextureRegion(goddessSpriteSheet,672, 64, 32, 64);
 
@@ -124,6 +130,9 @@ public class CastleScreen extends ScreenAdapter {
         final Texture menuSpriteSheet = new Texture(Gdx.files.internal("ui/menu.png"));
         menuTexture =                   new TextureRegion(menuSpriteSheet, 0,  192,96, 96);
         backButtonTexture =             new TextureRegion(menuSpriteSheet, 192,0 , 32, 32);
+        yellowButtonTexture =           new TextureRegion(menuSpriteSheet, 96, 192, 192,64);
+        purpleButtonTexture =           new TextureRegion(menuSpriteSheet, 96, 256, 192,64);
+        blueButtonTexture =             new TextureRegion(menuSpriteSheet,96, 320, 192, 64);
 
         final Texture cardSpriteSheet = new Texture(Gdx.files.internal("ui/heroCards.png"));
         electricCardTexture =           new TextureRegion(cardSpriteSheet, 32*5, 32*4, 96, 128);
@@ -136,7 +145,8 @@ public class CastleScreen extends ScreenAdapter {
         natureCardThumbnail =           new TextureRegion(cardSpriteSheet, 96,0, 64, 96);
 
         final Texture iconSpriteSheet = new Texture(Gdx.files.internal("icon-pack.png"));
-        foodIcon =                      new TextureRegion(iconSpriteSheet, 256, 0, 32, 32);
+        foodTexture =                   new TextureRegion(iconSpriteSheet, 256, 0, 32, 32);
+        arcanaTexture =                 new TextureRegion(iconSpriteSheet, 320, 0, 32, 32);
 
         final Texture buildingSpriteSheet = new Texture(Gdx.files.internal("structures/buildingSpriteSheet.png"));
         farmTexture =                       new TextureRegion(buildingSpriteSheet, 0, 128, 32, 32);
@@ -150,8 +160,8 @@ public class CastleScreen extends ScreenAdapter {
         campaignSelectorNature        = new TextureRegion(itemSpriteSheet,64, 64, 16,16);
         campaignSelectorEarth         = new TextureRegion(itemSpriteSheet,64, 70, 16,16);
         T3AIcon                       = new TextureRegion(itemSpriteSheet,128,368,16,16);
-
-//thyme 16*15, 16*7, 16, 16
+        thymeTexture                  = new TextureRegion(itemSpriteSheet,16*6, 16*14, 16, 16);
+        oreTexture                    = new TextureRegion(itemSpriteSheet, 32, 16*7, 16,16);
     }
 
     private void initialiseUI() {
@@ -332,6 +342,14 @@ public class CastleScreen extends ScreenAdapter {
         Gdx.input.setInputProcessor(multiplexer);
     }
 
+    private void updateHUD() {
+        foodDisplay.updateText();
+        oreDisplay.updateText();
+        thymeDisplay.updateText();
+        pureGemsDisplay.updateText();
+        arcanaDisplay.updateText();
+    }
+
     @Override
     public void render(float delta) {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -345,7 +363,7 @@ public class CastleScreen extends ScreenAdapter {
         isoMapRenderer.setView(gameCamera);
         isoMapRenderer.render();
 
-        foodDisplay.updateText();
+        updateHUD();
 
         gameStage.act();
         gameStage.draw();

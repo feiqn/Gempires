@@ -11,6 +11,8 @@ public class ResourceDisplay extends Image {
     private CastleScreen parentScreen;
     private Label.LabelStyle style;
     private Label label;
+    private Image img;
+
     public DisplayType dType;
 
     public enum DisplayType {
@@ -28,6 +30,26 @@ public class ResourceDisplay extends Image {
         style = parent.structureLabelStyle;
         text = "";
         label = new Label(text, style);
+
+        switch(dType) {
+            case FOOD:
+                img = new Image(parent.foodTexture);
+                break;
+            case ARCANA:
+                img = new Image(parent.arcanaTexture);
+                break;
+            case THYME:
+                img = new Image(parent.thymeTexture);
+                break;
+            case ORE:
+                img = new Image(parent.oreTexture);
+                break;
+            case PURE_GEM:
+                img = new Image(parent.pureGemTexture);
+                break;
+        }
+        img.setSize(parent.foodTexture.getRegionWidth() * .9f, parent.foodTexture.getRegionHeight() * .9f);
+
         updateText();
     }
 
@@ -61,11 +83,13 @@ public class ResourceDisplay extends Image {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
-        label.draw(batch, 1);
+        img.draw(batch, parentAlpha * .5f);
+        label.draw(batch, parentAlpha);
     }
 
     public void move(float x, float y) {
         this.setPosition(x,y);
+        img.setPosition(x,y + 3);
         label.setPosition(x + this.getWidth() * .2f,y + this.getHeight() * .5f);
     }
 

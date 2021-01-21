@@ -10,7 +10,7 @@ public class Farm extends Structure {
 
         structureType = StructureType.FARM;
 
-        itemNotifierBubble = new ItemNotifierBubble(parent.foodIcon, this);
+        itemNotifierBubble = new ItemNotifierBubble(parent.foodTexture, this);
 
         this.setSize(1.5f, 1.5f);
     }

@@ -10,8 +10,7 @@ public class Mine extends Structure {
 
         structureType = StructureType.MINE;
 
-        // TODO: update this to oreIcon
-        itemNotifierBubble = new ItemNotifierBubble(parent.foodIcon, this);
+        itemNotifierBubble = new ItemNotifierBubble(parent.oreTexture, this);
         this.setSize(1.5f, 1.5f);
     }
 }

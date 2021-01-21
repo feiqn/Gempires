@@ -9,6 +9,6 @@ public class Barracks extends Structure {
 
         structureType = StructureType.BARRACKS;
 
-        this.setSize(1.5f,1.5f);
+        this.setSize(2,2);
     }
 }

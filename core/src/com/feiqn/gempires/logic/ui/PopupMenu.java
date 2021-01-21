@@ -5,6 +5,9 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.feiqn.gempires.logic.castle.Structure;
 import com.feiqn.gempires.logic.characters.heroes.HeroCard;
+import com.feiqn.gempires.logic.items.ItemList;
+
+import java.util.HashMap;
 
 public class PopupMenu extends Group {
 
@@ -68,10 +71,9 @@ public class PopupMenu extends Group {
             case GODDESS_STATUE:
                 // SUMMON HERO
                 final SummonButton summonButton = new SummonButton(this);
-                summonButton.setX(parentStructure.getParentScreen().gameCamera.viewportWidth * .3f);
-                summonButton.setY(Gdx.graphics.getHeight() * .8f);
-                summonButton.setSize(Gdx.graphics.getWidth() * .8f, Gdx.graphics.getHeight() * .1f);
+                summonButton.move(Gdx.graphics.getWidth() * .12f, Gdx.graphics.getHeight() * .7f);
                 addActor(summonButton);
+                // TODO: display necessary resources
                 addLevelUpButton();
                 break;
             case RESOURCE_STRUCTURE:
@@ -83,10 +85,24 @@ public class PopupMenu extends Group {
 
     private void addLevelUpButton() {
         final LevelUpButton levelUpButton = new LevelUpButton(this);
-        levelUpButton.setX(parentStructure.getParentScreen().gameCamera.viewportWidth * .4f);
-        levelUpButton.setY(Gdx.graphics.getHeight() * .4f);
-        levelUpButton.setSize(Gdx.graphics.getWidth() * .8f, Gdx.graphics.getHeight() * .1f);
+        levelUpButton.move(Gdx.graphics.getWidth() * .12f, Gdx.graphics.getHeight() * .3f);
         addActor(levelUpButton);
+        final HashMap<ItemList, Integer> neededItems = parentStructure.getLevelUpItemRequirements();
+        for(ItemList item : ItemList.values()) {
+            if(neededItems.containsKey(item)) {
+                Gdx.app.log("level up button", "You need " + neededItems.get(item) + " " + item.toString() + "s. You have: " + parentStructure.getParentScreen().playerInventory.getItemCount(item));
+                // TODO
+            }
+        }
+
+        final HashMap<String, Integer> neededResources = parentStructure.getLevelUpResourceRequirements();
+        final int neededFood = neededResources.get("food");
+        final int neededOre = neededResources.get("ore");
+        final int neededArcana = neededResources.get("arcana");
+
+        Gdx.app.log("level up button", "You also need " + neededFood + " food, " + neededOre + " ore, and " + neededArcana + " arcana");
+        
+        // TODO: if(don't have enough resources) { levelUpButton.touchable = false }
     }
     public Structure getParentStructure() { return parentStructure; }
 }
