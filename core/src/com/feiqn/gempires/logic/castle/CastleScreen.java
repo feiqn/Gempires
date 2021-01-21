@@ -2,7 +2,6 @@ package com.feiqn.gempires.logic.castle;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -66,15 +65,17 @@ public class CastleScreen extends ScreenAdapter {
     public Texture barracksTexture,
                    avatarTexture;
 
-
-
     private ResourceDisplay foodDisplay,
                             oreDisplay,
                             pureGemsDisplay,
                             thymeDisplay,
                             arcanaDisplay;
 
-    public TextureRegion T3AIcon,
+    // TODO: for an indie dev I sure can't keep naming conventions straight
+    public TextureRegion purpleButtonTexture,
+                         blueButtonTexture,
+                         yellowButtonTexture,
+                         T3AIcon,
                          foodIcon,
                          oreIcon,
                          arcanaIcon,
@@ -95,7 +96,12 @@ public class CastleScreen extends ScreenAdapter {
                          campaignSelectorEarth,
 
                          menuTexture,
-                         natureCardRegion,
+                                 stoneCardTexture,
+                                 waterCardTexture,
+                                 fireCardTexture,
+                                 electricCardTexture,
+                                 voidCardTexture,
+                                 natureCardTexture,
                          natureCardThumbnail,
                          backButtonTexture;
 
@@ -111,34 +117,41 @@ public class CastleScreen extends ScreenAdapter {
         avatarTexture = new Texture(Gdx.files.internal("avatars/vivian.png"));
 
         final Texture goddessSpriteSheet = new Texture(Gdx.files.internal("structures/goddessSpriteSheet.png"));
-        goddessStatueTexture = new TextureRegion(goddessSpriteSheet,672, 64, 32, 64);
+        goddessStatueTexture =             new TextureRegion(goddessSpriteSheet,672, 64, 32, 64);
 
-        barracksTexture = new Texture(Gdx.files.internal("structures/barracks.png"));
+        barracksTexture =                  new Texture(Gdx.files.internal("structures/barracks.png"));
 
         final Texture menuSpriteSheet = new Texture(Gdx.files.internal("ui/menu.png"));
-        menuTexture =  new TextureRegion(menuSpriteSheet, 0,  192,96, 96);
-        backButtonTexture =     new TextureRegion(menuSpriteSheet, 192,0 , 32, 32);
+        menuTexture =                   new TextureRegion(menuSpriteSheet, 0,  192,96, 96);
+        backButtonTexture =             new TextureRegion(menuSpriteSheet, 192,0 , 32, 32);
 
         final Texture cardSpriteSheet = new Texture(Gdx.files.internal("ui/heroCards.png"));
-        natureCardRegion =    new TextureRegion(cardSpriteSheet, 0, 0, 96, 128);
-        natureCardThumbnail = new TextureRegion(cardSpriteSheet, 96,0, 64, 96);
+        electricCardTexture =           new TextureRegion(cardSpriteSheet, 32*5, 32*4, 96, 128);
+        stoneCardTexture =              new TextureRegion(cardSpriteSheet, 0, 32*8, 96, 128);
+        fireCardTexture =               new TextureRegion(cardSpriteSheet, 32*5, 32*8, 96, 128);
+        waterCardTexture =              new TextureRegion(cardSpriteSheet, 0, 32*12, 96, 128);
+        voidCardTexture =               new TextureRegion(cardSpriteSheet, 32*5, 32*12, 96, 128);
+
+        natureCardTexture =             new TextureRegion(cardSpriteSheet, 0, 0, 96, 128);
+        natureCardThumbnail =           new TextureRegion(cardSpriteSheet, 96,0, 64, 96);
 
         final Texture iconSpriteSheet = new Texture(Gdx.files.internal("icon-pack.png"));
-        foodIcon = new TextureRegion(iconSpriteSheet, 256, 0, 32, 32);
+        foodIcon =                      new TextureRegion(iconSpriteSheet, 256, 0, 32, 32);
 
         final Texture buildingSpriteSheet = new Texture(Gdx.files.internal("structures/buildingSpriteSheet.png"));
-        farmTexture = new TextureRegion(buildingSpriteSheet, 0, 128, 32, 32);
-        mineTexture = new TextureRegion(buildingSpriteSheet, 160, 96, 32, 32);
+        farmTexture =                       new TextureRegion(buildingSpriteSheet, 0, 128, 32, 32);
+        mineTexture =                       new TextureRegion(buildingSpriteSheet, 160, 96, 32, 32);
 
         final Texture itemSpriteSheet = new Texture(Gdx.files.internal("ui/RPG_Item_Pack.png"));
-        campaignSelectorVoid      = new TextureRegion(itemSpriteSheet,64, 0,  16,16);
-        campaignSelectorIce       = new TextureRegion(itemSpriteSheet,64, 16, 16,16);
-        campaignSelectorElectric  = new TextureRegion(itemSpriteSheet,64, 32, 16,16);
-        campaignSelectorFire      = new TextureRegion(itemSpriteSheet,64, 48, 16,16);
-        campaignSelectorNature    = new TextureRegion(itemSpriteSheet,64, 64, 16,16);
-        campaignSelectorEarth     = new TextureRegion(itemSpriteSheet,64, 70, 16,16);
-        T3AIcon                   = new TextureRegion(itemSpriteSheet,128,368,16,16);
+        campaignSelectorVoid          = new TextureRegion(itemSpriteSheet,64, 0,  16,16);
+        campaignSelectorIce           = new TextureRegion(itemSpriteSheet,64, 16, 16,16);
+        campaignSelectorElectric      = new TextureRegion(itemSpriteSheet,64, 32, 16,16);
+        campaignSelectorFire          = new TextureRegion(itemSpriteSheet,64, 48, 16,16);
+        campaignSelectorNature        = new TextureRegion(itemSpriteSheet,64, 64, 16,16);
+        campaignSelectorEarth         = new TextureRegion(itemSpriteSheet,64, 70, 16,16);
+        T3AIcon                       = new TextureRegion(itemSpriteSheet,128,368,16,16);
 
+//thyme 16*15, 16*7, 16, 16
     }
 
     private void initialiseUI() {
@@ -173,6 +186,21 @@ public class CastleScreen extends ScreenAdapter {
         oreDisplay. setSize(foodDisplay.getWidth(), foodDisplay.getHeight());
         oreDisplay.move(foodDisplay.getX(), foodDisplay.getY() + oreDisplay.getHeight() + (oreDisplay.getHeight() * .5f));
         uiGroup.addActor(oreDisplay);
+
+        arcanaDisplay = new ResourceDisplay(this, ResourceDisplay.DisplayType.ARCANA);
+        arcanaDisplay.setSize(foodDisplay.getWidth() * .9f, foodDisplay.getHeight());
+        arcanaDisplay.move(oreDisplay.getX() + oreDisplay.getWidth() + 5, oreDisplay.getY());
+        uiGroup.addActor(arcanaDisplay);
+
+        pureGemsDisplay = new ResourceDisplay(this, ResourceDisplay.DisplayType.PURE_GEM);
+        pureGemsDisplay.setSize(foodDisplay.getWidth() * .8f, foodDisplay.getHeight());
+        pureGemsDisplay.move(arcanaDisplay.getX() + arcanaDisplay.getWidth() + 5, arcanaDisplay.getY());
+        uiGroup.addActor(pureGemsDisplay);
+
+        thymeDisplay = new ResourceDisplay(this, ResourceDisplay.DisplayType.THYME);
+        thymeDisplay.setSize(arcanaDisplay.getWidth() + pureGemsDisplay.getWidth() + 5, pureGemsDisplay.getHeight());
+        thymeDisplay.move(arcanaDisplay.getX(), foodDisplay.getY());
+        uiGroup.addActor(thymeDisplay);
     }
 
     private void initialiseStructures() {

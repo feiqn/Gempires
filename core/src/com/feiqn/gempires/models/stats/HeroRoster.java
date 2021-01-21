@@ -44,7 +44,7 @@ public class HeroRoster {
         } else {
             Gdx.app.log("HeroRoster", "New Player");
             // TODO: add starter heroes
-             addHero(new Leif(parentCastle.natureCardRegion, parentCastle));
+             addHero(new Leif(parentCastle.natureCardTexture, parentCastle));
         }
 
         pref.flush();
@@ -94,7 +94,7 @@ public class HeroRoster {
                         // ZERO-STAR, COMMON-NOUN UNITS ARE LOADED BY PlayerInventory
                         break;
                     case LEIF:
-                        final Leif leif = new Leif(parentCastle.natureCardRegion, parentCastle);
+                        final Leif leif = new Leif(parentCastle.natureCardTexture, parentCastle);
                         restoreHero(leif);
                         break;
                 }
@@ -136,7 +136,7 @@ public class HeroRoster {
                 break;
             case LEIF:
                 if(!pref.contains("name" + newHero)) {
-                    addHero(new Leif(parentCastle.natureCardRegion, parentCastle));
+                    addHero(new Leif(parentCastle.natureCardTexture, parentCastle));
                 } else {
                     addBraveryToken(newHero);
                 }

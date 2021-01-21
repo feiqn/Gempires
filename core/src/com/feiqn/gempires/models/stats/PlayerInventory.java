@@ -237,6 +237,12 @@ public class PlayerInventory {
     public float getArcanaCount() { return arcanaCount; }
     public float getOreCount() { return oreCount; }
     public int getCommonUnitCount(Heroes unit) { return commonUnits.get(unit); }
-    public int getItemCount(ItemList item) { return items.get(item);}
+    public int getItemCount(ItemList item) {
+        if(items.containsKey(item)) {
+            return items.get(item);
+        } else {
+            return  0;
+        }
+    }
 
 }

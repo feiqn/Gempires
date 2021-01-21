@@ -53,10 +53,13 @@ public class PopupMenu extends Group {
                 int xRevs = 0;
                 int yRevs = 0;
                 for(HeroCard hero : parentStructure.getParentScreen().heroRoster.getHeroList()) {
-                    hero.thumbnail.setPosition(3 * xRevs, 4 * yRevs);
+                    final float w = (Gdx.graphics.getWidth() * .2f);
+                    final float h = w * 1.5f;
+                    hero.thumbnail.setSize(w, h);
+                    hero.thumbnail.setPosition(hero.thumbnail.getWidth() * xRevs, hero.thumbnail.getHeight() * yRevs);
                     addActor(hero.thumbnail);
                     xRevs++;
-                    if(xRevs > 4) {
+                    if(xRevs > 5) {
                         yRevs++;
                         xRevs = 0;
                     }
@@ -65,8 +68,9 @@ public class PopupMenu extends Group {
             case GODDESS_STATUE:
                 // SUMMON HERO
                 final SummonButton summonButton = new SummonButton(this);
-                summonButton.setX(parentStructure.getParentScreen().gameCamera.viewportWidth * .5f);
-                summonButton.setY(5);
+                summonButton.setX(parentStructure.getParentScreen().gameCamera.viewportWidth * .3f);
+                summonButton.setY(Gdx.graphics.getHeight() * .8f);
+                summonButton.setSize(Gdx.graphics.getWidth() * .8f, Gdx.graphics.getHeight() * .1f);
                 addActor(summonButton);
                 addLevelUpButton();
                 break;
@@ -79,8 +83,9 @@ public class PopupMenu extends Group {
 
     private void addLevelUpButton() {
         final LevelUpButton levelUpButton = new LevelUpButton(this);
-        levelUpButton.setX(parentStructure.getParentScreen().gameCamera.viewportWidth * .5f);
-        levelUpButton.setY(1);
+        levelUpButton.setX(parentStructure.getParentScreen().gameCamera.viewportWidth * .4f);
+        levelUpButton.setY(Gdx.graphics.getHeight() * .4f);
+        levelUpButton.setSize(Gdx.graphics.getWidth() * .8f, Gdx.graphics.getHeight() * .1f);
         addActor(levelUpButton);
     }
     public Structure getParentStructure() { return parentStructure; }
