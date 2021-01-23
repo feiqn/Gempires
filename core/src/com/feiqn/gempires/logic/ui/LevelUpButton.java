@@ -49,4 +49,10 @@ public class LevelUpButton extends Image {
         super.draw(batch, parentAlpha);
         label.draw(batch, parentAlpha);
     }
+
+    @Override
+    public void setColor(float r, float g, float b, float a) {
+        super.setColor(r,g,b,a);
+        label.setColor(r,g,b,a);
+    }
 }

@@ -1,8 +1,10 @@
 package com.feiqn.gempires.logic.ui;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.utils.DelayedRemovalArray;
 import com.feiqn.gempires.logic.castle.Structure;
 import com.feiqn.gempires.logic.characters.heroes.HeroCard;
 import com.feiqn.gempires.logic.items.ItemList;
@@ -84,14 +86,23 @@ public class PopupMenu extends Group {
     }
 
     private void addLevelUpButton() {
+        boolean canLevelUp = true;
         final LevelUpButton levelUpButton = new LevelUpButton(this);
+
         levelUpButton.move(Gdx.graphics.getWidth() * .12f, Gdx.graphics.getHeight() * .3f);
+
         addActor(levelUpButton);
+
         final HashMap<ItemList, Integer> neededItems = parentStructure.getLevelUpItemRequirements();
+
         for(ItemList item : ItemList.values()) {
             if(neededItems.containsKey(item)) {
                 Gdx.app.log("level up button", "You need " + neededItems.get(item) + " " + item.toString() + "s. You have: " + parentStructure.getParentScreen().playerInventory.getItemCount(item));
-                // TODO
+                final int ownedAmount = parentStructure.getParentScreen().playerInventory.getItemCount(item);
+                final int neededAmount = neededItems.get(item);
+                if(ownedAmount < neededAmount) {
+                    canLevelUp = false;
+                }
             }
         }
 
@@ -99,10 +110,24 @@ public class PopupMenu extends Group {
         final int neededFood = neededResources.get("food");
         final int neededOre = neededResources.get("ore");
         final int neededArcana = neededResources.get("arcana");
+        final int ownedFood = (int) parentStructure.getParentScreen().playerInventory.getFoodCount();
+        final int ownedOre = (int) parentStructure.getParentScreen().playerInventory.getOreCount();
+        final int ownedArcana = (int) parentStructure.getParentScreen().playerInventory.getFoodCount();
 
         Gdx.app.log("level up button", "You also need " + neededFood + " food, " + neededOre + " ore, and " + neededArcana + " arcana");
-        
-        // TODO: if(don't have enough resources) { levelUpButton.touchable = false }
+
+        if(neededArcana < ownedArcana
+          || neededFood < ownedFood
+          || neededOre  < ownedOre) {
+            canLevelUp = false;
+        }
+
+        if(!canLevelUp) {
+            levelUpButton.setColor(.4f,.4f, .4f,1);
+            for(EventListener l : levelUpButton.getListeners()) {
+                levelUpButton.removeListener(l);
+            }
+        }
     }
     public Structure getParentStructure() { return parentStructure; }
 }
