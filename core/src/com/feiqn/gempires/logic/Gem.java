@@ -2,9 +2,11 @@ package com.feiqn.gempires.logic;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.feiqn.gempires.logic.stages.match3.MatchScreen;
 
 
 public class Gem extends Image {
@@ -27,7 +29,7 @@ public class Gem extends Image {
         // ORANGE 3
         // YELLOW 4
         // BLUE   5
-        // CLEAR  6
+        // PURE   6
         // BLANK  7
 
         super(region);
@@ -40,15 +42,21 @@ public class Gem extends Image {
         addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                setColor(.5f, .5f, .5f, 1);
-                return true;
+                if(matchScreen.allowUserInput) {
+                    setColor(.5f, .5f, .5f, 1);
+                    return true;
+                } else {
+                    return false;
+                }
             }
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int point, int button) {
                 // Gdx.app.log("touchUP", "x: " + x + ", y: " + y);
-                setColor(1.5f, 1.5f, 1.5f, 1);
-                matchScreen.checkBoundsThenSwap(x, y, GemIndex);
+                if(matchScreen.allowUserInput) {
+                    setColor(1.5f, 1.5f, 1.5f, 1);
+                    matchScreen.checkBoundsThenSwap(x, y, GemIndex);
+                }
             }
         });
     }
@@ -56,12 +64,16 @@ public class Gem extends Image {
     public void setToBlank() {
         this.GemColor = 7;
         setColor(.1f, .1f, .1f, 0f);
+        for(EventListener l : getListeners()) {
+            removeListener(l);
+        }
     }
 
-    public void setXY(float pX, float pY) {
-        setPosition(pX, pY);
-        bounds.setX((int)pX);
-        bounds.setY((int)pY);
+    @Override
+    public void setPosition(float x, float y) {
+        super.setPosition(x, y);
+        bounds.setX(x);
+        bounds.setY(y);
     }
 }
 

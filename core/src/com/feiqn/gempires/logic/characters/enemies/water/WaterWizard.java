@@ -8,11 +8,9 @@ import com.feiqn.gempires.logic.characters.enemies.Enemy;
 public class WaterWizard extends Enemy {
 
     public WaterWizard(TextureRegion region) {
-        super(region, 5, 5, 10);
+        super(region, 5, 5, 100);
         this.element = Element.WATER;
         this.beastType = Bestiary.WATER_WIZARD;
-        this.setSize(2, 2);
-
     }
 
 }

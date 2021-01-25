@@ -22,12 +22,12 @@ public class Enemy extends Image {
     public Enemy(TextureRegion region, float baseStr, float baseDef, float baseHP) {
         super(region);
 
-        bounds = new Rectangle((int) getX(), (int) getY(), (int) getWidth(), (int) getHeight());
+        bounds = new Rectangle(getX(), getY(), getWidth(), getHeight());
 
         this.strength = baseStr;
         this.defense = baseDef;
         this.maxHealth = baseHP;
-        this.currentHealth = maxHealth;
+        this.currentHealth = baseHP;
     }
 
     public void scaleToLevel(int level) {
@@ -35,6 +35,7 @@ public class Enemy extends Image {
             strength *= 1.25f;
             defense *= 1.25f;
             maxHealth *= 1.25f;
+            currentHealth = maxHealth;
         }
     }
 
@@ -56,6 +57,19 @@ public class Enemy extends Image {
         currentHealth -= damage;
     }
 
+    @Override
+    public void setSize(float width, float height) {
+        super.setSize(width, height);
+        bounds = new Rectangle(getX(), getY(), getWidth() *.9f, getHeight());
+    }
+
+    @Override
+    public void setPosition(float x, float y) {
+        super.setPosition(x, y);
+        bounds.setX(x);
+        bounds.setY(y);
+    }
+
     // GETTERS
     public float getStrength() {
         return strength;
@@ -70,9 +84,5 @@ public class Enemy extends Image {
         return currentHealth;
     }
 
-    public void setXY(float pX, float pY) {
-        setPosition(pX, pY);
-        bounds.setX((int)pX);
-        bounds.setY((int)pY);
-    }
+
 }

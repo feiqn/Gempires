@@ -1,4 +1,4 @@
-package com.feiqn.gempires.logic;
+package com.feiqn.gempires.logic.stages.match3;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
@@ -10,6 +10,7 @@ import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
@@ -17,6 +18,8 @@ import com.badlogic.gdx.utils.DelayedRemovalArray;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.feiqn.gempires.GempiresGame;
+import com.feiqn.gempires.logic.AttackToken;
+import com.feiqn.gempires.logic.Gem;
 import com.feiqn.gempires.logic.characters.enemies.Bestiary;
 import com.feiqn.gempires.logic.characters.enemies.Enemy;
 import com.feiqn.gempires.logic.characters.enemies.water.WaterWizard;
@@ -34,20 +37,20 @@ public class MatchScreen extends ScreenAdapter {
     // Tables are kind of made for this sort of thing.
     // For no particular reason whatsoever, fuck tables.
 
-    private OrthographicCamera camera;
-    private OrthogonalTiledMapRenderer orthoMapRenderer;
-    private TiledMap matchMap;
+    public OrthographicCamera gameCamera;
+    public OrthogonalTiledMapRenderer orthoMapRenderer;
+    public TiledMap matchMap;
 
     public MapProperties mapProperties;
 
     public final float gemSwapTime = 0.2f;
     float timeToCompleteSwaps = 0f;
 
-    GempiresGame game;
-    private Stage stage;
+    final GempiresGame game;
+    public Stage stage;
 
     public Group gemGroup,
-                 topLayer; // TODO: set top layer for attack tokens to display on
+                 topLayer;
 
     public boolean matchFound,
                    classicMode,
@@ -65,14 +68,14 @@ public class MatchScreen extends ScreenAdapter {
                 stonePower,
                 electricPower,
                 enemyDifficulty,
-                wavesCleared,
-                enemiesOnScreen;
+                numberOfEnemiesOnScreen;
 
-    private TextureRegion[] gemTextures,
+    public TextureRegion[] gemTextures,
                             attackTokenTextures;
 
     public CampaignLevelID campaignLevelID;
 
+    public ArrayList<Vector2> slots;
     public ArrayList<Gem> matchesForThisGem,
                           sendToDestroy,
 
@@ -84,46 +87,38 @@ public class MatchScreen extends ScreenAdapter {
 
     // TODO: Current implementation of Gems<> is poor. Switch to POOLING will be mandatory soon.
     public DelayedRemovalArray<Gem> gems;
-
-    private DelayedRemovalArray<Enemy> enemies;
+    private DelayedRemovalArray<Enemy> enemiesOnScreen;
+    private DelayedRemovalArray<AttackToken> attackTokensOnScreen;
 
     private HashMap<Bestiary, Boolean> enemyIsInitialized;
-    private HashMap<Integer, Formation> waveFormations;
 
-    private ArrayList<Integer> waves;
+    public TextureRegion waterWizardTextureRegion;
 
-    public ArrayList<Vector2> slots;
-
-    private TextureRegion waterWizardTextureRegion;
-
-    public MatchScreen(GempiresGame game, Boolean classic, CampaignLevelID levelID){
+    public MatchScreen(GempiresGame game, CampaignLevelID levelID){
         this.game = game;
-        this.classicMode = classic;
+        this.classicMode = false;
         this.campaignLevelID = levelID;
     }
     public MatchScreen(GempiresGame game) {
-        // new MatchScreen(game, true, CampaignLevelID.DEFAULT);
         this.game = game;
         this.classicMode = true;
-        this.campaignLevelID = CampaignLevelID.DEBUG;
+        this.campaignLevelID = CampaignLevelID.CLASSIC_1;
     }
 
-    private void initAdventureMode(ArrayList<Bestiary> passToInitEnemies) {
-        // Called by loadMap()
+    public void initAdventureMode(ArrayList<Bestiary> passToInitEnemies) {
+        // Called by child class
 
-        waterPower = 0;
-        firePower = 0;
-        stonePower = 0;
-        electricPower = 0;
-        voidPower = 0;
-        naturePower = 0;
+        waterPower = 1;
+        firePower = 1;
+        stonePower = 1;
+        electricPower = 1;
+        voidPower = 1;
+        naturePower = 1;
 
         enemyDifficulty = 0;
-        enemiesOnScreen = 0;
-        wavesCleared = 0;
-        waves = new ArrayList<>();
-        waveFormations = new HashMap<>();
-        enemies = new DelayedRemovalArray<>();
+        numberOfEnemiesOnScreen = 0;
+        enemiesOnScreen = new DelayedRemovalArray<>();
+        attackTokensOnScreen = new DelayedRemovalArray<>();
         enemyIsInitialized = new HashMap<Bestiary, Boolean>(Bestiary.values().length);
 
         for(int i = 0; i < Bestiary.values().length; i++) {
@@ -140,25 +135,18 @@ public class MatchScreen extends ScreenAdapter {
             switch(beast) {
                 case WATER_WIZARD:
                     if(!enemyIsInitialized.get(Bestiary.WATER_WIZARD)) {
+                        Gdx.app.log("water wizard texture ready", "");
                         final Texture wizardSpriteSheet = new Texture(Gdx.files.internal("characters/enemies/wizard_spritesheet.png"));
                         waterWizardTextureRegion = new TextureRegion(wizardSpriteSheet, 64, 288, 64, 64);
 
                         enemyIsInitialized.put(Bestiary.WATER_WIZARD, true);
                     }
-
-                    final WaterWizard waterWizard = new WaterWizard(waterWizardTextureRegion);
-                    enemies.add(waterWizard);
                     break;
 
                 case ICE_FIEND:
                     break;
             }
         }
-
-        for(Enemy enemy : enemies) {
-            enemy.scaleToLevel(enemyDifficulty);
-        }
-
     }
 
     private void createAndFillSlots(final int countRows, final int countColumns) {
@@ -196,7 +184,7 @@ public class MatchScreen extends ScreenAdapter {
                 gem.positionInRow = x;
                 gem.positionInColumn = i;
 
-                gem.setXY(nextPosition.x, nextPosition.y);
+                gem.setPosition(nextPosition.x, nextPosition.y);
 
                 gems.add(gem);
                 stage.addActor(gem);
@@ -215,6 +203,8 @@ public class MatchScreen extends ScreenAdapter {
     }
 
     public void swapGems(Gem origin, Gem destination) {
+
+//        allowUserInput = false;
 
         final Vector2 originSlot = slots.get(origin.GemIndex);
         final Vector2 destinationSlot;
@@ -243,11 +233,12 @@ public class MatchScreen extends ScreenAdapter {
         destination.addAction(Actions.moveTo(originSlot.x, originSlot.y, gemSwapTime));
         origin.addAction(Actions.moveTo(destinationSlot.x, destinationSlot.y, gemSwapTime));
 
-//        if (slots.size > rows * columns) {
-//            slots.begin();
-//            slots.removeIndex(slots.size - 1);
-//            slots.end();
-//        }
+        Timer.schedule(new Timer.Task(){
+            @Override
+            public void run() {
+//                allowUserInput = true;
+            }
+        }, gemSwapTime);
 
     }
 
@@ -347,26 +338,37 @@ public class MatchScreen extends ScreenAdapter {
         return null;
     }
 
-    public void destroy(ArrayList<Gem> gemsToDestroy) {
+    public void destroyGems(ArrayList<Gem> gemsToDestroy) {
 
         for(Gem gem : gemsToDestroy) {
-            final Element gemElement = translateGemColorToElement(gem.GemColor);
-            if(gem.GemColor != 7) {
-                final AttackToken token = new AttackToken(attackTokenTextures[gem.GemColor], gemElement);
+            if(!classicMode) {
+                final Element gemElement = translateGemColorToElement(gem.GemColor);
+                if (gem.GemColor != 7) {
+                    final AttackToken token = new AttackToken(attackTokenTextures[gem.GemColor], gemElement);
 
-                token.setX(gem.getX());
-                token.setY(gem.getY());
+                    token.setX(gem.getX());
+                    token.setY(gem.getY());
 
-                stage.addActor(token);
+                    stage.addActor(token);
 
-                token.addAction(Actions.moveTo(token.getX(), camera.viewportHeight, 1));
+                    attackTokensOnScreen.add(token);
 
-                Timer.schedule(new Timer.Task() {
-                    @Override
-                    public void run() {
-                        token.remove();
-                    }
-                }, 2);
+                    token.addAction(Actions.moveTo(token.getX(), gameCamera.viewportHeight, 1));
+
+                    Timer.schedule(new Timer.Task() {
+                        @Override
+                        public void run() {
+                            try {
+                                token.remove();
+                                attackTokensOnScreen.begin();
+                                attackTokensOnScreen.removeValue(token, true);
+                                attackTokensOnScreen.end();
+                            } catch (Exception ignored) {
+
+                            }
+                        }
+                    }, 2);
+                }
             }
             gem.setToBlank();
         }
@@ -387,11 +389,55 @@ public class MatchScreen extends ScreenAdapter {
 
     public void checkIfGemsShouldBeDropped() {
 
-        for(final Gem gem : gems) {
+        for(Gem gem : gems) {
             if(gem.GemColor == 7) {
-
                 if(classicMode) {
                     // standard bejewelled style, gems fall from the top down
+                    // TODO: broken
+                    if(gem.positionInColumn == rows - 1) {
+                        // need to spawn a new gem,
+                        // TODO: newGem pooling
+                        Gdx.app.log("", "spawn new gem");
+
+                        final Random random = new Random();
+                        final int gemColor = random.nextInt(7);
+                        final int newIndex = gems.size + 1;
+                        final Gem newGem = new Gem(gemTextures[gemColor], gemColor, newIndex, this);
+
+                        newGem.positionInColumn = gem.positionInColumn;
+                        newGem.positionInRow = gem.positionInRow;
+
+                        newGem.setPosition(gem.getX(), gem.getY() + 2);
+
+                        gems.add(newGem);
+                        stage.addActor(newGem);
+
+                        // swap() the blank gem with the new gem below it,
+                        swapGems(gem, newGem);
+                        timeToCompleteSwaps += gemSwapTime;
+
+                        // and safely remove() the blank gem to end the loop!
+
+                        gems.begin();
+                        gems.removeValue(gem, true);
+                        gems.end();
+
+                        gem.remove();
+
+                    } else {
+                        // just swap the blank gem with the gem above it and repeat loop
+                        swapGems(gem, gems.get(gem.GemIndex + columns));
+                        timeToCompleteSwaps += gemSwapTime;
+
+                        Timer.schedule(new Timer.Task(){
+                            @Override
+                            public void run() {
+                                checkIfGemsShouldBeDropped();
+                            }
+                        }, 0.06f);
+
+                        break;
+                    }
 
                 } else {
                     // adventure mode, gems come from the bottom up
@@ -407,7 +453,7 @@ public class MatchScreen extends ScreenAdapter {
                         newGem.positionInColumn = gem.positionInColumn;
                         newGem.positionInRow = gem.positionInRow;
 
-                        newGem.setXY(gem.getX(), gem.getY() - 2f);
+                        newGem.setPosition(gem.getX(), gem.getY() - 2f);
 
                         gems.add(newGem);
                         stage.addActor(newGem);
@@ -624,7 +670,7 @@ public class MatchScreen extends ScreenAdapter {
         for(Gem gem : gems) { look(gem); }
 
         if(matchFound) {
-            destroy(sendToDestroy);
+            destroyGems(sendToDestroy);
         }
 
         return matchFound;
@@ -633,35 +679,17 @@ public class MatchScreen extends ScreenAdapter {
     private void loadMap() {
         // Called by show()
 
-        // Sizes default to 6 & 8 for adventure mode; but this can be changed for any given stage
         rows = 6;
         columns = 8;
-
-        ArrayList<Bestiary> neededEnemies = new ArrayList<>();
 
         switch (campaignLevelID) {
             case WATER_1:
             case WATER_2:
-                matchMap = new TmxMapLoader().load("maps/ice_debug.tmx");
-                enemyDifficulty = 2;
-
-                neededEnemies.add(Bestiary.WATER_WIZARD);
-                initAdventureMode(neededEnemies);
-
-                waves.add(1); // waves contains the NUMBER OF ENEMIES at each wave, with each index being 1 wave
-                waveFormations.put(0, Formation.ONE_CENTER); // waveFormations contains the layout / arrangement of enemies at each wave, with each key relating to wave number, indexed from zero
-
-                /*
-                 * The math for adding waves of enemies here must always add up.
-                 * For example, if 10 enemies are added, and 3 waves, the total
-                 * number of enemies deployed over 3 waves must equal 10. For example:
-                 * 3 + 3 + 4, 2 + 5 + 3, etc.
-                */
-                break;
-
             case WATER_3:
             case WATER_4:
             case WATER_5:
+                matchMap = new TmxMapLoader().load("maps/ice_debug.tmx");
+                break;
             case FIRE_1:
             case FIRE_2:
             case VOID_1:
@@ -674,8 +702,7 @@ public class MatchScreen extends ScreenAdapter {
             case ELECTRIC_2:
             case CLASSIC_1:
             case CLASSIC_2:
-
-            case DEBUG:
+            default:
                 matchMap = new TmxMapLoader().load("testMap.tmx");
                 rows = 5;
                 columns = 7;
@@ -685,64 +712,132 @@ public class MatchScreen extends ScreenAdapter {
     }
 
     private void destroyEnemy(Enemy enemy) {
-        // TODO: destroy enemy
 
-        enemies.removeValue(enemy, true);
+        enemiesOnScreen.begin();
+        enemiesOnScreen.removeValue(enemy, true);
+        enemiesOnScreen.end();
 
-        enemiesOnScreen--;
-        if(enemiesOnScreen <= 0) {
-            wavesCleared++;
-            deployEnemyWave();
+        enemy.remove();
+
+        numberOfEnemiesOnScreen--;
+        if(numberOfEnemiesOnScreen <= 0) {
+            // TODO: wait until matches are done
+            clearWave();
         }
     }
 
-    private void deployEnemyWave() {
-        // Called by show()
-        // Called by destroyEnemy() when a wave is cleared
+    public void clearWave() {
+        // child class only
+        // Template:
 
+//        if(firstWaveClear && secondWaveClear && thirdWaveClear) {
+//            // stage clear
+//
+//        } else if(firstWaveClear && secondWaveClear) {
+//            thirdWaveClear = true;
+//            // fourth wave?
+//
+//        } else if(firstWaveClear && !thirdWaveClear) {
+//            secondWaveClear = true;
+//            // deploy wave 3
+//
+//        } else if(!firstWaveClear && !secondWaveClear && !thirdWaveClear) {
+//            firstWaveClear = true;
+//            // deploy wave2
+//
+//        }
+    }
 
-        if(waves.size() > 0) {
+    public void deployWave(ArrayList<Enemy> wave, Formation formation) {
 
-            final int enemiesLeftToDeploy = waves.get(0);
-            final ArrayList<Enemy> thisWave = new ArrayList<>();
-            final Formation thisFormation = waveFormations.get(wavesCleared);
-
-            enemiesOnScreen = enemiesLeftToDeploy;
-
-            for(int i = 0; i < waves.get(0); i++) {
-                final Enemy enemyToDeploy = enemies.get(i);
-                stage.addActor(enemyToDeploy);
-            }
-
-             switch (thisFormation) {
-                 case ONE_CENTER:
-                     enemies.get(0).setSize(6,6);
-                     enemies.get(0).setXY(1.5f, 9.5f);
-                     break;
-                 case TWO_IN_BACK:
-                 case TWO_IN_FRONT:
-                 case TWO_STAGGERED_LEFT:
-                 case TWO_STAGGERED_RIGHT:
-                 case THREE_ASCENDING:
-                 case THREE_DESCENDING:
-                 case THREE_IN_FRONT:
-                 case FOUR_IN_FRONT:
-                 case FOUR_REVERSE_N_SHAPE:
-                 case FOUR_WITH_BACK_SIDE_FLANKS:
-                 case FOUR_WITH_FRONT_SIDE_FLANKS:
-                 case FOUR_N_SHAPE:
-                 case FIVE_M_SHAPE:
-                 case FIVE_W_SHAPE:
-                 case FIVE_PROTECTING_CENTER:
-                 case FIVE_DESCENDING:
-                 case FIVE_ASCENDING:
-                     break;
-             }
-
-            waves.remove(0);
+        for(Enemy e : wave) {
+            stage.addActor(e);
+            enemiesOnScreen.add(e);
         }
 
+        numberOfEnemiesOnScreen = wave.size();
+
+        switch (formation) {
+            case ONE_CENTER:
+                wave.get(0).setSize(4,4);
+                wave.get(0).setPosition(2.5f, 9.5f);
+                break;
+            case TWO_IN_BACK:
+            case TWO_IN_FRONT:
+                wave.get(0).setSize(4,4);
+                wave.get(0).setPosition(.5f, 9.5f);
+
+                wave.get(1).setSize(4,4);
+                wave.get(1).setPosition(3.5f, 9.5f);
+                break;
+            case TWO_STAGGERED_LEFT:
+            case TWO_STAGGERED_RIGHT:
+            case THREE_ASCENDING:
+            case THREE_DESCENDING:
+            case THREE_IN_FRONT:
+            case FOUR_IN_FRONT:
+            case FOUR_REVERSE_N_SHAPE:
+            case FOUR_WITH_BACK_SIDE_FLANKS:
+            case FOUR_WITH_FRONT_SIDE_FLANKS:
+            case FOUR_N_SHAPE:
+            case FIVE_M_SHAPE:
+            case FIVE_W_SHAPE:
+            case FIVE_PROTECTING_CENTER:
+            case FIVE_DESCENDING:
+            case FIVE_ASCENDING:
+                break;
+        }
+        for(Enemy enemy : wave) {
+            enemy.scaleToLevel(enemyDifficulty);
+        }
     }
+
+//    public void deployEnemyWave() {
+//        // Called by show()
+//        // Called by destroyEnemy() when a wave is cleared
+//
+//        if(waves.size() > 0) {
+//
+//            final int enemiesLeftToDeploy = waves.get(0);
+//            final ArrayList<Enemy> thisWave = new ArrayList<>();
+//            final Formation thisFormation = waveFormations.get(wavesCleared);
+//
+//            enemiesOnScreen = enemiesLeftToDeploy;
+//
+//            for(int i = 0; i < waves.get(0); i++) {
+//                final Enemy enemyToDeploy = enemies.get(i);
+//                stage.addActor(enemyToDeploy);
+//            }
+//
+//             switch (thisFormation) {
+//                 case ONE_CENTER:
+//                     enemies.get(0).setSize(6,6);
+//                     enemies.get(0).setXY(1.5f, 9.5f);
+//                     break;
+//                 case TWO_IN_BACK:
+//                 case TWO_IN_FRONT:
+//                 case TWO_STAGGERED_LEFT:
+//                 case TWO_STAGGERED_RIGHT:
+//                 case THREE_ASCENDING:
+//                 case THREE_DESCENDING:
+//                 case THREE_IN_FRONT:
+//                 case FOUR_IN_FRONT:
+//                 case FOUR_REVERSE_N_SHAPE:
+//                 case FOUR_WITH_BACK_SIDE_FLANKS:
+//                 case FOUR_WITH_FRONT_SIDE_FLANKS:
+//                 case FOUR_N_SHAPE:
+//                 case FIVE_M_SHAPE:
+//                 case FIVE_W_SHAPE:
+//                 case FIVE_PROTECTING_CENTER:
+//                 case FIVE_DESCENDING:
+//                 case FIVE_ASCENDING:
+//                     break;
+//             }
+//
+//            waves.remove(0);
+//        }
+//
+//    }
 
     private void calculateGemPower() {
         // TODO
@@ -782,15 +877,11 @@ public class MatchScreen extends ScreenAdapter {
         horizontalMatchLength = 0;
         verticalMatchLength = 0;
 
-        camera = new OrthographicCamera();
+        allowUserInput = true;
+        gameCamera = new OrthographicCamera();
         slots = new ArrayList<Vector2>();
         gems = new DelayedRemovalArray<Gem>();
         sendToDestroy = new ArrayList<Gem>();
-
-        //
-        classicMode=false; // debug
-        campaignLevelID = CampaignLevelID.WATER_1; // debug
-        //
 
         initGemTextures();
 
@@ -802,14 +893,13 @@ public class MatchScreen extends ScreenAdapter {
         final double worldHeight = Math.floor(worldWidth * 1.77777778f); // approx 9:16
 
         FitViewport fitViewport = new FitViewport(worldWidth, (int) worldHeight);
-        camera.setToOrtho(false, worldWidth, (int) worldHeight);
+        gameCamera.setToOrtho(false, worldWidth, (int) worldHeight);
 
         stage = new Stage(fitViewport);
 
         createAndFillSlots(rows, columns);
 
         if(!classicMode) {
-            deployEnemyWave();
             calculateGemPower();
         }
 
@@ -820,10 +910,9 @@ public class MatchScreen extends ScreenAdapter {
         stage.addActor(debugShuffler); //
         //
 
-
         Gdx.input.setInputProcessor(stage);
 
-        camera.update();
+        gameCamera.update();
 
         Timer.schedule(new Timer.Task(){
             @Override
@@ -833,13 +922,155 @@ public class MatchScreen extends ScreenAdapter {
         }, 1);
     }
 
+    private void calculateDamage(Element damageType, Enemy enemy) {
+
+        final float damage;
+
+        // TODO: do these elements actually make sense?
+
+        switch(damageType) {
+            case ELECTRIC:
+                switch(enemy.element) {
+                    case VOID:
+                    case WATER:
+                        damage = electricPower * 2;
+                        break;
+                    case NATURE:
+                    case STONE:
+                        damage = electricPower * .5f;
+                        break;
+                    default:
+                        damage = electricPower;
+                        break;
+                }
+                break;
+            case FIRE:
+                switch(enemy.element) {
+                    case NATURE:
+                    case VOID:
+                        damage = firePower * 2;
+                        break;
+                    case WATER:
+                    case STONE:
+                        damage = firePower * .5f;
+                        break;
+                    default:
+                        damage = firePower;
+                        break;
+                }
+                break;
+            case STONE:
+                switch(enemy.element) {
+                    case FIRE:
+                    case ELECTRIC:
+                        damage = stonePower * 2;
+                        break;
+                    case VOID:
+                    case WATER:
+                        damage = stonePower * .5f;
+                        break;
+                    default:
+                        damage = stonePower;
+                        break;
+                }
+                break;
+            case WATER:
+                switch(enemy.element) {
+                    case FIRE:
+                    case STONE:
+                        damage = waterPower * 2;
+                        break;
+                    case NATURE:
+                    case ELECTRIC:
+                        damage = waterPower * .5f;
+                        break;
+                    default:
+                        damage = waterPower;
+                        break;
+                }
+                break;
+            case NATURE:
+                switch(enemy.element) {
+                    case WATER:
+                    case ELECTRIC:
+                        damage = naturePower * 2;
+                        break;
+                    case FIRE:
+                    case VOID:
+                        damage = naturePower * .5f;
+                        break;
+                    default:
+                        damage = naturePower;
+                        break;
+                }
+                break;
+            case VOID:
+                switch(enemy.element) {
+                    case STONE:
+                    case NATURE:
+                        damage = voidPower * 2;
+                        break;
+                    case FIRE:
+                    case ELECTRIC:
+                        damage = voidPower * .5f;
+                        break;
+                    default:
+                        damage = voidPower;
+                        break;
+                }
+                break;
+            case PURE:
+                // TODO:
+                damage = 1000000000;
+                break;
+            default:
+                damage = 1;
+                break;
+        }
+
+        enemy.applyDamage(damage);
+
+        if(enemy.getCurrentHealth() <= 0) {
+            destroyEnemy(enemy);
+        }
+    }
+
+    private void checkCollision() {
+        for (AttackToken t : attackTokensOnScreen) {
+            t.updateBounds();
+            for (final Enemy e : enemiesOnScreen) {
+                if (Intersector.overlaps(t.bounds, e.bounds)) {
+                    t.remove();
+                    attackTokensOnScreen.begin();
+                    attackTokensOnScreen.removeValue(t, true);
+                    attackTokensOnScreen.end();
+
+                    calculateDamage(t.element, e);
+
+                    e.setColor(.5f,.5f,.5f,1);
+
+                    Timer.schedule(new Timer.Task(){
+                        @Override
+                        public void run() {
+                            e.setColor(1f,1f,1f,1);
+                        }
+                    }, 0.05f);
+                }
+            }
+        }
+    }
+
     @Override
     public void render(float delta) {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         Gdx.gl.glClearColor(0, 0, 0, 1);
 
-        orthoMapRenderer.setView(camera);
+        orthoMapRenderer.setView(gameCamera);
         orthoMapRenderer.render();
+
+        if(!classicMode) {
+            checkCollision();
+        }
 
         stage.act();
         stage.draw();
@@ -854,6 +1085,10 @@ public class MatchScreen extends ScreenAdapter {
     @Override
     public void dispose() {
         stage.dispose();
+    }
+
+    public void setEnemyDifficulty(int difficulty) {
+        enemyDifficulty = difficulty;
     }
 
 }

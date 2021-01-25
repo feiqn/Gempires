@@ -6,7 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.feiqn.gempires.models.Element;
-import com.feiqn.gempires.logic.MatchScreen;
+import com.feiqn.gempires.logic.stages.match3.MatchScreen;
 import com.feiqn.gempires.logic.castle.CastleScreen;
 
 public class HeroCard extends Image {

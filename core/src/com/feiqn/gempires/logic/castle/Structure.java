@@ -30,7 +30,8 @@ public class Structure extends Image {
         TURRET,             // attack nearby enemies
         GARRISON,           // station heroes to attack nearby enemies
         BARRICADE,          // block enemies from passing through
-        GODDESS_STATUE      // base structure at the center of castle. everybody always has only one.
+        GODDESS_STATUE,     // base structure at the center of castle. everybody always has only one.
+        CAMPAIGN_SELECTOR   // handler for campaign levels
     }
 
     public Rectangle bounds;
@@ -101,6 +102,12 @@ public class Structure extends Image {
                     case GODDESS_STATUE:
                         final PopupMenu goddessPopUpMenu = new PopupMenu(self, PopupMenu.MenuType.GODDESS_STATUE);
                         parentScreen.uiGroup.addActor(goddessPopUpMenu);
+                        break;
+                    case CAMPAIGN_SELECTOR:
+                        final PopupMenu campaignMenu = new PopupMenu(self, PopupMenu.MenuType.CAMPAIGN_SELECTOR);
+                        parentScreen.uiGroup.addActor(campaignMenu);
+                        break;
+                    default:
                         break;
                 }
             }
@@ -368,6 +375,10 @@ public class Structure extends Image {
         setPosition(pX, pY);
         bounds.setX((int)pX);
         bounds.setY((int)pY);
+    }
+
+    public void selectLevel() {
+        // child class CampaignSelector only
     }
 
     public void collectResource() {

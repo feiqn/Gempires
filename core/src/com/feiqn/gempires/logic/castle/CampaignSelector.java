@@ -4,30 +4,50 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.feiqn.gempires.logic.stages.match3.Water_1;
 import com.feiqn.gempires.models.CampaignLevelID;
 
-public class CampaignSelector extends Image {
+public class CampaignSelector extends Structure {
 
     public CampaignLevelID campaignLevelID;
+    private CastleScreen parent;
 
-    public CampaignSelector(TextureRegion region, CampaignLevelID id) {
-        super(region);
+    public CampaignSelector(TextureRegion region, CastleScreen parent, CampaignLevelID id) {
+        super(region, parent);
 
+        this.parent = parent;
         campaignLevelID = id;
+        this.structureType = StructureType.CAMPAIGN_SELECTOR;
+    }
 
-        addListener(new InputListener() {
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                setColor(.5f, .5f, .5f, 1);
-                return true;
-            }
+    @Override
+    public void selectLevel() {
+        switch(campaignLevelID) {
+            case FIRE_1:
+            case FIRE_2:
 
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int point, int button) {
-                setColor(1.5f, 1.5f, 1.5f, 1);
+            case VOID_1:
+            case VOID_2:
 
-                // TODO: pass game to match screen
-            }
-        });
+            case STONE_1:
+            case STONE_2:
+
+            case WATER_1:
+                parent.game.setScreen(new Water_1(parent.game));
+                break;
+            case WATER_2:
+            case WATER_3:
+            case WATER_4:
+            case WATER_5:
+
+            case NATURE_1:
+            case NATURE_2:
+
+            case ELECTRIC_1:
+            case ELECTRIC_2:
+                break;
+            default:
+                break;
+        }
     }
 }

@@ -16,7 +16,8 @@ public class PopupMenu extends Group {
     public enum MenuType {
         HERO_ROSTER,
         RESOURCE_STRUCTURE,
-        GODDESS_STATUE
+        GODDESS_STATUE,
+        CAMPAIGN_SELECTOR
     }
 
     private final Structure parentStructure;
@@ -33,6 +34,7 @@ public class PopupMenu extends Group {
             case HERO_ROSTER:
             case GODDESS_STATUE:
             case RESOURCE_STRUCTURE:
+            case CAMPAIGN_SELECTOR:
                 // TODO: finish this
                 background.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
                 break;
@@ -79,8 +81,12 @@ public class PopupMenu extends Group {
                 addLevelUpButton();
                 break;
             case RESOURCE_STRUCTURE:
-                // display resource available, capacity,
+                // TODO: display resource available, capacity,
                 addLevelUpButton();
+                break;
+            case CAMPAIGN_SELECTOR:
+                // display campaign stage and team
+                sender.selectLevel();
                 break;
         }
     }

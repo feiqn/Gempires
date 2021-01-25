@@ -42,7 +42,7 @@ public class CastleScreen extends ScreenAdapter {
     public TiledMap castleMap;
     public IsometricTiledMapRenderer isoMapRenderer;
 
-    final private GempiresGame game;
+    final public GempiresGame game;
 
     // TODO: use an AssetManager
 
@@ -92,7 +92,7 @@ public class CastleScreen extends ScreenAdapter {
                          goddessStatueTexture,
 
                          campaignSelectorVoid,
-                         campaignSelectorIce,
+                                 campaignSelectorWater,
                          campaignSelectorFire,
                          campaignSelectorElectric,
                          campaignSelectorNature,
@@ -154,7 +154,7 @@ public class CastleScreen extends ScreenAdapter {
 
         final Texture itemSpriteSheet = new Texture(Gdx.files.internal("ui/RPG_Item_Pack.png"));
         campaignSelectorVoid          = new TextureRegion(itemSpriteSheet,64, 0,  16,16);
-        campaignSelectorIce           = new TextureRegion(itemSpriteSheet,64, 16, 16,16);
+        campaignSelectorWater = new TextureRegion(itemSpriteSheet,64, 16, 16,16);
         campaignSelectorElectric      = new TextureRegion(itemSpriteSheet,64, 32, 16,16);
         campaignSelectorFire          = new TextureRegion(itemSpriteSheet,64, 48, 16,16);
         campaignSelectorNature        = new TextureRegion(itemSpriteSheet,64, 64, 16,16);
@@ -219,7 +219,7 @@ public class CastleScreen extends ScreenAdapter {
 //        t3ATestButton.setPosition(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 //        uiGroup.addActor((t3ATestButton));
 
-        CampaignSelector debugSelector = new CampaignSelector(campaignSelectorFire, CampaignLevelID.FIRE_1);
+        CampaignSelector debugSelector = new CampaignSelector(campaignSelectorWater, this, CampaignLevelID.WATER_1);
         debugSelector.setSize(1,1);
         debugSelector.setPosition(60, 60);
         rootGroup.addActor(debugSelector);
