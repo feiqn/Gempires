@@ -122,17 +122,20 @@ public class Structure extends Image {
         final String arcana = "arcana";
 
         switch(structureType) {
+            case SILO:
             case FARM:
                 map.put(food, level * 100);
                 map.put(ore, level * 200);
                 map.put(arcana, level * 25);
                 break;
             case MINE:
+            case WAREHOUSE:
                 map.put(food, level * 200);
                 map.put(ore, level * 100);
                 map.put(arcana, level * 25);
                 break;
             case LIBRARY:
+            case ARCHIVE:
                 map.put(food, level * 300);
                 map.put(ore, level * 300);
                 map.put(arcana, level * 100);
@@ -141,6 +144,11 @@ public class Structure extends Image {
                 map.put(food, level * 2000);
                 map.put(ore, level * 2000);
                 map.put(arcana, level * 1000);
+                break;
+            default:
+                map.put(food, level * 100);
+                map.put(ore, level * 100);
+                map.put(arcana, level * 50);
                 break;
         }
 
@@ -173,6 +181,7 @@ public class Structure extends Image {
                         map.put(ItemList.MINT, 1);
                         break;
                 }
+                break;
             case 2:
                 switch(structureType) {
                     case GODDESS_STATUE:
@@ -194,6 +203,7 @@ public class Structure extends Image {
                     default:
                         break;
                 }
+                break;
             case 3:
                 switch(structureType) {
                     case GODDESS_STATUE:
@@ -215,6 +225,7 @@ public class Structure extends Image {
                     default:
                         break;
                 }
+                break;
             case 4:
                 switch(structureType) {
                     case GODDESS_STATUE:
@@ -236,6 +247,7 @@ public class Structure extends Image {
                     default:
                         break;
                 }
+                break;
             case 5:
                 switch(structureType) {
                     case GODDESS_STATUE:
@@ -257,6 +269,7 @@ public class Structure extends Image {
                     default:
                         break;
                 }
+                break;
             case 6:
                 switch(structureType) {
                     case GODDESS_STATUE:
@@ -278,6 +291,7 @@ public class Structure extends Image {
                     default:
                         break;
                 }
+                break;
             case 7:
                 switch(structureType) {
                     case GODDESS_STATUE:
@@ -299,6 +313,7 @@ public class Structure extends Image {
                     default:
                         break;
                 }
+                break;
             case 8:
                 switch(structureType) {
                     case GODDESS_STATUE:
@@ -320,6 +335,7 @@ public class Structure extends Image {
                     default:
                         break;
                 }
+                break;
             case 9:
                 switch(structureType) {
                     case GODDESS_STATUE:
@@ -341,6 +357,7 @@ public class Structure extends Image {
                     default:
                         break;
                 }
+                break;
 
             // 10..98
 
@@ -371,10 +388,11 @@ public class Structure extends Image {
         return map;
     }
 
-    public void setXY(float pX, float pY) {
-        setPosition(pX, pY);
-        bounds.setX((int)pX);
-        bounds.setY((int)pY);
+    @Override
+    public void setPosition(float pX, float pY) {
+        super.setPosition(pX, pY);
+        bounds.setX(pX);
+        bounds.setY(pY);
     }
 
     public void selectLevel() {

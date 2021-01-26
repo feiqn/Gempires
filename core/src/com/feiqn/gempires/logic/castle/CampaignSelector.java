@@ -1,10 +1,7 @@
 package com.feiqn.gempires.logic.castle;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.feiqn.gempires.logic.stages.match3.Water_1;
+import com.feiqn.gempires.logic.stages.match3.water.Water_1;
 import com.feiqn.gempires.models.CampaignLevelID;
 
 public class CampaignSelector extends Structure {
@@ -33,7 +30,7 @@ public class CampaignSelector extends Structure {
             case STONE_2:
 
             case WATER_1:
-                parent.game.setScreen(new Water_1(parent.game));
+                parent.game.setScreen(new Water_1(parent.game, parent.playerInventory));
                 break;
             case WATER_2:
             case WATER_3:

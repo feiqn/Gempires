@@ -23,6 +23,7 @@ import com.feiqn.gempires.logic.Gem;
 import com.feiqn.gempires.logic.characters.enemies.Bestiary;
 import com.feiqn.gempires.logic.characters.enemies.Enemy;
 import com.feiqn.gempires.logic.characters.enemies.water.WaterWizard;
+import com.feiqn.gempires.logic.items.ItemList;
 import com.feiqn.gempires.logic.items.Tornado;
 import com.feiqn.gempires.models.CampaignLevelID;
 import com.feiqn.gempires.models.Element;
@@ -75,6 +76,7 @@ public class MatchScreen extends ScreenAdapter {
 
     public CampaignLevelID campaignLevelID;
 
+    public ArrayList<ItemList> loot;
     public ArrayList<Vector2> slots;
     public ArrayList<Gem> matchesForThisGem,
                           sendToDestroy,
@@ -117,9 +119,10 @@ public class MatchScreen extends ScreenAdapter {
 
         enemyDifficulty = 0;
         numberOfEnemiesOnScreen = 0;
+        loot = new ArrayList<>();
         enemiesOnScreen = new DelayedRemovalArray<>();
         attackTokensOnScreen = new DelayedRemovalArray<>();
-        enemyIsInitialized = new HashMap<Bestiary, Boolean>(Bestiary.values().length);
+        enemyIsInitialized = new HashMap<>(Bestiary.values().length);
 
         for(int i = 0; i < Bestiary.values().length; i++) {
             enemyIsInitialized.put(Bestiary.values()[i], false);
@@ -233,12 +236,12 @@ public class MatchScreen extends ScreenAdapter {
         destination.addAction(Actions.moveTo(originSlot.x, originSlot.y, gemSwapTime));
         origin.addAction(Actions.moveTo(destinationSlot.x, destinationSlot.y, gemSwapTime));
 
-        Timer.schedule(new Timer.Task(){
-            @Override
-            public void run() {
+//        Timer.schedule(new Timer.Task(){
+//            @Override
+//            public void run() {
 //                allowUserInput = true;
-            }
-        }, gemSwapTime);
+//            }
+//        }, gemSwapTime);
 
     }
 
@@ -297,7 +300,7 @@ public class MatchScreen extends ScreenAdapter {
 
         } else if (mouseUpAtX < 1
                 && mouseUpAtX > -1
-                && mouseUpAtY > 0.5f
+                && mouseUpAtY > 0.8f
                 && index + columns < gems.size -1) {
             // MOVE UP ^
             swapGems(gems.get(index), gems.get(index + columns));
@@ -388,8 +391,13 @@ public class MatchScreen extends ScreenAdapter {
     }
 
     public void checkIfGemsShouldBeDropped() {
-
-        for(Gem gem : gems) {
+        /* This checks for "blank" gems on the board, which have been destroyed.
+        *  It then decides weather there is an existing gem above/below which should be
+        *  "dropped" into this empty space. This repeats until all existing gems have been
+        *  dropped into place, and then new gems are spawned to fill the empty space.
+        */
+        for(final int[] g = {0}; g[0] < gems.size; g[0]++) {
+            final Gem gem = gems.get(g[0]);
             if(gem.GemColor == 7) {
                 if(classicMode) {
                     // standard bejewelled style, gems fall from the top down
@@ -471,13 +479,15 @@ public class MatchScreen extends ScreenAdapter {
                         gem.remove();
 
                     } else {
-                        // just swap the blank gem with the gem below it and repeat loop
+                        // just swap the blank gem with the gem below it and restart loop
                         swapGems(gem, gems.get(gem.GemIndex - columns));
                         timeToCompleteSwaps += gemSwapTime;
 
                          Timer.schedule(new Timer.Task(){
                             @Override
                             public void run() {
+                                g[0] = gems.size;
+                                // Thank you IntelliJ for this big brain constant array trick.
                                 checkIfGemsShouldBeDropped();
                             }
                         }, 0.06f);
@@ -717,6 +727,8 @@ public class MatchScreen extends ScreenAdapter {
         enemiesOnScreen.removeValue(enemy, true);
         enemiesOnScreen.end();
 
+        loot.addAll(enemy.rollLoot());
+
         enemy.remove();
 
         numberOfEnemiesOnScreen--;
@@ -753,6 +765,8 @@ public class MatchScreen extends ScreenAdapter {
         for(Enemy e : wave) {
             stage.addActor(e);
             enemiesOnScreen.add(e);
+            e.scaleToLevel(enemyDifficulty);
+            e.initLootTable();
         }
 
         numberOfEnemiesOnScreen = wave.size();
@@ -786,9 +800,6 @@ public class MatchScreen extends ScreenAdapter {
             case FIVE_DESCENDING:
             case FIVE_ASCENDING:
                 break;
-        }
-        for(Enemy enemy : wave) {
-            enemy.scaleToLevel(enemyDifficulty);
         }
     }
 

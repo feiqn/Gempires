@@ -1,13 +1,44 @@
 package com.feiqn.gempires.logic.items;
 
 public enum ItemList {
-    THYME,
+    // UPGRADE ITEMS
+    THYME, // Thyme is money.
     BASIL,
     MINT,
     PARSLEY,
     SAGE,
     SAFFRON,
-    PURE_GEM,
+    PURE_GEM, // "Premium currency"
+
+    OAK_LOGS,
+    WILLOW_LOGS,
+    MAPLE_LOGS,
+    TEAK_LOGS,
+    YEW_LOGS,
+    MAHOGANY_LOGS,
+    MAGIC_LOGS,
+    REDWOOD_LOGS,
+    BLESSED_LOGS,
+
+    COPPER_CHUNK,
+    TIN_CHUNK,
+    STEEL_CHUNK,
+    MITHRIL_CHUNK,
+    ADAMANT_CHUNK,
+    RUNEITE_CHUNK,
+    OBSIDIAN_CHUNK,
+    CRYSTAL_CHUNK,
+    BLESSED_CHUNK,
+
+    BATTERED_RELIC,
+    ORAL_HISTORY,
+    TRANSCRIBED_TEACHINGS,
+    BURNT_BOOK,
+    ANCIENT_DIARY,
+    CAVE_RELIEF,
+    FOREBODING_TOME,
+    HORRIFIC_TRUTH,
+    COSMIC_SECRET,
 
     // ASCENSION ITEMS
     // 1*
@@ -56,4 +87,19 @@ public enum ItemList {
 
     // BATTLE ITEMS:
     TORNADO,
+
+    HEALTH_POTION_SMALL,
+    HEALTH_POTION_MEDIUM,
+    HEALTH_POTION_LARGE,
+    HEALTH_POTION_MASSIVE,
+    HEALTH_POTION_PURE,
+
+    REVIVE_POTION,
+
+    MANA_POTION_SMALL,
+    MANA_POTION_MEDIUM,
+    MANA_POTION_LARGE,
+    MANA_POTION_MASSIVE,
+    MANA_POTION_PURE,
+
 }
