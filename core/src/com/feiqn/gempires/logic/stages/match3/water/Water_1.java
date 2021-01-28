@@ -21,12 +21,14 @@ public class Water_1 extends MatchScreen {
     private Boolean firstWaveClear;
     private Boolean secondWaveClear;
     private Boolean thirdWaveClear;
-    private PlayerInventory playerInventory;
-    private GempiresGame game;
+    final private PlayerInventory playerInventory;
+    final private GempiresGame game;
+    final private CastleScreen parent;
 
-    public Water_1(GempiresGame game, PlayerInventory inventory) {
-        super(game, CampaignLevelID.WATER_1);
-        this.game = game;
+    public Water_1(CastleScreen castle, PlayerInventory inventory) {
+        super(castle.game, CampaignLevelID.WATER_1);
+        parent = castle;
+        this.game = castle.game;
         firstWaveClear = false;
         secondWaveClear = false;
         thirdWaveClear = false;
@@ -63,7 +65,7 @@ public class Water_1 extends MatchScreen {
             Timer.schedule(new Timer.Task(){
                 @Override
                 public void run() {
-                    game.setScreen(new CastleScreen(game));
+                    game.setScreen(parent);
                 }
             }, 3);
 
@@ -76,9 +78,8 @@ public class Water_1 extends MatchScreen {
 
             wave.add(w3);
             wave.add(w2);
-// TODO
-            deployWave(wave, Formation.TWO_IN_FRONT);
 
+            deployWave(wave, Formation.TWO_STAGGERED_LEFT);
 
         } else if(firstWaveClear && !thirdWaveClear) {
             secondWaveClear = true;
@@ -86,12 +87,11 @@ public class Water_1 extends MatchScreen {
             final ArrayList<Enemy> wave = new ArrayList<>();
             final WaterWizard w3 = new WaterWizard(waterWizardTextureRegion);
             final WaterWizard w2 = new WaterWizard(waterWizardTextureRegion);
-// TODO
+
             wave.add(w3);
             wave.add(w2);
 
             deployWave(wave, Formation.TWO_IN_FRONT);
-
 
         } else if(!firstWaveClear && !secondWaveClear && !thirdWaveClear) {
             firstWaveClear = true;
@@ -100,11 +100,17 @@ public class Water_1 extends MatchScreen {
             final ArrayList<Enemy> wave = new ArrayList<>();
             final WaterWizard w3 = new WaterWizard(waterWizardTextureRegion);
             final WaterWizard w2 = new WaterWizard(waterWizardTextureRegion);
+            final WaterWizard w  = new WaterWizard(waterWizardTextureRegion);
+            final WaterWizard w4  = new WaterWizard(waterWizardTextureRegion);
+            final WaterWizard w5  = new WaterWizard(waterWizardTextureRegion);
 
+            wave.add(w5);
+            wave.add(w4);
             wave.add(w3);
             wave.add(w2);
+            wave.add(w);
 
-            deployWave(wave, Formation.TWO_IN_FRONT);
+            deployWave(wave, Formation.FIVE_ASCENDING);
 
         }
     }

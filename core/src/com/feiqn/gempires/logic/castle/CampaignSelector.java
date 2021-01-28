@@ -30,7 +30,7 @@ public class CampaignSelector extends Structure {
             case STONE_2:
 
             case WATER_1:
-                parent.game.setScreen(new Water_1(parent.game, parent.playerInventory));
+                parent.game.setScreen(new Water_1(parent, parent.playerInventory));
                 break;
             case WATER_2:
             case WATER_3:

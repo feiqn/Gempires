@@ -8,17 +8,19 @@ import com.feiqn.gempires.logic.characters.heroes.HeroCard;
 import com.feiqn.gempires.logic.characters.heroes.Heroes;
 import com.feiqn.gempires.logic.characters.heroes.nature.Leif;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
 public class HeroRoster {
-    // includes: which heroes are owned, and the levels / stats / equipment of said heroes
+    // includes: teams, which heroes are owned, and the levels / stats / equipment of said heroes
 
     private final Preferences pref;
 
-    private DelayedRemovalArray<HeroCard> heroList;
+    private final DelayedRemovalArray<HeroCard> heroList;
+    private final ArrayList<ArrayList<HeroCard>> teams;
 
-    private HashMap<Heroes, Integer> braveryTokens;
+    private final HashMap<Heroes, Integer> braveryTokens;
 
     public int numberOfHeroes;
 
@@ -28,6 +30,8 @@ public class HeroRoster {
         pref = Gdx.app.getPreferences("PlayerHeroRoster");
         heroList = new DelayedRemovalArray<>();
         braveryTokens = new HashMap<>();
+        teams = new ArrayList<>(19);
+        initTeams();
 
         parentCastle = parent;
 
@@ -41,13 +45,50 @@ public class HeroRoster {
         if(numberOfHeroes > 0) {
             fillHeroes();
             fillBraveryTokens();
+            fillTeams();
         } else {
             Gdx.app.log("HeroRoster", "New Player");
+            flushTeams();
             // TODO: add starter heroes
-             addHero(new Leif(parentCastle.natureCardTexture, parentCastle));
+            addHero(new Leif(parentCastle.natureCardTexture, parentCastle));
         }
 
         pref.flush();
+    }
+
+    public void initTeams() {
+        for(int t = 0; t < 19; t++) {
+            final ArrayList<HeroCard> nt = new ArrayList<>(4);
+            for(int i = 0; i < 4; i++) {
+                nt.add(null);
+            }
+            teams.add(nt);
+        }
+    }
+
+    public void flushTeams() {
+        // save teams<>
+
+        for(int t = 0; t < teams.size(); t++) {
+            final ArrayList<HeroCard> thisTeam = teams.get(t);
+            for(int teamSize = 0; teamSize < 4; teamSize++) {
+
+                if(thisTeam.get(teamSize) != null) {
+                    final HeroCard thisHero = thisTeam.get(teamSize);
+                    pref.putString("Team" + t + "Member" + teamSize, "" + thisHero.heroName.toUpperCase());
+                } else {
+                    pref.putString("Team" + t + "Member" + teamSize, "none");
+                }
+            }
+        }
+
+        pref.flush();
+    }
+
+    public void fillTeams() {
+        // load teams<>
+
+        // TODO
     }
 
     public void flushHeroes() {

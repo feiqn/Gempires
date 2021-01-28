@@ -54,6 +54,7 @@ public class Gem extends Image {
             public void touchUp(InputEvent event, float x, float y, int point, int button) {
                 // Gdx.app.log("touchUP", "x: " + x + ", y: " + y);
                 if(matchScreen.allowUserInput) {
+                    matchScreen.allowUserInput = false;
                     setColor(1.5f, 1.5f, 1.5f, 1);
                     matchScreen.checkBoundsThenSwap(x, y, GemIndex);
                 }

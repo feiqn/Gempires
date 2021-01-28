@@ -22,7 +22,7 @@ import com.feiqn.gempires.logic.AttackToken;
 import com.feiqn.gempires.logic.Gem;
 import com.feiqn.gempires.logic.characters.enemies.Bestiary;
 import com.feiqn.gempires.logic.characters.enemies.Enemy;
-import com.feiqn.gempires.logic.characters.enemies.water.WaterWizard;
+import com.feiqn.gempires.logic.characters.heroes.HeroCard;
 import com.feiqn.gempires.logic.items.ItemList;
 import com.feiqn.gempires.logic.items.Tornado;
 import com.feiqn.gempires.models.CampaignLevelID;
@@ -55,6 +55,7 @@ public class MatchScreen extends ScreenAdapter {
 
     public boolean matchFound,
                    classicMode,
+            needToClearWave,
                    allowUserInput;
 
     public int rows,
@@ -76,6 +77,7 @@ public class MatchScreen extends ScreenAdapter {
 
     public CampaignLevelID campaignLevelID;
 
+    public ArrayList<HeroCard> team;
     public ArrayList<ItemList> loot;
     public ArrayList<Vector2> slots;
     public ArrayList<Gem> matchesForThisGem,
@@ -96,10 +98,11 @@ public class MatchScreen extends ScreenAdapter {
 
     public TextureRegion waterWizardTextureRegion;
 
-    public MatchScreen(GempiresGame game, CampaignLevelID levelID){
+    public MatchScreen(GempiresGame game, CampaignLevelID levelID /* , Arraylist<HeroCard> team */){
         this.game = game;
         this.classicMode = false;
         this.campaignLevelID = levelID;
+        // this.team = team;
     }
     public MatchScreen(GempiresGame game) {
         this.game = game;
@@ -262,6 +265,12 @@ public class MatchScreen extends ScreenAdapter {
                     matchFound = checkWholeBoardForMatches();
                     if(!matchFound) {
                         swapGems(gems.get(index), gems.get(index + 1));
+                        Timer.schedule(new Timer.Task(){
+                            @Override
+                            public void run() {
+                                allowUserInput = true;
+                            }
+                        }, gemSwapTime);
                     }
                 }
             }, gemSwapTime);
@@ -278,6 +287,12 @@ public class MatchScreen extends ScreenAdapter {
                     matchFound = checkWholeBoardForMatches();
                     if(!matchFound) {
                         swapGems(gems.get(index), gems.get(index - 1));
+                        Timer.schedule(new Timer.Task(){
+                            @Override
+                            public void run() {
+                                allowUserInput = true;
+                            }
+                        }, gemSwapTime);
                     }
                 }
             }, gemSwapTime);
@@ -294,6 +309,12 @@ public class MatchScreen extends ScreenAdapter {
                     matchFound = checkWholeBoardForMatches();
                     if(!matchFound) {
                         swapGems(gems.get(index), gems.get(index - columns));
+                        Timer.schedule(new Timer.Task(){
+                            @Override
+                            public void run() {
+                                allowUserInput = true;
+                            }
+                        }, gemSwapTime);
                     }
                 }
             }, gemSwapTime);
@@ -310,9 +331,17 @@ public class MatchScreen extends ScreenAdapter {
                     matchFound = checkWholeBoardForMatches();
                     if(!matchFound) {
                         swapGems(gems.get(index), gems.get(index + columns));
+                        Timer.schedule(new Timer.Task(){
+                            @Override
+                            public void run() {
+                                allowUserInput = true;
+                            }
+                        }, gemSwapTime);
                     }
                 }
             }, gemSwapTime);
+        } else {
+            allowUserInput = true;
         }
     }
 
@@ -378,16 +407,21 @@ public class MatchScreen extends ScreenAdapter {
 
         checkIfGemsShouldBeDropped();
 
-        int swapTimer = (int) Math.ceil(timeToCompleteSwaps); // TODO: not perfect
+        if(timeToCompleteSwaps < 1) {
+            timeToCompleteSwaps = (int) Math.ceil(timeToCompleteSwaps);
+        }
 
         Timer.schedule(new Timer.Task(){
             @Override
             public void run() {
                 Gdx.app.log("timer", "fired");
-                checkWholeBoardForMatches();
+                matchFound = checkWholeBoardForMatches();
+                if(!matchFound) {
+                    allowUserInput = true;
+                }
                 timeToCompleteSwaps = 0f;
             }
-        }, swapTimer);
+        }, timeToCompleteSwaps);
     }
 
     public void checkIfGemsShouldBeDropped() {
@@ -733,8 +767,11 @@ public class MatchScreen extends ScreenAdapter {
 
         numberOfEnemiesOnScreen--;
         if(numberOfEnemiesOnScreen <= 0) {
-            // TODO: wait until matches are done
-            clearWave();
+            if(allowUserInput)  {
+                clearWave();
+            } else {
+                needToClearWave = true;
+            }
         }
     }
 
@@ -771,84 +808,133 @@ public class MatchScreen extends ScreenAdapter {
 
         numberOfEnemiesOnScreen = wave.size();
 
+        // TODO: check each of these and polish if needed
         switch (formation) {
             case ONE_CENTER:
                 wave.get(0).setSize(4,4);
                 wave.get(0).setPosition(2.5f, 9.5f);
                 break;
             case TWO_IN_BACK:
+                wave.get(0).setSize(3,3);
+                wave.get(0).setPosition(.5f, 11f);
+
+                wave.get(1).setSize(3,3);
+                wave.get(1).setPosition(5.5f, 11f);
+                break;
             case TWO_IN_FRONT:
                 wave.get(0).setSize(4,4);
                 wave.get(0).setPosition(.5f, 9.5f);
 
                 wave.get(1).setSize(4,4);
-                wave.get(1).setPosition(3.5f, 9.5f);
+                wave.get(1).setPosition(4.5f, 9.5f);
                 break;
             case TWO_STAGGERED_LEFT:
+                wave.get(0).setSize(3,3);
+                wave.get(0).setPosition(.5f, 11f);
+
+                wave.get(1).setSize(4,4);
+                wave.get(1).setPosition(1.5f, 9.5f);
+                break;
             case TWO_STAGGERED_RIGHT:
+                wave.get(0).setSize(3,3);
+                wave.get(0).setPosition(5.5f, 11);
+
+                wave.get(1).setSize(4,4);
+                wave.get(1).setPosition(3.5f, 9.5f);
+                break;
             case THREE_ASCENDING:
+                wave.get(0).setSize(2,2);
+                wave.get(0).setPosition(6f, 11.5f);
+
+                wave.get(1).setSize(3,3);
+                wave.get(1).setPosition(3.5f, 10.5f);
+
+                wave.get(2).setSize(5,5);
+                wave.get(2).setPosition(.5f, 9.5f);
+                break;
             case THREE_DESCENDING:
+                wave.get(0).setSize(2,2);
+                wave.get(0).setPosition(.5f, 11.5f);
+
+                wave.get(1).setSize(3,3);
+                wave.get(1).setPosition(3.5f, 10.5f);
+
+                wave.get(2).setSize(5,5);
+                wave.get(2).setPosition(6, 9.5f);
+                break;
             case THREE_IN_FRONT:
+                wave.get(0).setSize(2,2);
+                wave.get(0).setPosition(6.5f, 10f);
+
+                wave.get(1).setSize(2,2);
+                wave.get(1).setPosition(3.5f, 10f);
+
+                wave.get(2).setSize(2,2);
+                wave.get(2).setPosition(.5f, 10f);
+                break;
             case FOUR_IN_FRONT:
+                wave.get(0).setSize(2,2);
+                wave.get(0).setPosition(4.5f, 10f);
+
+                wave.get(1).setSize(2,2);
+                wave.get(1).setPosition(2.5f, 10f);
+
+                wave.get(2).setSize(2,2);
+                wave.get(2).setPosition(.5f, 10f);
+
+                wave.get(3).setSize(2,2);
+                wave.get(3).setPosition(6.5f, 10);
+                break;
             case FOUR_REVERSE_N_SHAPE:
             case FOUR_WITH_BACK_SIDE_FLANKS:
+                wave.get(0).setSize(3,3);
+                wave.get(0).setPosition(.5f, 11);
+
+                wave.get(1).setSize(3,3);
+                wave.get(1).setPosition(6.5f, 11);
+
+                wave.get(2).setSize(3,3);
+                wave.get(2).setPosition(1.5f, 9.5f);
+
+                wave.get(3).setSize(3,3);
+                wave.get(3).setPosition(4.5f, 9.5f);
+                break;
             case FOUR_WITH_FRONT_SIDE_FLANKS:
+                wave.get(0).setSize(3,3);
+                wave.get(0).setPosition(1.5f, 11);
+
+                wave.get(1).setSize(3,3);
+                wave.get(1).setPosition(4.5f, 11);
+
+                wave.get(2).setSize(3,3);
+                wave.get(2).setPosition(.5f, 9.5f);
+
+                wave.get(3).setSize(3,3);
+                wave.get(3).setPosition(6.5f, 9.5f);
+                break;
             case FOUR_N_SHAPE:
             case FIVE_M_SHAPE:
             case FIVE_W_SHAPE:
             case FIVE_PROTECTING_CENTER:
             case FIVE_DESCENDING:
             case FIVE_ASCENDING:
+                wave.get(0).setSize(2,2);
+                wave.get(0).setPosition(6.5f, 14);
+
+                wave.get(1).setSize(3,3);
+                wave.get(1).setPosition(5.5f, 13.5f);
+
+                wave.get(2).setSize(4,4);
+                wave.get(2).setPosition(4.25f, 12);
+
+                wave.get(3).setSize(5,5);
+                wave.get(3).setPosition(2.5f, 10.25f);
+
+                wave.get(4).setSize(6,6);
+                wave.get(4).setPosition(.5f, 9);
                 break;
         }
     }
-
-//    public void deployEnemyWave() {
-//        // Called by show()
-//        // Called by destroyEnemy() when a wave is cleared
-//
-//        if(waves.size() > 0) {
-//
-//            final int enemiesLeftToDeploy = waves.get(0);
-//            final ArrayList<Enemy> thisWave = new ArrayList<>();
-//            final Formation thisFormation = waveFormations.get(wavesCleared);
-//
-//            enemiesOnScreen = enemiesLeftToDeploy;
-//
-//            for(int i = 0; i < waves.get(0); i++) {
-//                final Enemy enemyToDeploy = enemies.get(i);
-//                stage.addActor(enemyToDeploy);
-//            }
-//
-//             switch (thisFormation) {
-//                 case ONE_CENTER:
-//                     enemies.get(0).setSize(6,6);
-//                     enemies.get(0).setXY(1.5f, 9.5f);
-//                     break;
-//                 case TWO_IN_BACK:
-//                 case TWO_IN_FRONT:
-//                 case TWO_STAGGERED_LEFT:
-//                 case TWO_STAGGERED_RIGHT:
-//                 case THREE_ASCENDING:
-//                 case THREE_DESCENDING:
-//                 case THREE_IN_FRONT:
-//                 case FOUR_IN_FRONT:
-//                 case FOUR_REVERSE_N_SHAPE:
-//                 case FOUR_WITH_BACK_SIDE_FLANKS:
-//                 case FOUR_WITH_FRONT_SIDE_FLANKS:
-//                 case FOUR_N_SHAPE:
-//                 case FIVE_M_SHAPE:
-//                 case FIVE_W_SHAPE:
-//                 case FIVE_PROTECTING_CENTER:
-//                 case FIVE_DESCENDING:
-//                 case FIVE_ASCENDING:
-//                     break;
-//             }
-//
-//            waves.remove(0);
-//        }
-//
-//    }
 
     private void calculateGemPower() {
         // TODO
@@ -888,7 +974,7 @@ public class MatchScreen extends ScreenAdapter {
         horizontalMatchLength = 0;
         verticalMatchLength = 0;
 
-        allowUserInput = true;
+        allowUserInput = false;
         gameCamera = new OrthographicCamera();
         slots = new ArrayList<Vector2>();
         gems = new DelayedRemovalArray<Gem>();
@@ -1081,6 +1167,10 @@ public class MatchScreen extends ScreenAdapter {
 
         if(!classicMode) {
             checkCollision();
+            if(needToClearWave && allowUserInput) {
+                needToClearWave = false;
+                clearWave();
+            }
         }
 
         stage.act();
