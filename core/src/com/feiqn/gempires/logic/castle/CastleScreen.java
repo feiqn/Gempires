@@ -140,7 +140,6 @@ public class CastleScreen extends ScreenAdapter {
         fireCardTexture =               new TextureRegion(cardSpriteSheet, 32*5, 32*8, 96, 128);
         waterCardTexture =              new TextureRegion(cardSpriteSheet, 0, 32*12, 96, 128);
         voidCardTexture =               new TextureRegion(cardSpriteSheet, 32*5, 32*12, 96, 128);
-
         natureCardTexture =             new TextureRegion(cardSpriteSheet, 0, 0, 96, 128);
         natureCardThumbnail =           new TextureRegion(cardSpriteSheet, 96,0, 64, 96);
 
@@ -154,7 +153,7 @@ public class CastleScreen extends ScreenAdapter {
 
         final Texture itemSpriteSheet = new Texture(Gdx.files.internal("ui/RPG_Item_Pack.png"));
         campaignSelectorVoid          = new TextureRegion(itemSpriteSheet,64, 0,  16,16);
-        campaignSelectorWater = new TextureRegion(itemSpriteSheet,64, 16, 16,16);
+        campaignSelectorWater         = new TextureRegion(itemSpriteSheet,64, 16, 16,16);
         campaignSelectorElectric      = new TextureRegion(itemSpriteSheet,64, 32, 16,16);
         campaignSelectorFire          = new TextureRegion(itemSpriteSheet,64, 48, 16,16);
         campaignSelectorNature        = new TextureRegion(itemSpriteSheet,64, 64, 16,16);

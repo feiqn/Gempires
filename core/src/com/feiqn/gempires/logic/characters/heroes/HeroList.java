@@ -1,6 +1,6 @@
 package com.feiqn.gempires.logic.characters.heroes;
 
-public enum Heroes {
+public enum HeroList {
     // ZERO-STAR, COMMON-NOUN UNITS
     // These units have no associated class or stats, and exist only numerically in PlayerInventory
 
@@ -16,5 +16,6 @@ public enum Heroes {
     // MARK: ONE-STAR AND UP ONLY
     // These heroes have their own classes and data
 
-    LEIF
+    LEIF,
+    VIVAIN,
 }

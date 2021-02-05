@@ -1,15 +1,10 @@
 package com.feiqn.gempires.logic.ui;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.utils.DelayedRemovalArray;
 import com.feiqn.gempires.logic.castle.Structure;
 import com.feiqn.gempires.logic.characters.heroes.HeroCard;
-import com.feiqn.gempires.logic.items.ItemList;
-
-import java.util.HashMap;
 
 public class PopupMenu extends Group {
 
@@ -59,7 +54,7 @@ public class PopupMenu extends Group {
             case HERO_ROSTER:
                 int xRevs = 0;
                 int yRevs = 0;
-                for(HeroCard hero : parentStructure.getParentScreen().heroRoster.getHeroList()) {
+                for(HeroCard hero : parentStructure.getParentScreen().heroRoster.getOwnedHeroes()) {
                     final float w = (Gdx.graphics.getWidth() * .2f);
                     final float h = w * 1.5f;
                     hero.thumbnail.setSize(w, h);
@@ -86,7 +81,9 @@ public class PopupMenu extends Group {
                 break;
             case CAMPAIGN_SELECTOR:
                 // display campaign stage and team
-                sender.selectLevel();
+                
+                // TODO: button for this:
+                // sender.selectLevel();
                 break;
         }
     }

@@ -1,8 +1,7 @@
 package com.feiqn.gempires.logic.characters.heroes.nature;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.feiqn.gempires.logic.characters.heroes.Heroes;
+import com.feiqn.gempires.logic.characters.heroes.HeroList;
 import com.feiqn.gempires.models.Element;
 import com.feiqn.gempires.logic.castle.CastleScreen;
 import com.feiqn.gempires.logic.characters.heroes.HeroCard;
@@ -20,9 +19,9 @@ public class Leif extends HeroCard {
 
         element = Element.NATURE;
 
-        heroID = Heroes.LEIF;
+        heroID = HeroList.LEIF;
 
-        initialiseThumbnail(element);
+//        initialiseThumbnail(element);
         initializeStats(10, 5, 100);
     }
 

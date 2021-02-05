@@ -69,6 +69,7 @@ public class MatchScreen extends ScreenAdapter {
                 waterPower,
                 stonePower,
                 electricPower,
+                purePower,
                 enemyDifficulty,
                 numberOfEnemiesOnScreen;
 
@@ -119,6 +120,7 @@ public class MatchScreen extends ScreenAdapter {
         electricPower = 1;
         voidPower = 1;
         naturePower = 1;
+        purePower = 1;
 
         enemyDifficulty = 0;
         numberOfEnemiesOnScreen = 0;
@@ -720,6 +722,32 @@ public class MatchScreen extends ScreenAdapter {
         return matchFound;
     }
 
+    public void deployHeroes(ArrayList<HeroCard> team) {
+        for(int i = 0; i < team.size(); i++) {
+            final HeroCard hero = team.get(i);
+            if(hero != null) {
+               hero.battleCard.setSize(1.8f, 3);
+               switch(i) {
+                   case 0:
+                       hero.battleCard.setPosition(3.6f, 0);
+                       break;
+                   case 1:
+                       hero.battleCard.setPosition(1.8f, 0);
+                       break;
+                   case 2:
+                       hero.battleCard.setPosition(5.4f, 0);
+                       break;
+                   case 3:
+                       break;
+                   case 4:
+                       hero.battleCard.setPosition(7.2f, 0);
+                       break;
+               }
+               stage.addActor(hero.battleCard);
+            }
+        }
+    }
+
     private void loadMap() {
         // Called by show()
 
@@ -936,12 +964,32 @@ public class MatchScreen extends ScreenAdapter {
         }
     }
 
-    private void calculateGemPower() {
-        // TODO
-    }
-
-    private void layOutTeamCards() {
-        // TODO
+    public void calculateGemPower(ArrayList<HeroCard> team) {
+        for(HeroCard hero : team) {
+            switch(hero.element) {
+                case ELECTRIC:
+                    electricPower += hero.getStrength();
+                    break;
+                case FIRE:
+                    firePower += hero.getStrength();
+                    break;
+                case NATURE:
+                    naturePower += hero.getStrength();
+                     break;
+                case VOID:
+                    voidPower += hero.getStrength();
+                    break;
+                case WATER:
+                    waterPower += hero.getStrength();
+                    break;
+                case STONE:
+                    stonePower += hero.getStrength();
+                    break;
+                case PURE:
+                    purePower += hero.getStrength();
+                    break;
+            }
+        }
     }
 
     private void initGemTextures() {
@@ -995,10 +1043,6 @@ public class MatchScreen extends ScreenAdapter {
         stage = new Stage(fitViewport);
 
         createAndFillSlots(rows, columns);
-
-        if(!classicMode) {
-            calculateGemPower();
-        }
 
         //
         final Tornado debugShuffler = new Tornado(gemTextures[1], this); // debug

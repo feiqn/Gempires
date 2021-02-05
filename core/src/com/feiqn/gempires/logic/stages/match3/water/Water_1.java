@@ -7,6 +7,7 @@ import com.feiqn.gempires.logic.castle.CastleScreen;
 import com.feiqn.gempires.logic.characters.enemies.Bestiary;
 import com.feiqn.gempires.logic.characters.enemies.Enemy;
 import com.feiqn.gempires.logic.characters.enemies.water.WaterWizard;
+import com.feiqn.gempires.logic.characters.heroes.HeroCard;
 import com.feiqn.gempires.logic.items.ItemList;
 import com.feiqn.gempires.logic.stages.match3.MatchScreen;
 import com.feiqn.gempires.models.CampaignLevelID;
@@ -17,15 +18,16 @@ import java.util.ArrayList;
 
 public class Water_1 extends MatchScreen {
 
-    ArrayList<Bestiary> neededEnemies;
+    final ArrayList<Bestiary> neededEnemies;
     private Boolean firstWaveClear;
     private Boolean secondWaveClear;
     private Boolean thirdWaveClear;
     final private PlayerInventory playerInventory;
     final private GempiresGame game;
     final private CastleScreen parent;
+    final private ArrayList<HeroCard> team;
 
-    public Water_1(CastleScreen castle, PlayerInventory inventory) {
+    public Water_1(CastleScreen castle) {
         super(castle.game, CampaignLevelID.WATER_1);
         parent = castle;
         this.game = castle.game;
@@ -33,7 +35,8 @@ public class Water_1 extends MatchScreen {
         secondWaveClear = false;
         thirdWaveClear = false;
         neededEnemies = new ArrayList<>();
-        playerInventory = inventory;
+        playerInventory = parent.playerInventory;
+        this.team = parent.heroRoster.getTeam(parent.heroRoster.defaultTeam);
     }
 
     @Override
@@ -42,6 +45,9 @@ public class Water_1 extends MatchScreen {
 
         neededEnemies.add(Bestiary.WATER_WIZARD);
         initAdventureMode(neededEnemies);
+
+        calculateGemPower(team);
+        deployHeroes(team);
 
         setEnemyDifficulty(2);
 

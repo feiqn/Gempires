@@ -2,10 +2,11 @@ package com.feiqn.gempires.models.stats;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.DelayedRemovalArray;
 import com.feiqn.gempires.logic.castle.CastleScreen;
 import com.feiqn.gempires.logic.characters.heroes.HeroCard;
-import com.feiqn.gempires.logic.characters.heroes.Heroes;
+import com.feiqn.gempires.logic.characters.heroes.HeroList;
 import com.feiqn.gempires.logic.characters.heroes.nature.Leif;
 
 import java.util.ArrayList;
@@ -17,21 +18,24 @@ public class HeroRoster {
 
     private final Preferences pref;
 
-    private final DelayedRemovalArray<HeroCard> heroList;
+    private final DelayedRemovalArray<HeroCard> ownedHeroes;
     private final ArrayList<ArrayList<HeroCard>> teams;
+    public int defaultTeam;
 
-    private final HashMap<Heroes, Integer> braveryTokens;
+    private final HashMap<HeroList, Integer> braveryTokens;
 
     public int numberOfHeroes;
 
     private final CastleScreen parentCastle;
 
     public HeroRoster(CastleScreen parent) {
+        defaultTeam = 0;
         pref = Gdx.app.getPreferences("PlayerHeroRoster");
-        heroList = new DelayedRemovalArray<>();
+        ownedHeroes = new DelayedRemovalArray<>();
         braveryTokens = new HashMap<>();
-        teams = new ArrayList<>(19);
-        initTeams();
+        teams = new ArrayList<>();
+        teams.add(new ArrayList<HeroCard>()); // TODO: better
+//        initTeams();
 
         parentCastle = parent;
 
@@ -48,20 +52,21 @@ public class HeroRoster {
             fillTeams();
         } else {
             Gdx.app.log("HeroRoster", "New Player");
-            flushTeams();
+
             // TODO: add starter heroes
-            addHero(new Leif(parentCastle.natureCardTexture, parentCastle));
+            final HeroCard leif = new Leif(parentCastle.natureCardTexture, parentCastle);
+            addHero(leif);
+            teams.get(defaultTeam).add(leif);
+
+            flushTeams();
         }
 
         pref.flush();
     }
 
     public void initTeams() {
-        for(int t = 0; t < 19; t++) {
-            final ArrayList<HeroCard> nt = new ArrayList<>(4);
-            for(int i = 0; i < 4; i++) {
-                nt.add(null);
-            }
+        for(int l = 0; l < teams.size(); l++) {
+            final ArrayList<HeroCard> nt = new ArrayList<>();
             teams.add(nt);
         }
     }
@@ -71,7 +76,8 @@ public class HeroRoster {
 
         for(int t = 0; t < teams.size(); t++) {
             final ArrayList<HeroCard> thisTeam = teams.get(t);
-            for(int teamSize = 0; teamSize < 4; teamSize++) {
+
+            for(int teamSize = 0; teamSize < thisTeam.size(); teamSize++) {
 
                 if(thisTeam.get(teamSize) != null) {
                     final HeroCard thisHero = thisTeam.get(teamSize);
@@ -88,13 +94,34 @@ public class HeroRoster {
     public void fillTeams() {
         // load teams<>
 
-        // TODO
+        for(int t = 0; t < teams.size(); t++) {
+            final ArrayList<HeroCard> thisTeam = teams.get(t);
+
+            for (int teamSize = 0; teamSize <= thisTeam.size(); teamSize++) {
+
+                final String string = pref.getString("Team" + t + "Member" + teamSize);
+                // TODO: surely there's a better way to do this.
+
+                switch(string) {
+                    case "LEIF":
+                        for(HeroCard hero : ownedHeroes) {
+                            if(hero.heroID == HeroList.LEIF) {
+                                thisTeam.add(hero);
+                                break;
+                            }
+                        }
+                        break;
+                    case "none":
+                        break;
+                }
+            }
+        }
     }
 
     public void flushHeroes() {
         // Save
 
-        for(HeroCard hero : heroList) {
+        for(HeroCard hero : ownedHeroes) {
             pref.putString("name" + hero.heroID, hero.heroName);
             pref.putInteger("level" + hero.heroID, hero.getLevel());
             pref.putInteger("bravery" + hero.heroID, hero.getBravery());
@@ -114,14 +141,14 @@ public class HeroRoster {
 
         hero.scaleToTrueLevel(targetTrueLevel);
 
-        heroList.add(hero);
+        ownedHeroes.add(hero);
     }
 
     private void fillHeroes() {
         // Load
 
-        for(int i = 0; i < Heroes.values().length; i++) {
-            final Heroes h = Heroes.values()[i];
+        for(int i = 0; i < HeroList.values().length; i++) {
+            final HeroList h = HeroList.values()[i];
             if(pref.contains("name" + h)){
                 switch(h) {
                     case CUNNING_CRAFTSMAN:
@@ -141,13 +168,12 @@ public class HeroRoster {
                 }
             }
         }
-
         pref.flush();
     }
 
     private void fillBraveryTokens() {
-        for(int i = 0; i < Heroes.values().length; i++) {
-            final Heroes hero = Heroes.values()[i];
+        for(int i = 0; i < HeroList.values().length; i++) {
+            final HeroList hero = HeroList.values()[i];
             if(pref.contains("countBraveryToken" + hero)) {
                 final int count = pref.getInteger("countBraveryToken" + hero);
                 for(int c = 0; c < count; c++) {
@@ -159,8 +185,8 @@ public class HeroRoster {
 
     public void goddessSummon() {
         final Random random = new Random();
-        final int randomIndex = random.nextInt(Heroes.values().length);
-        final Heroes newHero = Heroes.values()[randomIndex];
+        final int randomIndex = random.nextInt(HeroList.values().length);
+        final HeroList newHero = HeroList.values()[randomIndex];
 
         Gdx.app.log("summon", "got: " + newHero);
 
@@ -188,7 +214,7 @@ public class HeroRoster {
 
     }
 
-    public void addBraveryToken(Heroes hero) {
+    public void addBraveryToken(HeroList hero) {
         if(!braveryTokens.containsKey(hero)) {
             braveryTokens.put(hero, 1);
         } else {
@@ -201,17 +227,19 @@ public class HeroRoster {
         pref.flush();
     }
 
+    public ArrayList<HeroCard> getTeam(int index) { return teams.get(index); }
+
     public void addHero(HeroCard hero) {
-        heroList.add(hero);
+        ownedHeroes.add(hero);
         numberOfHeroes++;
         pref.putInteger("NumberOfHeroes", numberOfHeroes);
         flushHeroes();
     }
 
     public void removeHero(HeroCard hero) {
-        heroList.begin();
-        heroList.removeValue(hero, true);
-        heroList.end();
+        ownedHeroes.begin();
+        ownedHeroes.removeValue(hero, true);
+        ownedHeroes.end();
 
         pref.remove("name" + hero.heroID);
         pref.remove("level" + hero.heroID);
@@ -224,7 +252,7 @@ public class HeroRoster {
         pref.flush();
     }
 
-    public DelayedRemovalArray<HeroCard> getHeroList(){ return heroList; }
-    public int getBraveryTokenCount(Heroes hero) { return braveryTokens.get(hero); }
+    public DelayedRemovalArray<HeroCard> getOwnedHeroes(){ return ownedHeroes; }
+    public int getBraveryTokenCount(HeroList hero) { return braveryTokens.get(hero); }
 
 }

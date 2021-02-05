@@ -1,12 +1,12 @@
 package com.feiqn.gempires.logic.characters.heroes;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.feiqn.gempires.models.Element;
-import com.feiqn.gempires.logic.stages.match3.MatchScreen;
 import com.feiqn.gempires.logic.castle.CastleScreen;
 
 public class HeroCard extends Image {
@@ -14,12 +14,9 @@ public class HeroCard extends Image {
     public class HeroCardThumbnail extends Image {
         private final HeroCard parentCard;
 
-        public Rectangle bounds;
-
         public HeroCardThumbnail(TextureRegion region, HeroCard parent) {
             super(region);
             this.parentCard = parent;
-            bounds = new Rectangle((int) getX(), (int) getY(), (int) getWidth(), (int) getHeight());
             this.setSize(2,3);
 
             addListener(new InputListener() {
@@ -37,22 +34,41 @@ public class HeroCard extends Image {
                 }
             });
         }
-        public void setXY(float pX, float pY) {
-            setPosition(pX, pY);
-            bounds.setX((int)pX);
-            bounds.setY((int)pY);
+    }
+
+    public class HeroBattleCard extends Image {
+        private final HeroCard parentCard;
+
+        public HeroBattleCard(TextureRegion region, HeroCard parent) {
+            super(region);
+            this.parentCard = parent;
+//            final float w = Gdx.graphics.getWidth() * .2f;
+//            this.setSize(w, w * 1.5f);
+
+            addListener(new InputListener() {
+                @Override
+                public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                    setColor(.5f, .5f, .5f, 1);
+                    return true;
+                }
+
+                @Override
+                public void touchUp(InputEvent event, float x, float y, int point, int button) {
+                    setColor(1.5f, 1.5f, 1.5f, 1);
+                    // TODO
+                    heroAbility();
+                }
+            });
         }
     }
 
-    // TODO: public class HeroBattleCard
-
     private final HeroCard self = this;
 
+    public HeroBattleCard battleCard;
     public HeroCardThumbnail thumbnail;
     public Element element;
-    public Rectangle bounds;
 
-    private CastleScreen parentScreen;
+    private CastleScreen parentCastle;
 
     private int bravery,
                 level;
@@ -70,29 +86,20 @@ public class HeroCard extends Image {
                   heroAbilityTitle,
                   heroAbilityDescription;
 
-    public Heroes heroID;
+    public HeroList heroID;
 
-    public HeroCard(TextureRegion region, MatchScreen parentScreen) {
+    public HeroCard(TextureRegion region, CastleScreen parentCastle) {
         super(region);
-        // battle mode enters here
+        this.thumbnail = new HeroCardThumbnail(region, self);
+        this.battleCard = new HeroBattleCard(region, self); // todo: different region
 
-//         this.parentScreen = parentScreen;
-    }
-
-    // TODO: setup boolean paths for parentScreen type (Castle / Match)
-
-    public HeroCard(TextureRegion region, CastleScreen parentScreen) {
-        super(region);
-
-        this.parentScreen = parentScreen;
+        this.parentCastle = parentCastle;
         sharedInit();
     }
 
     private void sharedInit() {
 
-        this.setSize(parentScreen.gameCamera.viewportWidth, parentScreen.gameCamera.viewportHeight);
-
-        bounds = new Rectangle((int) getX(), (int) getY(), (int) getWidth(), (int) getHeight());
+        this.setSize(parentCastle.gameCamera.viewportWidth, parentCastle.gameCamera.viewportHeight);
 
         // base stats
         level = 1;
@@ -100,31 +107,30 @@ public class HeroCard extends Image {
         isPure = false;
     }
 
-    public void setXY(float pX, float pY) {
-        setPosition(pX, pY);
-        bounds.setX((int)pX);
-        bounds.setY((int)pY);
-    }
-
-    public void initialiseThumbnail(Element element) {
-        switch(element) {
-            case NATURE:
-                thumbnail = new HeroCardThumbnail(parentScreen.natureCardThumbnail, self);
-                break;
-            case WATER:
-                break;
-            case FIRE:
-                break;
-            case STONE:
-                break;
-            case ELECTRIC:
-                break;
-            case VOID:
-                break;
-            case PURE:
-                break;
-        }
-    }
+//    public void initialiseThumbnail(Element element) {
+//        switch(element) {
+//            case NATURE:
+//                thumbnail = new HeroCardThumbnail(parentCastle.natureCardTexture, self);
+//                break;
+//            case WATER:
+//                thumbnail = new HeroCardThumbnail(parentCastle.waterCardTexture, self);
+//                break;
+//            case FIRE:
+//                thumbnail = new HeroCardThumbnail(parentCastle.fireCardTexture, self);
+//                break;
+//            case STONE:
+//                thumbnail = new HeroCardThumbnail(parentCastle.stoneCardTexture, self);
+//                break;
+//            case ELECTRIC:
+//                thumbnail = new HeroCardThumbnail(parentCastle.electricCardTexture, self);
+//                break;
+//            case VOID:
+//                thumbnail = new HeroCardThumbnail(parentCastle.voidCardTexture, self);
+//                break;
+//            case PURE:
+//                break;
+//        }
+//    }
 
     public void heroAbility() {}
 

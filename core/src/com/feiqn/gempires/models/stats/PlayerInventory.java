@@ -2,10 +2,9 @@ package com.feiqn.gempires.models.stats;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
-import com.badlogic.gdx.utils.DelayedRemovalArray;
 import com.feiqn.gempires.logic.castle.CastleScreen;
 import com.feiqn.gempires.logic.castle.Structure;
-import com.feiqn.gempires.logic.characters.heroes.Heroes;
+import com.feiqn.gempires.logic.characters.heroes.HeroList;
 import com.feiqn.gempires.logic.items.ItemList;
 
 import java.util.HashMap;
@@ -19,7 +18,7 @@ public class PlayerInventory {
 
     private final HashMap<ItemList, Integer> items;
 
-    private final HashMap<Heroes, Integer> commonUnits;
+    private final HashMap<HeroList, Integer> commonUnits;
 
     private float foodCount,
                   maxFood,
@@ -103,8 +102,8 @@ public class PlayerInventory {
     }
 
     private void fillCommonUnits() {
-        for(int i = 0; i < Heroes.values().length; i++) {
-            final Heroes hero = Heroes.values()[i];
+        for(int i = 0; i < HeroList.values().length; i++) {
+            final HeroList hero = HeroList.values()[i];
             switch (hero) {
                 case DARING_CHEF:
                 case DREAMY_DRUID:
@@ -175,7 +174,7 @@ public class PlayerInventory {
         pref.putInteger("count" + item, i);
         pref.flush();
     }
-    public void addCommonUnit(Heroes unitToAdd) {
+    public void addCommonUnit(HeroList unitToAdd) {
         if(!commonUnits.containsKey(unitToAdd)) {
             commonUnits.put(unitToAdd, 1);
         } else {
@@ -219,7 +218,7 @@ public class PlayerInventory {
         pref.putFloat("arcanaCount", arcanaCount);
         pref.flush();
     }
-    public void subtractCommonUnit(Heroes unitToSubtract) {
+    public void subtractCommonUnit(HeroList unitToSubtract) {
         final int currentInt = commonUnits.get(unitToSubtract);
         commonUnits.put(unitToSubtract, currentInt - 1);
         pref.putInteger("count" + unitToSubtract, currentInt - 1);
@@ -236,7 +235,7 @@ public class PlayerInventory {
     public float getFoodCount() { return foodCount; }
     public float getArcanaCount() { return arcanaCount; }
     public float getOreCount() { return oreCount; }
-    public int getCommonUnitCount(Heroes unit) { return commonUnits.get(unit); }
+    public int getCommonUnitCount(HeroList unit) { return commonUnits.get(unit); }
     public int getItemCount(ItemList item) {
         if(items.containsKey(item)) {
             return items.get(item);
