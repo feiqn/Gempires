@@ -21,15 +21,15 @@ public class Structure extends Image {
         WAREHOUSE,          // store ore
         LIBRARY,            // research arcana to level up goddessStatue and others
         ARCHIVE,            // store arcana
-        ALTAR,              // power up heroes of corresponding element
-        ALCHEMIST,          // create items like healing potions or ascent stones
-        SUMMONING_CIRCLE,   // do pulls for more heroes
-        CLAN_TOWER,         // interact with multiplayer guild
-        ACADEMY,            // train lower tier heroes into higher tier ones
+        ALTAR,              // power up heroes of corresponding element TODO
+        ALCHEMIST,          // create items like healing potions or ascent stones TODO
+        SUMMONING_CIRCLE,   // do pulls for more heroes TODO
+        CLAN_TOWER,         // interact with multiplayer guild TODO
+        ACADEMY,            // train lower tier heroes into higher tier ones TODO
         BARRACKS,           // access hero roster
-        TURRET,             // attack nearby enemies
-        GARRISON,           // station heroes to attack nearby enemies
-        BARRICADE,          // block enemies from passing through
+        TURRET,             // attack nearby enemies TODO
+        GARRISON,           // station heroes to attack nearby enemies TODO
+        BARRICADE,          // block enemies from passing through TODO
         GODDESS_STATUE,     // base structure at the center of castle. everybody always has only one.
         CAMPAIGN_SELECTOR   // handler for campaign levels
     }
@@ -42,6 +42,11 @@ public class Structure extends Image {
 
     public StructureType structureType;
 
+    /*  Resources are stored as generic "resources" in this and
+     *  respective child classes. The StructureType can then
+     *  be switched upon to determine whether the resource should be
+     *  food, iron, arcana, etc.
+     */
     private float productionRate;
     private float resourceCapacity;
     private float storedResource;

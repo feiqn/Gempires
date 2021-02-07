@@ -81,9 +81,9 @@ public class PopupMenu extends Group {
                 break;
             case CAMPAIGN_SELECTOR:
                 // display campaign stage and team
-                
+
                 // TODO: button for this:
-                // sender.selectLevel();
+                 sender.selectLevel();
                 break;
         }
     }
