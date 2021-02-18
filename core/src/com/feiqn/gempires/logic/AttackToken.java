@@ -3,16 +3,16 @@ package com.feiqn.gempires.logic;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.feiqn.gempires.models.Element;
+import com.feiqn.gempires.models.ElementalType;
 
 public class AttackToken extends Image {
 
-    public Element element;
+    public ElementalType elementalType;
     public Rectangle bounds;
 
-    public AttackToken(TextureRegion region, Element e){
+    public AttackToken(TextureRegion region, ElementalType e){
         super(region);
-        this.element = e;
+        this.elementalType = e;
         this.bounds = new Rectangle(getX(), getY(), getWidth(), getHeight());
         this.setSize(1,1);
     }

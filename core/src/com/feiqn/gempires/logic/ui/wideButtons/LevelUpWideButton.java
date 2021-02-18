@@ -1,30 +1,21 @@
-package com.feiqn.gempires.logic.ui;
+package com.feiqn.gempires.logic.ui.wideButtons;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.feiqn.gempires.logic.items.ItemList;
+import com.feiqn.gempires.logic.ui.PopupMenu;
 
 import java.util.HashMap;
 
 
-public class LevelUpButton extends Image {
+public class LevelUpWideButton extends WideButton {
 
-    private final Label label;
-
-    public LevelUpButton(final PopupMenu parentMenu) {
-        super(parentMenu.getParentStructure().getParentScreen().yellowButtonTexture);
+    public LevelUpWideButton(final PopupMenu parentMenu) {
+        super(parentMenu.getParentStructure().getParentScreen().yellowButtonTexture, parentMenu);
         boolean canLevelUp = true;
 
-        final float w = Gdx.graphics.getWidth() * .9f;
-        this.setSize(w, w * .3f);
-
-        label = new Label("Level up!", parentMenu.getParentStructure().getParentScreen().structureLabelStyle);
-        label.setFontScale(2.5f);
+        updateLabelText("Level up!");
 
         final HashMap<ItemList, Integer> neededItems = parentMenu.getParentStructure().getLevelUpItemRequirements();
 
@@ -85,22 +76,5 @@ public class LevelUpButton extends Image {
         } else {
             setColor(.3f,.3f,.3f,1);
         }
-    }
-
-    public void move(float x, float y) {
-        this.setPosition(x,y);
-        label.setPosition(x + this.getWidth() * .1f,y + this.getHeight() * .4f);
-    }
-
-    @Override
-    public void draw(Batch batch, float parentAlpha) {
-        super.draw(batch, parentAlpha);
-        label.draw(batch, parentAlpha);
-    }
-
-    @Override
-    public void setColor(float r, float g, float b, float a) {
-        super.setColor(r,g,b,a);
-        label.setColor(r,g,b,a);
     }
 }

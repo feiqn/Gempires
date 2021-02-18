@@ -10,6 +10,7 @@ public enum ItemList {
     SAFFRON,
     PURE_GEM, // "Premium currency"
 
+    // "food" resources
     OAK_LOGS,
     WILLOW_LOGS,
     MAPLE_LOGS,
@@ -20,6 +21,7 @@ public enum ItemList {
     REDWOOD_LOGS,
     BLESSED_LOGS,
 
+    // "ore" resources
     COPPER_CHUNK,
     TIN_CHUNK,
     STEEL_CHUNK,
@@ -30,6 +32,7 @@ public enum ItemList {
     CRYSTAL_CHUNK,
     BLESSED_CHUNK,
 
+    // "arcana" resources
     BATTERED_RELIC,
     ORAL_HISTORY,
     TRANSCRIBED_TEACHINGS,
@@ -48,12 +51,12 @@ public enum ItemList {
     // 2*
     LEATHER_ARMOR,
     IRON_WEAPONS,
-    COLDSTONE,
-    EMBERSTONE,
-    LUCKY_CLOVER,
-    FLINT,
-    COPPER_WIRE,
-    BROKEN_PROMISE,
+    COLDSTONE,      // water
+    EMBERSTONE,     // fire
+    LUCKY_CLOVER,   // nature
+    FLINT,          // stone
+    COPPER_WIRE,    // electric
+    BROKEN_PROMISE, // void
 
     // 3*
     PLATE_ARMOR,
@@ -68,22 +71,22 @@ public enum ItemList {
     // 4*
     DAMASCUS_ARMOR,
     RUNEITE_WEAPONS,
-    HOLY_WATER,
-    HOLY_INCENSE_ASH,
-    REDWOOD_SEED,
-    OBSIDIAN_GEODE,
-    LIGHTNING_ROD,
-    MARTYRS_DIARY,
+    HOLY_WATER,       // water
+    HOLY_INCENSE_ASH, // fire
+    REDWOOD_SEED,     // nature
+    OBSIDIAN_GEODE,   // stone
+    LIGHTNING_ROD,    // electric
+    MARTYRS_DIARY,    // void
 
     // 5*
     BLESSED_ARMOR,
     BLESSED_WEAPONS,
-    GODDESS_TEARS,
-    VOLCANO_HEART,
-    REDWOOD_ROOTS,
-    TITAN_FOSSIL,
-    STORMS_EYE,
-    NIGHTMARE_DRAWING,
+    GODDESS_TEARS,     // water
+    VOLCANO_HEART,     // fire
+    REDWOOD_ROOTS,     // nature
+    TITAN_FOSSIL,      // stone
+    STORMS_EYE,        // electric
+    NIGHTMARE_DRAWING, // void
 
     // BATTLE ITEMS:
     TORNADO,

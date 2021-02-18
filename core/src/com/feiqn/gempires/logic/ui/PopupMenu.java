@@ -2,9 +2,15 @@ package com.feiqn.gempires.logic.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.feiqn.gempires.logic.castle.Structure;
 import com.feiqn.gempires.logic.characters.heroes.HeroCard;
+import com.feiqn.gempires.logic.ui.wideButtons.BeginStageWideButton;
+import com.feiqn.gempires.logic.ui.wideButtons.LevelUpWideButton;
+import com.feiqn.gempires.logic.ui.wideButtons.OpenShopWideButton;
+import com.feiqn.gempires.logic.ui.wideButtons.SummonWideButton;
 
 public class PopupMenu extends Group {
 
@@ -12,13 +18,15 @@ public class PopupMenu extends Group {
         HERO_ROSTER,
         RESOURCE_STRUCTURE,
         GODDESS_STATUE,
-        CAMPAIGN_SELECTOR
+        CAMPAIGN_SELECTOR,
+        ALCHEMIST,
+        SHOP_ALCHEMY
     }
 
     private final Structure parentStructure;
     private final MenuType menuType;
 
-    public PopupMenu(Structure sender, MenuType type) {
+    public PopupMenu(final Structure sender, MenuType type) {
         super();
         parentStructure = sender;
         menuType = type;
@@ -30,27 +38,18 @@ public class PopupMenu extends Group {
             case GODDESS_STATUE:
             case RESOURCE_STRUCTURE:
             case CAMPAIGN_SELECTOR:
-                // TODO: finish this
+            case ALCHEMIST:
+            case SHOP_ALCHEMY:
+                // TODO: make a mini-menu for simpler structures like farms and mines
                 background.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
                 break;
         }
 
         addActor(background);
 
-        final Image header = new Image(sender.getParentScreen().menuTexture);
-        header.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight() * .05f);
-        header.setColor(.5f, .5f, .5f, 1);
-        header.setPosition(0, Gdx.graphics.getHeight() - header.getHeight());
-        addActor(header);
-
-        final BackButton backButton = new BackButton(parentStructure.getParentScreen().backButtonTexture);
-        backButton.setSize(Gdx.graphics.getHeight() * .04f, Gdx.graphics.getHeight() * .04f);
-        backButton.setPosition(Gdx.graphics.getWidth() * .85f, header.getY() - (backButton.getHeight() * .5f));
-        backButton.setParent(this);
-        addActor(backButton);
-
         // TODO: update this switch
         switch(menuType) {
+
             case HERO_ROSTER:
                 int xRevs = 0;
                 int yRevs = 0;
@@ -67,34 +66,87 @@ public class PopupMenu extends Group {
                     }
                 }
                 break;
+
             case GODDESS_STATUE:
                 // SUMMON HERO
-                final SummonButton summonButton = new SummonButton(this);
-                summonButton.move(Gdx.graphics.getWidth() * .12f, Gdx.graphics.getHeight() * .7f);
+                final SummonWideButton summonButton = new SummonWideButton(this);
+                summonButton.setPosition(Gdx.graphics.getWidth() * .12f, Gdx.graphics.getHeight() * .7f);
                 addActor(summonButton);
                 // TODO: display necessary resources
                 addLevelUpButton();
                 break;
+
             case RESOURCE_STRUCTURE:
                 // TODO: display resource available, capacity,
                 addLevelUpButton();
                 break;
-            case CAMPAIGN_SELECTOR:
-                // display campaign stage and team
 
-                // TODO: button for this:
-                 sender.selectLevel();
+            case CAMPAIGN_SELECTOR:
+                // TODO: display campaign stage name, team, other relevant info
+
+                final BeginStageWideButton beginStageButton = new BeginStageWideButton(this);
+                beginStageButton.setPosition(Gdx.graphics.getWidth() * .12f, Gdx.graphics.getHeight() * .4f);
+                addActor(beginStageButton);
+                break;
+
+            case ALCHEMIST:
+                // TODO: "enter shop" button to a scrolling menu of items
+                final OpenShopWideButton shopButton = new OpenShopWideButton(this);
+                shopButton.setPosition(Gdx.graphics.getWidth() * .12f, Gdx.graphics.getHeight() * .6f);
+                addActor(shopButton);
+
+                addLevelUpButton();
+                break;
+
+            case SHOP_ALCHEMY:
+                layoutShop();
+                break;
+
+            default:
                 break;
         }
+
+        final Image header = new Image(sender.getParentScreen().menuTexture);
+        header.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight() * .05f);
+        header.setColor(.5f, .5f, .5f, 1);
+        header.setPosition(0, Gdx.graphics.getHeight() - header.getHeight());
+        addActor(header);
+
+        final BackButton backButton = new BackButton(parentStructure.getParentScreen().backButtonTexture);
+        backButton.setSize(Gdx.graphics.getHeight() * .04f, Gdx.graphics.getHeight() * .04f);
+        backButton.setPosition(Gdx.graphics.getWidth() * .85f, header.getY() - (backButton.getHeight() * .5f));
+        backButton.setParent(this);
+        addActor(backButton);
+
     }
 
     private void addLevelUpButton() {
 
-        final LevelUpButton levelUpButton = new LevelUpButton(this);
+        final LevelUpWideButton levelUpButton = new LevelUpWideButton(this);
 
-        levelUpButton.move(Gdx.graphics.getWidth() * .12f, Gdx.graphics.getHeight() * .3f);
+        levelUpButton.setPosition(Gdx.graphics.getWidth() * .12f, Gdx.graphics.getHeight() * .3f);
 
         addActor(levelUpButton);
     }
     public Structure getParentStructure() { return parentStructure; }
+
+    private void layoutShop() {
+        /* TODO:
+         * final ArrayList<ItemList> itemsAlchemistCanMake
+         * for each ItemList item in itemsAlchemistCan Make
+         * add a little ui card to contain item info
+         * show a picture of the item, its name,
+         * amount owned, and a button to create more of the item
+         * when button is pressed
+         * final Group = new group
+         * group.add(new background)
+         * display resources needed to create item
+         * new button
+         * if have enough resources,
+         * let press button,
+         * if press button,
+         * remove resources, start making item
+         */
+    }
+
 }

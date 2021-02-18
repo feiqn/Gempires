@@ -21,10 +21,10 @@ public class Structure extends Image {
         WAREHOUSE,          // store ore
         LIBRARY,            // research arcana to level up goddessStatue and others
         ARCHIVE,            // store arcana
-        ALTAR,              // power up heroes of corresponding element TODO
-        ALCHEMIST,          // create items like healing potions or ascent stones TODO
-        SUMMONING_CIRCLE,   // do pulls for more heroes TODO
-        CLAN_TOWER,         // interact with multiplayer guild TODO
+        ALTAR,              // power up heroes of corresponding element
+        ALCHEMIST,          // create items like healing potions or ascent stones
+        SUMMONING_PYRE,     // use items to play special stages TODO
+        CLAN_TOWER,         // interact with multiplayer guild TODO during Multiplayer implementation
         ACADEMY,            // train lower tier heroes into higher tier ones TODO
         BARRACKS,           // access hero roster
         TURRET,             // attack nearby enemies TODO
@@ -112,6 +112,10 @@ public class Structure extends Image {
                         final PopupMenu campaignMenu = new PopupMenu(self, PopupMenu.MenuType.CAMPAIGN_SELECTOR);
                         parentScreen.uiGroup.addActor(campaignMenu);
                         break;
+                    case ALCHEMIST:
+                        final PopupMenu menu = new PopupMenu(self, PopupMenu.MenuType.ALCHEMIST);
+                        parentScreen.uiGroup.addActor(menu);
+                        break;
                     default:
                         break;
                 }
@@ -168,7 +172,7 @@ public class Structure extends Image {
                 switch(structureType) {
                     case GODDESS_STATUE:
                     case FARM:
-                    case SUMMONING_CIRCLE:
+                    case SUMMONING_PYRE:
                     case CLAN_TOWER:
                     case WAREHOUSE:
                     case BARRICADE:
@@ -191,7 +195,7 @@ public class Structure extends Image {
                 switch(structureType) {
                     case GODDESS_STATUE:
                     case FARM:
-                    case SUMMONING_CIRCLE:
+                    case SUMMONING_PYRE:
                     case CLAN_TOWER:
                     case WAREHOUSE:
                     case BARRICADE:
@@ -213,7 +217,7 @@ public class Structure extends Image {
                 switch(structureType) {
                     case GODDESS_STATUE:
                     case FARM:
-                    case SUMMONING_CIRCLE:
+                    case SUMMONING_PYRE:
                     case CLAN_TOWER:
                     case WAREHOUSE:
                     case BARRICADE:
@@ -235,7 +239,7 @@ public class Structure extends Image {
                 switch(structureType) {
                     case GODDESS_STATUE:
                     case FARM:
-                    case SUMMONING_CIRCLE:
+                    case SUMMONING_PYRE:
                     case CLAN_TOWER:
                     case WAREHOUSE:
                     case BARRICADE:
@@ -257,7 +261,7 @@ public class Structure extends Image {
                 switch(structureType) {
                     case GODDESS_STATUE:
                     case FARM:
-                    case SUMMONING_CIRCLE:
+                    case SUMMONING_PYRE:
                     case CLAN_TOWER:
                     case WAREHOUSE:
                     case BARRICADE:
@@ -279,7 +283,7 @@ public class Structure extends Image {
                 switch(structureType) {
                     case GODDESS_STATUE:
                     case FARM:
-                    case SUMMONING_CIRCLE:
+                    case SUMMONING_PYRE:
                     case CLAN_TOWER:
                     case WAREHOUSE:
                     case BARRICADE:
@@ -301,7 +305,7 @@ public class Structure extends Image {
                 switch(structureType) {
                     case GODDESS_STATUE:
                     case FARM:
-                    case SUMMONING_CIRCLE:
+                    case SUMMONING_PYRE:
                     case CLAN_TOWER:
                     case WAREHOUSE:
                     case BARRICADE:
@@ -323,7 +327,7 @@ public class Structure extends Image {
                 switch(structureType) {
                     case GODDESS_STATUE:
                     case FARM:
-                    case SUMMONING_CIRCLE:
+                    case SUMMONING_PYRE:
                     case CLAN_TOWER:
                     case WAREHOUSE:
                     case BARRICADE:
@@ -345,7 +349,7 @@ public class Structure extends Image {
                 switch(structureType) {
                     case GODDESS_STATUE:
                     case FARM:
-                    case SUMMONING_CIRCLE:
+                    case SUMMONING_PYRE:
                     case CLAN_TOWER:
                     case WAREHOUSE:
                     case BARRICADE:
@@ -370,7 +374,7 @@ public class Structure extends Image {
                 switch(structureType) {
                     case GODDESS_STATUE:
                     case FARM:
-                    case SUMMONING_CIRCLE:
+                    case SUMMONING_PYRE:
                     case CLAN_TOWER:
                     case WAREHOUSE:
                     case BARRICADE:

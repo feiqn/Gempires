@@ -1,20 +1,20 @@
-package com.feiqn.gempires.logic.characters.enemies.water;
+package com.feiqn.gempires.logic.characters.enemies.dark;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.feiqn.gempires.logic.items.ItemList;
-import com.feiqn.gempires.models.ElementalType;
 import com.feiqn.gempires.logic.characters.enemies.Bestiary;
 import com.feiqn.gempires.logic.characters.enemies.Enemy;
+import com.feiqn.gempires.logic.items.ItemList;
+import com.feiqn.gempires.models.ElementalType;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-public class WaterWizard extends Enemy {
+public class DarkKnight extends Enemy {
 
-    public WaterWizard(TextureRegion region) {
-        super(region, 5, 5, 500);
-        this.elementalType = ElementalType.WATER;
-        this.beastType = Bestiary.WATER_WIZARD;
+    public DarkKnight(TextureRegion region) {
+        super(region, 5, 15, 400);
+        this.elementalType = ElementalType.VOID;
+        this.beastType = Bestiary.DARK_KNIGHT;
     }
 
     @Override
@@ -45,7 +45,7 @@ public class WaterWizard extends Enemy {
             case 80:
                 final float r1 = random.nextFloat();
                 if(r1 > .9f) {
-                    loot.add(ItemList.COLDSTONE);
+                    loot.add(ItemList.BROKEN_PROMISE);
                 }
             case 79:
             case 78:
@@ -86,6 +86,12 @@ public class WaterWizard extends Enemy {
             case 43:
             case 42:
             case 41:
+                final float r = random.nextFloat();
+                if(r > .3f) {
+                    loot.add(ItemList.TOOLS);
+                } else {
+                    loot.add(ItemList.LEATHER_ARMOR);
+                }
             case 40:
             case 39:
             case 38:
@@ -97,10 +103,6 @@ public class WaterWizard extends Enemy {
             case 32:
             case 31:
             case 30:
-                final float r = random.nextFloat();
-                if(r > .5f) {
-                    loot.add(ItemList.WORK_CLOTHES);
-                }
             case 29:
             case 28:
             case 27:
@@ -113,6 +115,7 @@ public class WaterWizard extends Enemy {
             case 20:
             case 19:
             case 18:
+                loot.add(ItemList.HEALTH_POTION_SMALL);
             case 17:
             case 16:
             case 15:
@@ -120,7 +123,6 @@ public class WaterWizard extends Enemy {
             case 13:
             case 12:
             case 11:
-                loot.add(ItemList.HEALTH_POTION_SMALL);
             case 10:
             case 9:
             case 8:
@@ -139,5 +141,4 @@ public class WaterWizard extends Enemy {
         }
 
     }
-
 }

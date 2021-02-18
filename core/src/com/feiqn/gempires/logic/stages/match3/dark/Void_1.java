@@ -1,4 +1,4 @@
-package com.feiqn.gempires.logic.stages.match3.water;
+package com.feiqn.gempires.logic.stages.match3.dark;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Timer;
@@ -6,6 +6,7 @@ import com.feiqn.gempires.GempiresGame;
 import com.feiqn.gempires.logic.castle.CastleScreen;
 import com.feiqn.gempires.logic.characters.enemies.Bestiary;
 import com.feiqn.gempires.logic.characters.enemies.Enemy;
+import com.feiqn.gempires.logic.characters.enemies.dark.DarkKnight;
 import com.feiqn.gempires.logic.characters.enemies.water.WaterWizard;
 import com.feiqn.gempires.logic.characters.heroes.HeroCard;
 import com.feiqn.gempires.logic.items.ItemList;
@@ -17,7 +18,7 @@ import com.feiqn.gempires.models.stats.PlayerInventory;
 
 import java.util.ArrayList;
 
-public class Water_1 extends MatchScreen {
+public class Void_1 extends MatchScreen {
 
     final ArrayList<Bestiary> neededEnemies;
     private Boolean firstWaveClear;
@@ -28,8 +29,8 @@ public class Water_1 extends MatchScreen {
     final private CastleScreen parent;
     final private ArrayList<HeroCard> team;
 
-    public Water_1(CastleScreen castle) {
-        super(castle.game, CampaignLevelID.WATER_1);
+    public Void_1(CastleScreen castle) {
+        super(castle.game, CampaignLevelID.VOID_1);
         parent = castle;
         this.game = castle.game;
         firstWaveClear = false;
@@ -44,7 +45,7 @@ public class Water_1 extends MatchScreen {
     public void show() {
         super.show();
 
-        neededEnemies.add(Bestiary.WATER_WIZARD);
+        neededEnemies.add(Bestiary.DARK_KNIGHT);
         initAdventureMode(neededEnemies);
 
         calculateGemPower(team);
@@ -53,15 +54,15 @@ public class Water_1 extends MatchScreen {
         setEnemyDifficulty(2);
 
         final ArrayList<Enemy> wave = new ArrayList<>();
-        final WaterWizard w = new WaterWizard(waterWizardTextureRegion);
-        wave.add(w);
+
+        final DarkKnight d = new DarkKnight(darkKnightTextureRegion);
+        wave.add(d);
 
         deployWave(wave, Formation.ONE_CENTER);
-
     }
 
     @Override
-    public void clearWave() {
+    public void clearWave() { // TODO: change these to void enemies instead of water
         if(firstWaveClear && secondWaveClear && thirdWaveClear) {
             // stage clear
             for(ItemList i : loot) {
@@ -70,7 +71,7 @@ public class Water_1 extends MatchScreen {
             }
             allowUserInput = false;
 
-            parent.castleStats.setStageCleared(ElementalType.WATER, 1);
+            parent.castleStats.setStageCleared(ElementalType.VOID, 1);
 
             Timer.schedule(new Timer.Task(){
                 @Override

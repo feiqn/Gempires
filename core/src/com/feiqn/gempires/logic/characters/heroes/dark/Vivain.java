@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.feiqn.gempires.logic.castle.CastleScreen;
 import com.feiqn.gempires.logic.characters.heroes.HeroCard;
 import com.feiqn.gempires.logic.characters.heroes.HeroList;
-import com.feiqn.gempires.models.Element;
+import com.feiqn.gempires.models.ElementalType;
 
 public class Vivain extends HeroCard {
 
@@ -17,7 +17,7 @@ public class Vivain extends HeroCard {
         heroAbilityTitle = "";
         heroAbilityDescription = "";
 
-        element = Element.VOID;
+        elementalType = ElementalType.VOID;
 
         heroID = HeroList.VIVAIN;
 

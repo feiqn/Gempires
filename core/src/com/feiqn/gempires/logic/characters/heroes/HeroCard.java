@@ -1,12 +1,10 @@
 package com.feiqn.gempires.logic.characters.heroes;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.feiqn.gempires.models.Element;
+import com.feiqn.gempires.models.ElementalType;
 import com.feiqn.gempires.logic.castle.CastleScreen;
 
 public class HeroCard extends Image {
@@ -66,7 +64,7 @@ public class HeroCard extends Image {
 
     public HeroBattleCard battleCard;
     public HeroCardThumbnail thumbnail;
-    public Element element;
+    public ElementalType elementalType;
 
     private CastleScreen parentCastle;
 

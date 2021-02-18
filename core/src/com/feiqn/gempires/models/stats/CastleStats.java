@@ -2,9 +2,9 @@ package com.feiqn.gempires.models.stats;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.DelayedRemovalArray;
 import com.feiqn.gempires.logic.castle.*;
+import com.feiqn.gempires.models.ElementalType;
 
 public class CastleStats {
     // includes: which buildings are where, what level they are, if units are garrisoned and which units those are, and summoner stats
@@ -49,7 +49,9 @@ public class CastleStats {
 
         if(!pref.contains("NewGame?")) {
             pref.putBoolean("NewGame?", false);
+
             // do first time setup stuff here
+
             final Barracks barracks = new Barracks(parentCastle.barracksTexture, parentCastle);
             barracks.setPosition(59.5f,64.5f);
             addStructure(barracks);
@@ -65,6 +67,23 @@ public class CastleStats {
             final Farm farm = new Farm(parentCastle.farmTexture, parentCastle);
             farm.setPosition(52.5f, 63.5f);
             addStructure(farm);
+
+            final Warehouse warehouse = new Warehouse(parentCastle.warehouseTexture, parentCastle);
+            warehouse.setPosition( 55.5f, 60.5f);
+            addStructure(warehouse);
+
+            final Silo silo = new Silo(parentCastle.siloTexture, parentCastle);
+            silo.setPosition(58.5f, 63.5f);
+            addStructure(silo);
+
+            final Archive archive = new Archive(parentCastle.archivesTexture, parentCastle);
+            archive.setPosition(50.5f, 60.5f);
+            addStructure(archive);
+
+            final Alchemist alchemist = new Alchemist(parentCastle.alchemistTexture, parentCastle);
+            alchemist.setPosition(40.5f, 50.5f);
+            addStructure(alchemist);
+
         } else {
             fillStructures();
         }
@@ -90,73 +109,53 @@ public class CastleStats {
 
                     final Structure str;
 
+                    // TODO: finish this switch
                     switch(structType) {
                         case FARM:
                             str = new Farm(parentCastle.farmTexture, parentCastle);
-
-                            Gdx.app.log("fillStructs", "farm");
-                            str.setX(destinationX);// TO BE DELETED
-                            str.setY(destinationY);// TO BE DELETED
-                            while(str.getLevel() < goalLevel) {// TO BE DELETED
-                                str.levelUp();// TO BE DELETED
-                            }// TO BE DELETED
-                            structures.add(str);// TO BE DELETED
-
                             break;
                         case MINE:
                             str = new Mine(parentCastle.mineTexture, parentCastle);
-
-                            Gdx.app.log("fillStructs", "mine");
-                            str.setX(destinationX);// TO BE DELETED
-                            str.setY(destinationY);// TO BE DELETED
-                            while(str.getLevel() < goalLevel) {// TO BE DELETED
-                                str.levelUp();// TO BE DELETED
-                            }// TO BE DELETED
-                            structures.add(str);// TO BE DELETED
-
                             break;
                         case SILO:
+                            str = new Silo(parentCastle.siloTexture, parentCastle);
+                            break;
                         case ALTAR:
+                            str = new Altar(parentCastle.altarWaterTexture, parentCastle, ElementalType.WATER); // TODO: other elements
+                            break;
                         case TURRET:
                         case ACADEMY:
                         case ARCHIVE:
+                            str = new Archive(parentCastle.archivesTexture, parentCastle);
+                            break;
                         case LIBRARY:
+                            str = new Library(parentCastle.libraryTexture, parentCastle);
+                            break;
                         case BARRACKS:
                             str = new Barracks(parentCastle.barracksTexture, parentCastle);
-
-                            str.setX(destinationX);// TO BE DELETED
-                            str.setY(destinationY);// TO BE DELETED
-                            while(str.getLevel() < goalLevel) {// TO BE DELETED
-                                str.levelUp();// TO BE DELETED
-                            }// TO BE DELETED
-                            structures.add(str);// TO BE DELETED
-
                             break;
                         case GARRISON:
                         case ALCHEMIST:
+                            str = new Alchemist(parentCastle.alchemistTexture, parentCastle);
+                            break;
                         case BARRICADE:
                         case WAREHOUSE:
+                            str = new Warehouse(parentCastle.warehouseTexture, parentCastle);
+                            break;
+                        case SUMMONING_PYRE:
                         case CLAN_TOWER:
                         case GODDESS_STATUE:
                             str = new GoddessStatue(parentCastle.goddessStatueTexture, parentCastle);
-
-                            str.setX(destinationX);// TO BE DELETED
-                            str.setY(destinationY);// TO BE DELETED
-                            while(str.getLevel() < goalLevel) { // TO BE DELETED
-                                str.levelUp(); // TO BE DELETED
-                            } // TO BE DELETED
-                            structures.add(str); // TO BE DELETED
-
-                        case SUMMONING_CIRCLE:
                             break;
+                        default:
+                            throw new IllegalStateException("Unexpected value: " + structType);
                     }
-                    // TODO: delete redundant code above and uncomment below, after all structure textures have been finished
-//                    str.setX(destinationX);
-//                    str.setY(destinationY);
-//                    while(str.getLevel() < goalLevel) {
-//                        str.levelUp();
-//                    }
-//                    structures.add(str);
+                    str.setX(destinationX);
+                    str.setY(destinationY);
+                    while(str.getLevel() < goalLevel) {
+                        str.levelUp();
+                    }
+                    structures.add(str);
                 }
             }
         }
@@ -209,8 +208,16 @@ public class CastleStats {
         pref.putInteger("GoddessStatueLevel", goddessStatueLevel);
         pref.flush();
     }
+    public void setStageCleared(ElementalType elem, Integer num) {
+        final String s = elem.toString() + "StagesCleared";
+        pref.putInteger(s, num);
+        pref.flush();
+    }
 
     // GETTERS
+    public int getStagesCleared(ElementalType elem) {
+        return pref.getInteger(elem.toString() + "StagesCleared");
+    }
     public DelayedRemovalArray<Structure> getStructures() { return structures; }
     public int getSummonerExp() { return summonerExp; }
     public int getSummonerLevel() { return summonerLevel; }

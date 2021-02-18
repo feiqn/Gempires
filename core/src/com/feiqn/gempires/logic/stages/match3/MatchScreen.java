@@ -26,7 +26,7 @@ import com.feiqn.gempires.logic.characters.heroes.HeroCard;
 import com.feiqn.gempires.logic.items.ItemList;
 import com.feiqn.gempires.logic.items.Tornado;
 import com.feiqn.gempires.models.CampaignLevelID;
-import com.feiqn.gempires.models.Element;
+import com.feiqn.gempires.models.ElementalType;
 import com.feiqn.gempires.models.Formation;
 import org.jetbrains.annotations.NotNull;
 
@@ -97,7 +97,9 @@ public class MatchScreen extends ScreenAdapter {
 
     private HashMap<Bestiary, Boolean> enemyIsInitialized;
 
-    public TextureRegion waterWizardTextureRegion;
+    // TODO: these can surely be managed elsewhere
+    public TextureRegion waterWizardTextureRegion,
+                         darkKnightTextureRegion;
 
     public MatchScreen(GempiresGame game, CampaignLevelID levelID /* , Arraylist<HeroCard> team */){
         this.game = game;
@@ -144,14 +146,22 @@ public class MatchScreen extends ScreenAdapter {
                 case WATER_WIZARD:
                     if(!enemyIsInitialized.get(Bestiary.WATER_WIZARD)) {
                         Gdx.app.log("water wizard texture ready", "");
-                        final Texture wizardSpriteSheet = new Texture(Gdx.files.internal("characters/enemies/wizard_spritesheet.png"));
+                        final Texture wizardSpriteSheet = new Texture(Gdx.files.internal("characters/enemies/water/wizard_spritesheet.png"));
                         waterWizardTextureRegion = new TextureRegion(wizardSpriteSheet, 64, 288, 64, 64);
 
                         enemyIsInitialized.put(Bestiary.WATER_WIZARD, true);
                     }
                     break;
-
                 case ICE_FIEND:
+                    break;
+                case DARK_KNIGHT:
+                    if(!enemyIsInitialized.get(Bestiary.DARK_KNIGHT)) {
+                        Gdx.app.log("dark knight texture ready", "");
+                        final Texture darkKnightSprite = new Texture(Gdx.files.internal("characters/enemies/dark/dark_knight.png"));
+                        darkKnightTextureRegion = new TextureRegion(darkKnightSprite, 0,0, 64,64);
+
+                        enemyIsInitialized.put(Bestiary.DARK_KNIGHT, true);
+                    }
                     break;
             }
         }
@@ -347,24 +357,24 @@ public class MatchScreen extends ScreenAdapter {
         }
     }
 
-    private Element translateGemColorToElement(Integer color) {
+    private ElementalType translateGemColorToElement(Integer color) {
         // this class solely exists as a stop-gap until Gem class refactor is complete
 
         switch (color) {
             case 0:
-                return Element.NATURE;
+                return ElementalType.NATURE;
             case 1:
-                return Element.VOID;
+                return ElementalType.VOID;
             case 2:
-                return Element.FIRE;
+                return ElementalType.FIRE;
             case 3:
-                return Element.STONE;
+                return ElementalType.STONE;
             case 4:
-                return Element.ELECTRIC;
+                return ElementalType.ELECTRIC;
             case 5:
-                return Element.WATER;
+                return ElementalType.WATER;
             case 6:
-                return Element.PURE;
+                return ElementalType.PURE;
             case 7:
                 break;
         }
@@ -376,9 +386,9 @@ public class MatchScreen extends ScreenAdapter {
 
         for(Gem gem : gemsToDestroy) {
             if(!classicMode) {
-                final Element gemElement = translateGemColorToElement(gem.GemColor);
+                final ElementalType gemElementalType = translateGemColorToElement(gem.GemColor);
                 if (gem.GemColor != 7) {
-                    final AttackToken token = new AttackToken(attackTokenTextures[gem.GemColor], gemElement);
+                    final AttackToken token = new AttackToken(attackTokenTextures[gem.GemColor], gemElementalType);
 
                     token.setX(gem.getX());
                     token.setY(gem.getY());
@@ -764,14 +774,24 @@ public class MatchScreen extends ScreenAdapter {
                 break;
             case FIRE_1:
             case FIRE_2:
+                matchMap = new TmxMapLoader().load("maps/fire_debug.tmx");
+                break;
             case VOID_1:
             case VOID_2:
+                matchMap = new TmxMapLoader().load("maps/void_debug.tmx");
+                break;
             case STONE_1:
             case STONE_2:
+                matchMap = new TmxMapLoader().load("maps/stone_debug.tmx");
+                break;
             case NATURE_1:
             case NATURE_2:
+                matchMap = new TmxMapLoader().load("maps/nature_debug.tmx");
+                break;
             case ELECTRIC_1:
             case ELECTRIC_2:
+                matchMap = new TmxMapLoader().load("maps/electric_debug.tmx");
+                break;
             case CLASSIC_1:
             case CLASSIC_2:
             default:
@@ -966,7 +986,7 @@ public class MatchScreen extends ScreenAdapter {
 
     public void calculateGemPower(ArrayList<HeroCard> team) {
         for(HeroCard hero : team) {
-            switch(hero.element) {
+            switch(hero.elementalType) {
                 case ELECTRIC:
                     electricPower += hero.getStrength();
                     break;
@@ -1063,7 +1083,7 @@ public class MatchScreen extends ScreenAdapter {
         }, 1);
     }
 
-    private void calculateDamage(Element damageType, Enemy enemy) {
+    private void calculateDamage(ElementalType damageType, Enemy enemy) {
 
         final float damage;
 
@@ -1071,7 +1091,7 @@ public class MatchScreen extends ScreenAdapter {
 
         switch(damageType) {
             case ELECTRIC:
-                switch(enemy.element) {
+                switch(enemy.elementalType) {
                     case VOID:
                     case WATER:
                         damage = electricPower * 2;
@@ -1086,7 +1106,7 @@ public class MatchScreen extends ScreenAdapter {
                 }
                 break;
             case FIRE:
-                switch(enemy.element) {
+                switch(enemy.elementalType) {
                     case NATURE:
                     case VOID:
                         damage = firePower * 2;
@@ -1101,7 +1121,7 @@ public class MatchScreen extends ScreenAdapter {
                 }
                 break;
             case STONE:
-                switch(enemy.element) {
+                switch(enemy.elementalType) {
                     case FIRE:
                     case ELECTRIC:
                         damage = stonePower * 2;
@@ -1116,7 +1136,7 @@ public class MatchScreen extends ScreenAdapter {
                 }
                 break;
             case WATER:
-                switch(enemy.element) {
+                switch(enemy.elementalType) {
                     case FIRE:
                     case STONE:
                         damage = waterPower * 2;
@@ -1131,7 +1151,7 @@ public class MatchScreen extends ScreenAdapter {
                 }
                 break;
             case NATURE:
-                switch(enemy.element) {
+                switch(enemy.elementalType) {
                     case WATER:
                     case ELECTRIC:
                         damage = naturePower * 2;
@@ -1146,7 +1166,7 @@ public class MatchScreen extends ScreenAdapter {
                 }
                 break;
             case VOID:
-                switch(enemy.element) {
+                switch(enemy.elementalType) {
                     case STONE:
                     case NATURE:
                         damage = voidPower * 2;
@@ -1186,7 +1206,7 @@ public class MatchScreen extends ScreenAdapter {
                     attackTokensOnScreen.removeValue(t, true);
                     attackTokensOnScreen.end();
 
-                    calculateDamage(t.element, e);
+                    calculateDamage(t.elementalType, e);
 
                     e.setColor(.5f,.5f,.5f,1);
 

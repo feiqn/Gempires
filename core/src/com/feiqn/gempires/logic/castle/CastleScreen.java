@@ -89,14 +89,22 @@ public class CastleScreen extends ScreenAdapter {
                          siloTexture,
                          warehouseTexture,
                          archivesTexture,
+                         alchemistTexture,
                          goddessStatueTexture,
 
-                         campaignSelectorVoid,
-                                 campaignSelectorWater,
-                         campaignSelectorFire,
-                         campaignSelectorElectric,
-                         campaignSelectorNature,
-                         campaignSelectorEarth,
+                         altarFireTexture,
+                         altarWaterTexture,
+                         altarVoidTexture,
+                         altarElectricTexture,
+                         altarNatureTexture,
+                         altarStoneTexture,
+
+                         campaignSelectorVoidTexture,
+                         campaignSelectorWaterTexture,
+                         campaignSelectorFireTexture,
+                         campaignSelectorElectricTexture,
+                         campaignSelectorNatureTexture,
+                         campaignSelectorStoneTexture,
 
                          menuTexture,
                          stoneCardTexture,
@@ -108,8 +116,6 @@ public class CastleScreen extends ScreenAdapter {
                          natureCardThumbnail,
                          backButtonTexture;
 
-    public Barracks barracks;
-
 //    public T3AButton t3ATestButton;
 
     public BitmapFont structureFont;
@@ -117,6 +123,8 @@ public class CastleScreen extends ScreenAdapter {
     public CastleScreen(GempiresGame game) { this.game = game; }
 
     private void initialiseTextures() {
+        // TODO: new, isometric textures, please.
+
         avatarTexture = new Texture(Gdx.files.internal("avatars/vivian.png"));
 
         final Texture gemSpriteSheet = new Texture(Gdx.files.internal("gem_set.png"));
@@ -150,17 +158,23 @@ public class CastleScreen extends ScreenAdapter {
         final Texture buildingSpriteSheet = new Texture(Gdx.files.internal("structures/buildingSpriteSheet.png"));
         farmTexture =                       new TextureRegion(buildingSpriteSheet, 0, 128, 32, 32);
         mineTexture =                       new TextureRegion(buildingSpriteSheet, 160, 96, 32, 32);
+        libraryTexture =                    new TextureRegion(buildingSpriteSheet, 64, 0, 32, 32);
+        alchemistTexture =                  new TextureRegion(buildingSpriteSheet, 32*7, 0, 32,32);
+        archivesTexture =                   new TextureRegion(buildingSpriteSheet, 32*5, 32*5, 32,32);
+        siloTexture =                       new TextureRegion(buildingSpriteSheet, 32, 32*7, 32, 32);
+        warehouseTexture =                  new TextureRegion(buildingSpriteSheet, 32, 32*5, 32,32);
+        altarWaterTexture =                 new TextureRegion(buildingSpriteSheet, 32*5, 0, 32,32);
 
-        final Texture itemSpriteSheet = new Texture(Gdx.files.internal("ui/RPG_Item_Pack.png"));
-        campaignSelectorVoid          = new TextureRegion(itemSpriteSheet,64, 0,  16,16);
-        campaignSelectorWater         = new TextureRegion(itemSpriteSheet,64, 16, 16,16);
-        campaignSelectorElectric      = new TextureRegion(itemSpriteSheet,64, 32, 16,16);
-        campaignSelectorFire          = new TextureRegion(itemSpriteSheet,64, 48, 16,16);
-        campaignSelectorNature        = new TextureRegion(itemSpriteSheet,64, 64, 16,16);
-        campaignSelectorEarth         = new TextureRegion(itemSpriteSheet,64, 70, 16,16);
-        T3AIcon                       = new TextureRegion(itemSpriteSheet,128,368,16,16);
-        thymeTexture                  = new TextureRegion(itemSpriteSheet,16*6, 16*14, 16, 16);
-        oreTexture                    = new TextureRegion(itemSpriteSheet, 32, 16*7, 16,16);
+        final Texture itemSpriteSheet   = new Texture(Gdx.files.internal("ui/RPG_Item_Pack.png"));
+        campaignSelectorVoidTexture     = new TextureRegion(itemSpriteSheet,64, 0,  16,16);
+        campaignSelectorWaterTexture    = new TextureRegion(itemSpriteSheet,64, 16, 16,16);
+        campaignSelectorElectricTexture = new TextureRegion(itemSpriteSheet,64, 32, 16,16);
+        campaignSelectorFireTexture     = new TextureRegion(itemSpriteSheet,64, 48, 16,16);
+        campaignSelectorNatureTexture   = new TextureRegion(itemSpriteSheet,64, 64, 16,16);
+        campaignSelectorStoneTexture    = new TextureRegion(itemSpriteSheet,64, 70, 16,16);
+        T3AIcon                         = new TextureRegion(itemSpriteSheet,128,368,16,16);
+        thymeTexture                    = new TextureRegion(itemSpriteSheet,16*6, 16*14, 16, 16);
+        oreTexture                      = new TextureRegion(itemSpriteSheet, 32, 16*7, 16,16);
     }
 
     private void initialiseUI() {
@@ -218,11 +232,15 @@ public class CastleScreen extends ScreenAdapter {
 //        t3ATestButton.setPosition(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 //        uiGroup.addActor((t3ATestButton));
 
-        CampaignSelector debugSelector = new CampaignSelector(campaignSelectorWater, this, CampaignLevelID.WATER_1);
-        debugSelector.setSize(1,1);
-        debugSelector.setPosition(60, 60);
-        rootGroup.addActor(debugSelector);
+        final CampaignSelector debugWaterSelector = new CampaignSelector(campaignSelectorWaterTexture, this, CampaignLevelID.WATER_1);
+        debugWaterSelector.setSize(1,1);
+        debugWaterSelector.setPosition(60, 60);
+        rootGroup.addActor(debugWaterSelector);
 
+        final CampaignSelector debugVoidSelector = new CampaignSelector(campaignSelectorVoidTexture, this, CampaignLevelID.VOID_1);
+        debugVoidSelector.setSize(1,1);
+        debugVoidSelector.setPosition(62,62);
+        rootGroup.addActor(debugVoidSelector);
 
         for(Structure s : castleStats.getStructures()) {
             rootGroup.addActor(s);

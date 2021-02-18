@@ -14,12 +14,18 @@ public class GempiresGame extends Game {
 	public SpriteBatch batch;
 
 	// Entrance to the program.
+	// TODO: asset manager
 
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
 
 		setScreen(new MainMenuScreen(this));
+	}
+
+	@Override
+	public void render() {
+
 	}
 
 	@Override

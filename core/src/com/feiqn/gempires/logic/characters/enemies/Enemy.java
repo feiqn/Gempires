@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.feiqn.gempires.logic.items.ItemList;
-import com.feiqn.gempires.models.Element;
+import com.feiqn.gempires.models.ElementalType;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -22,7 +22,7 @@ public class Enemy extends Image {
 
     public int level;
 
-    public Element element;
+    public ElementalType elementalType;
     public Bestiary beastType;
     public ArrayList<ItemList> loot;
 
