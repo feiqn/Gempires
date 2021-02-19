@@ -1,15 +1,13 @@
 package com.feiqn.gempires.logic.ui.wideButtons;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.feiqn.gempires.logic.castle.Structure;
 import com.feiqn.gempires.logic.ui.PopupMenu;
 
 public class BeginStageWideButton extends WideButton {
 
     public BeginStageWideButton(final PopupMenu parentMenu) {
-        super(parentMenu.getParentStructure().getParentScreen().blueButtonTexture, parentMenu);
+        super(parentMenu.getParentStructure().getParentScreen().game.gempiresAssetHandler.blueButtonTexture, parentMenu);
 
         updateLabelText("Venture On");
         updateLabelFontScale(2f);

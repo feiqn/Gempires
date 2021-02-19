@@ -1,4 +1,4 @@
-package com.feiqn.gempires.logic.characters.enemies.dark;
+package com.feiqn.gempires.logic.characters.enemies.fire;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.feiqn.gempires.GempiresGame;
@@ -10,12 +10,12 @@ import com.feiqn.gempires.models.ElementalType;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class DarkKnight extends Enemy {
+public class FireDragon extends Enemy {
 
-    public DarkKnight(GempiresGame game) {
-        super(game, game.gempiresAssetHandler.darkKnightTextureRegion, 5, 15, 400);
-        this.elementalType = ElementalType.VOID;
-        this.beastType = Bestiary.DARK_KNIGHT;
+    public FireDragon(GempiresGame game) {
+        super(game, game.gempiresAssetHandler.fireDragonTextureRegion, 20, 15, 450);
+        this.elementalType = ElementalType.FIRE;
+        this.beastType = Bestiary.FIRE_DRAGON;
     }
 
     @Override
@@ -45,8 +45,8 @@ public class DarkKnight extends Enemy {
             case 81:
             case 80:
                 final float r1 = random.nextFloat();
-                if(r1 > .9f) {
-                    loot.add(ItemList.BROKEN_PROMISE);
+                if(r1 > .7f) {
+                    loot.add(ItemList.EMBERSTONE);
                 }
             case 79:
             case 78:
@@ -140,6 +140,5 @@ public class DarkKnight extends Enemy {
                 loot.add(ItemList.BASIL);
                 break;
         }
-
     }
 }

@@ -1,12 +1,11 @@
 package com.feiqn.gempires.logic.ui;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.feiqn.gempires.logic.castle.Structure;
+import com.feiqn.gempires.logic.castle.structures.Structure;
 
 public class ItemNotifierBubble extends Image {
     // A type-agnostic bubble for quickly collecting resources from any structure

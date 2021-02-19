@@ -20,6 +20,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.feiqn.gempires.GempiresGame;
 import com.feiqn.gempires.logic.AttackToken;
 import com.feiqn.gempires.logic.Gem;
+import com.feiqn.gempires.logic.castle.CastleScreen;
 import com.feiqn.gempires.logic.characters.enemies.Bestiary;
 import com.feiqn.gempires.logic.characters.enemies.Enemy;
 import com.feiqn.gempires.logic.characters.heroes.HeroCard;
@@ -28,6 +29,7 @@ import com.feiqn.gempires.logic.items.Tornado;
 import com.feiqn.gempires.models.CampaignLevelID;
 import com.feiqn.gempires.models.ElementalType;
 import com.feiqn.gempires.models.Formation;
+import com.feiqn.gempires.models.stats.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -47,7 +49,7 @@ public class MatchScreen extends ScreenAdapter {
     public final float gemSwapTime = 0.2f;
     float timeToCompleteSwaps = 0f;
 
-    final GempiresGame game;
+    final public GempiresGame game;
     public Stage stage;
 
     public Group gemGroup,
@@ -55,7 +57,7 @@ public class MatchScreen extends ScreenAdapter {
 
     public boolean matchFound,
                    classicMode,
-            needToClearWave,
+                   needToClearWave,
                    allowUserInput;
 
     public int rows,
@@ -73,12 +75,8 @@ public class MatchScreen extends ScreenAdapter {
                 enemyDifficulty,
                 numberOfEnemiesOnScreen;
 
-    public TextureRegion[] gemTextures,
-                            attackTokenTextures;
-
     public CampaignLevelID campaignLevelID;
 
-    public ArrayList<HeroCard> team;
     public ArrayList<ItemList> loot;
     public ArrayList<Vector2> slots;
     public ArrayList<Gem> matchesForThisGem,
@@ -89,25 +87,32 @@ public class MatchScreen extends ScreenAdapter {
                           upMatches,
                           downMatches;
 
-
     // TODO: Current implementation of Gems<> is poor. Switch to POOLING will be mandatory soon.
-    public DelayedRemovalArray<Gem> gems;
+    public  DelayedRemovalArray<Gem> gems;
     private DelayedRemovalArray<Enemy> enemiesOnScreen;
     private DelayedRemovalArray<AttackToken> attackTokensOnScreen;
 
-    private HashMap<Bestiary, Boolean> enemyIsInitialized;
-
-    // TODO: these can surely be managed elsewhere
-    public TextureRegion waterWizardTextureRegion,
-                         darkKnightTextureRegion;
+    public ArrayList<Bestiary> neededEnemies;
+    public Boolean firstWaveClear;
+    public Boolean secondWaveClear;
+    public Boolean thirdWaveClear;
+    public PlayerInventory playerInventory;
+    public ArrayList<HeroCard> team;
 
     public MatchScreen(GempiresGame game, CampaignLevelID levelID /* , Arraylist<HeroCard> team */){
+        // Adventure Mode constructor
         this.game = game;
         this.classicMode = false;
         this.campaignLevelID = levelID;
-        // this.team = team;
+
+        firstWaveClear = false;
+        secondWaveClear = false;
+        thirdWaveClear = false;
+        neededEnemies = new ArrayList<>();
+        this.team = game.castle.heroRoster.getTeam(game.castle.heroRoster.defaultTeam);
     }
     public MatchScreen(GempiresGame game) {
+        // Classic constructor
         this.game = game;
         this.classicMode = true;
         this.campaignLevelID = CampaignLevelID.CLASSIC_1;
@@ -129,42 +134,8 @@ public class MatchScreen extends ScreenAdapter {
         loot = new ArrayList<>();
         enemiesOnScreen = new DelayedRemovalArray<>();
         attackTokensOnScreen = new DelayedRemovalArray<>();
-        enemyIsInitialized = new HashMap<>(Bestiary.values().length);
 
-        for(int i = 0; i < Bestiary.values().length; i++) {
-            enemyIsInitialized.put(Bestiary.values()[i], false);
-        }
-
-        initEnemies(passToInitEnemies);
-    }
-
-    private void initEnemies(ArrayList<Bestiary> beasts) {
-        // Called by initAdventureMode()
-
-        for(Bestiary beast : beasts) {
-            switch(beast) {
-                case WATER_WIZARD:
-                    if(!enemyIsInitialized.get(Bestiary.WATER_WIZARD)) {
-                        Gdx.app.log("water wizard texture ready", "");
-                        final Texture wizardSpriteSheet = new Texture(Gdx.files.internal("characters/enemies/water/wizard_spritesheet.png"));
-                        waterWizardTextureRegion = new TextureRegion(wizardSpriteSheet, 64, 288, 64, 64);
-
-                        enemyIsInitialized.put(Bestiary.WATER_WIZARD, true);
-                    }
-                    break;
-                case ICE_FIEND:
-                    break;
-                case DARK_KNIGHT:
-                    if(!enemyIsInitialized.get(Bestiary.DARK_KNIGHT)) {
-                        Gdx.app.log("dark knight texture ready", "");
-                        final Texture darkKnightSprite = new Texture(Gdx.files.internal("characters/enemies/dark/dark_knight.png"));
-                        darkKnightTextureRegion = new TextureRegion(darkKnightSprite, 0,0, 64,64);
-
-                        enemyIsInitialized.put(Bestiary.DARK_KNIGHT, true);
-                    }
-                    break;
-            }
-        }
+        game.gempiresAssetHandler.initialiseEnemyTextures(passToInitEnemies);
     }
 
     private void createAndFillSlots(final int countRows, final int countColumns) {
@@ -197,7 +168,7 @@ public class MatchScreen extends ScreenAdapter {
 
                 final Random random = new Random();
                 final int gemColor = random.nextInt(7);
-                final Gem gem = new Gem(gemTextures[gemColor], gemColor, revolution, this);
+                final Gem gem = new Gem(game.gempiresAssetHandler.gemTextures[gemColor], gemColor, revolution, this);
 
                 gem.positionInRow = x;
                 gem.positionInColumn = i;
@@ -388,7 +359,7 @@ public class MatchScreen extends ScreenAdapter {
             if(!classicMode) {
                 final ElementalType gemElementalType = translateGemColorToElement(gem.GemColor);
                 if (gem.GemColor != 7) {
-                    final AttackToken token = new AttackToken(attackTokenTextures[gem.GemColor], gemElementalType);
+                    final AttackToken token = new AttackToken(game.gempiresAssetHandler.attackTokenTextures[gem.GemColor], gemElementalType);
 
                     token.setX(gem.getX());
                     token.setY(gem.getY());
@@ -456,7 +427,7 @@ public class MatchScreen extends ScreenAdapter {
                         final Random random = new Random();
                         final int gemColor = random.nextInt(7);
                         final int newIndex = gems.size + 1;
-                        final Gem newGem = new Gem(gemTextures[gemColor], gemColor, newIndex, this);
+                        final Gem newGem = new Gem(game.gempiresAssetHandler.gemTextures[gemColor], gemColor, newIndex, this);
 
                         newGem.positionInColumn = gem.positionInColumn;
                         newGem.positionInRow = gem.positionInRow;
@@ -502,7 +473,7 @@ public class MatchScreen extends ScreenAdapter {
                         final Random random = new Random();
                         final int gemColor = random.nextInt(7);
                         final int newIndex = gems.size + 1;
-                        final Gem newGem = new Gem(gemTextures[gemColor], gemColor, newIndex, this);
+                        final Gem newGem = new Gem(game.gempiresAssetHandler.gemTextures[gemColor], gemColor, newIndex, this);
 
                         newGem.positionInColumn = gem.positionInColumn;
                         newGem.positionInRow = gem.positionInRow;
@@ -856,7 +827,7 @@ public class MatchScreen extends ScreenAdapter {
 
         numberOfEnemiesOnScreen = wave.size();
 
-        // TODO: check each of these and polish if needed
+        // TODO: check each of these and polish if needed, finish rest
         switch (formation) {
             case ONE_CENTER:
                 wave.get(0).setSize(4,4);
@@ -1012,31 +983,6 @@ public class MatchScreen extends ScreenAdapter {
         }
     }
 
-    private void initGemTextures() {
-        final Texture gemSpriteSheet = new Texture(Gdx.files.internal("gem_set.png"));
-        gemTextures = new TextureRegion[]{
-                new TextureRegion(gemSpriteSheet, 160, 0, 32, 32),  // GREEN 0
-                new TextureRegion(gemSpriteSheet, 128, 64, 32, 32), // PURPLE 1
-                new TextureRegion(gemSpriteSheet, 32, 128, 32, 32), // RED 2
-                new TextureRegion(gemSpriteSheet, 0, 192, 32, 32),  // ORANGE 3
-                new TextureRegion(gemSpriteSheet, 0, 288, 32, 32),  // YELLOW 4
-                new TextureRegion(gemSpriteSheet, 160, 320, 32, 32),// BLUE 5
-                new TextureRegion(gemSpriteSheet, 160, 384, 32, 32) // CLEAR 6, not to be confused with BLANK 7
-        };
-
-        if(!classicMode) {
-            attackTokenTextures = new TextureRegion[] {
-                new TextureRegion(gemSpriteSheet, 128, 0, 32, 32),
-                new TextureRegion(gemSpriteSheet, 160, 64, 32, 32),
-                new TextureRegion(gemSpriteSheet, 0, 128, 32, 32),
-                new TextureRegion(gemSpriteSheet, 32, 192, 32, 32),
-                new TextureRegion(gemSpriteSheet, 0, 256, 32, 32),
-                new TextureRegion(gemSpriteSheet, 128, 320, 32,32),
-                new TextureRegion(gemSpriteSheet, 128, 384, 32, 32)
-            };
-        }
-    }
-
     @Override
     public void show() {
         horizontalMatchLength = 0;
@@ -1048,7 +994,7 @@ public class MatchScreen extends ScreenAdapter {
         gems = new DelayedRemovalArray<Gem>();
         sendToDestroy = new ArrayList<Gem>();
 
-        initGemTextures();
+        game.gempiresAssetHandler.initialiseGemTextures(classicMode);
 
         loadMap();
 
@@ -1065,7 +1011,7 @@ public class MatchScreen extends ScreenAdapter {
         createAndFillSlots(rows, columns);
 
         //
-        final Tornado debugShuffler = new Tornado(gemTextures[1], this); // debug
+        final Tornado debugShuffler = new Tornado(game.gempiresAssetHandler.gemTextures[1], this); // debug
         debugShuffler.setY(12); //
         debugShuffler.setX(1); //
         stage.addActor(debugShuffler); //

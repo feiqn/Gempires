@@ -68,7 +68,7 @@ public class MainMenuScreen extends ScreenAdapter {
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int point, int button) {
-                game.setScreen(new CastleScreen(game));
+                game.setScreen(game.castle);
             }
         });
 
@@ -80,11 +80,16 @@ public class MainMenuScreen extends ScreenAdapter {
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        Gdx.gl.glClearColor(0,0,0,1);
+        if(game.gempiresAssetHandler.getManager().update()) {
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+            Gdx.gl.glClearColor(0,0,0,1);
 
-        stage.act();
-        stage.draw();
+            stage.act();
+            stage.draw();
+        } else {
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+            Gdx.gl.glClearColor(0,1,0,1);
+        }
     }
 
 }

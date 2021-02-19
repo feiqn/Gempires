@@ -1,6 +1,8 @@
 package com.feiqn.gempires.logic.castle;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.feiqn.gempires.GempiresGame;
+import com.feiqn.gempires.logic.castle.structures.Structure;
 import com.feiqn.gempires.logic.stages.match3.dark.Void_1;
 import com.feiqn.gempires.logic.stages.match3.water.Water_1;
 import com.feiqn.gempires.models.CampaignLevelID;
@@ -10,10 +12,10 @@ public class CampaignSelector extends Structure {
     public CampaignLevelID campaignLevelID;
     private CastleScreen parent;
 
-    public CampaignSelector(TextureRegion region, CastleScreen parent, CampaignLevelID id) {
-        super(region, parent);
+    public CampaignSelector(TextureRegion region, GempiresGame game, CampaignLevelID id) {
+        super(region, game);
 
-        this.parent = parent;
+        this.parent = game.castle;
         campaignLevelID = id;
         this.structureType = StructureType.CAMPAIGN_SELECTOR;
     }
@@ -25,7 +27,7 @@ public class CampaignSelector extends Structure {
             case FIRE_2:
 
             case VOID_1:
-                parent.game.setScreen(new Void_1(parent));
+                parent.game.setScreen(new Void_1(parent.game));
                 break;
             case VOID_2:
 
@@ -33,7 +35,7 @@ public class CampaignSelector extends Structure {
             case STONE_2:
 
             case WATER_1:
-                 parent.game.setScreen(new Water_1(parent));
+                 parent.game.setScreen(new Water_1(parent.game));
                 break;
             case WATER_2:
             case WATER_3:

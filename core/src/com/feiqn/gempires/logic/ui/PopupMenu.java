@@ -2,10 +2,8 @@ package com.feiqn.gempires.logic.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.feiqn.gempires.logic.castle.Structure;
+import com.feiqn.gempires.logic.castle.structures.Structure;
 import com.feiqn.gempires.logic.characters.heroes.HeroCard;
 import com.feiqn.gempires.logic.ui.wideButtons.BeginStageWideButton;
 import com.feiqn.gempires.logic.ui.wideButtons.LevelUpWideButton;
@@ -31,7 +29,7 @@ public class PopupMenu extends Group {
         parentStructure = sender;
         menuType = type;
 
-        final Image background = new Image(sender.getParentScreen().menuTexture);
+        final Image background = new Image(sender.getParentScreen().game.gempiresAssetHandler.menuTexture);
 
         switch(menuType) {
             case HERO_ROSTER:
@@ -69,7 +67,7 @@ public class PopupMenu extends Group {
 
             case GODDESS_STATUE:
                 // SUMMON HERO
-                final SummonWideButton summonButton = new SummonWideButton(this);
+                final SummonWideButton summonButton = new SummonWideButton(this, sender.getParentScreen().game);
                 summonButton.setPosition(Gdx.graphics.getWidth() * .12f, Gdx.graphics.getHeight() * .7f);
                 addActor(summonButton);
                 // TODO: display necessary resources
@@ -106,13 +104,13 @@ public class PopupMenu extends Group {
                 break;
         }
 
-        final Image header = new Image(sender.getParentScreen().menuTexture);
+        final Image header = new Image(sender.getParentScreen().game.gempiresAssetHandler.menuTexture);
         header.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight() * .05f);
         header.setColor(.5f, .5f, .5f, 1);
         header.setPosition(0, Gdx.graphics.getHeight() - header.getHeight());
         addActor(header);
 
-        final BackButton backButton = new BackButton(parentStructure.getParentScreen().backButtonTexture);
+        final BackButton backButton = new BackButton(parentStructure.getParentScreen().game.gempiresAssetHandler.backButtonTexture);
         backButton.setSize(Gdx.graphics.getHeight() * .04f, Gdx.graphics.getHeight() * .04f);
         backButton.setPosition(Gdx.graphics.getWidth() * .85f, header.getY() - (backButton.getHeight() * .5f));
         backButton.setParent(this);

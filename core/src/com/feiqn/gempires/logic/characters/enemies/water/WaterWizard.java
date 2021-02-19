@@ -1,6 +1,6 @@
 package com.feiqn.gempires.logic.characters.enemies.water;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.feiqn.gempires.GempiresGame;
 import com.feiqn.gempires.logic.items.ItemList;
 import com.feiqn.gempires.models.ElementalType;
 import com.feiqn.gempires.logic.characters.enemies.Bestiary;
@@ -11,8 +11,8 @@ import java.util.Random;
 
 public class WaterWizard extends Enemy {
 
-    public WaterWizard(TextureRegion region) {
-        super(region, 5, 5, 500);
+    public WaterWizard(GempiresGame game) {
+        super(game, game.gempiresAssetHandler.waterWizardTextureRegion, 5, 5, 500);
         this.elementalType = ElementalType.WATER;
         this.beastType = Bestiary.WATER_WIZARD;
     }

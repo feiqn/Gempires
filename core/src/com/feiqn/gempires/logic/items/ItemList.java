@@ -61,12 +61,12 @@ public enum ItemList {
     // 3*
     PLATE_ARMOR,
     REINFORCED_WEAPONS,
-    NEVERMELT_ICE,
-    LAVACOAL,
-    ANGELFRUIT,
-    TITANITE,
-    GROUNDING_POLE,
-    LAMENTING_POEM,
+    NEVERMELT_ICE,  // water
+    LAVACOAL,       // fire
+    ANGEL_FRUIT,    // nature
+    TITANITE,       // stone
+    GROUNDING_POLE, // electric
+    LAMENTING_POEM, // void
 
     // 4*
     DAMASCUS_ARMOR,

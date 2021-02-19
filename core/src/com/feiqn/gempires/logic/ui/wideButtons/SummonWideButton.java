@@ -2,12 +2,13 @@ package com.feiqn.gempires.logic.ui.wideButtons;
 
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.feiqn.gempires.GempiresGame;
 import com.feiqn.gempires.logic.ui.PopupMenu;
 
 public class SummonWideButton extends WideButton {
 
-    public SummonWideButton(final PopupMenu parentMenu) {
-        super(parentMenu.getParentStructure().getParentScreen().purpleButtonTexture, parentMenu);
+    public SummonWideButton(final PopupMenu parentMenu, GempiresGame game) {
+        super(game.gempiresAssetHandler.purpleButtonTexture, parentMenu);
 
         updateLabelText("Search the Fog");
         updateLabelFontScale(1.5f);

@@ -2,23 +2,16 @@ package com.feiqn.gempires.logic.characters.enemies;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.feiqn.gempires.GempiresGame;
+import com.feiqn.gempires.logic.characters.Combatant;
 import com.feiqn.gempires.logic.items.ItemList;
 import com.feiqn.gempires.models.ElementalType;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-public class Enemy extends Image {
-    // TODO: this class shares a fair bit of code with HeroCard class. Eventually the shared code should be combined into a mutual superclass.
-
+public class Enemy extends Combatant {
     public Rectangle bounds;
-
-    // Every enemy subclass must define base stats in its constructor method
-    private float strength,
-                  defense,
-                  maxHealth,
-                  currentHealth;
 
     public int level;
 
@@ -26,8 +19,22 @@ public class Enemy extends Image {
     public Bestiary beastType;
     public ArrayList<ItemList> loot;
 
-    public Enemy(TextureRegion region, float baseStr, float baseDef, float baseHP) {
-        super(region);
+    public Enemy(GempiresGame game, TextureRegion region) {
+        super(game, region);
+
+        bounds = new Rectangle(getX(), getY(), getWidth(), getHeight());
+
+        loot = new ArrayList<>();
+        this.strength = 5;
+        this.defense = 5;
+        this.maxHealth = 20;
+        this.currentHealth = 20;
+        this.level = 0;
+        initLootTable();
+    }
+
+    public Enemy(GempiresGame game, TextureRegion region, float baseStr, float baseDef, float baseHP) {
+        super(game, region);
 
         bounds = new Rectangle(getX(), getY(), getWidth(), getHeight());
 
@@ -179,24 +186,6 @@ public class Enemy extends Image {
         }
     }
 
-    public void healPercentage(float percentage) {
-        final float heal = maxHealth * percentage;
-        healStaticAmount(heal);
-    }
-    public void healStaticAmount(float heal) {
-        if(currentHealth + heal < maxHealth) {
-            currentHealth += heal;
-        } else {
-            resetCurrentHealth();
-        }
-    }
-    public void resetCurrentHealth() {
-        currentHealth = maxHealth;
-    }
-    public void applyDamage(float damage) {
-        currentHealth -= damage;
-    }
-
     @Override
     public void setSize(float width, float height) {
         super.setSize(width, height);
@@ -208,20 +197,6 @@ public class Enemy extends Image {
         super.setPosition(x, y);
         bounds.setX(x);
         bounds.setY(y);
-    }
-
-    // GETTERS
-    public float getStrength() {
-        return strength;
-    }
-    public float getDefense() {
-        return defense;
-    }
-    public float getMaxHealth() {
-        return maxHealth;
-    }
-    public float getCurrentHealth() {
-        return currentHealth;
     }
 
 }

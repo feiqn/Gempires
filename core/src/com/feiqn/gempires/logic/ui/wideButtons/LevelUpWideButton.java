@@ -12,7 +12,7 @@ import java.util.HashMap;
 public class LevelUpWideButton extends WideButton {
 
     public LevelUpWideButton(final PopupMenu parentMenu) {
-        super(parentMenu.getParentStructure().getParentScreen().yellowButtonTexture, parentMenu);
+        super(parentMenu.getParentStructure().getParentScreen().game.gempiresAssetHandler.yellowButtonTexture, parentMenu);
         boolean canLevelUp = true;
 
         updateLabelText("Level up!");

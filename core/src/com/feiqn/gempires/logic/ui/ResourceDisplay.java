@@ -24,7 +24,7 @@ public class ResourceDisplay extends Image {
     }
 
     public ResourceDisplay(CastleScreen parent, DisplayType type) {
-        super(parent.menuTexture);
+        super(parent.game.gempiresAssetHandler.menuTexture);
         this.parentScreen = parent;
         dType = type;
         style = parent.structureLabelStyle;
@@ -33,22 +33,22 @@ public class ResourceDisplay extends Image {
 
         switch(dType) {
             case FOOD:
-                img = new Image(parent.foodTexture);
+                img = new Image(parent.game.gempiresAssetHandler.foodTexture);
                 break;
             case ARCANA:
-                img = new Image(parent.arcanaTexture);
+                img = new Image(parent.game.gempiresAssetHandler.arcanaTexture);
                 break;
             case THYME:
-                img = new Image(parent.thymeTexture);
+                img = new Image(parent.game.gempiresAssetHandler.thymeTexture);
                 break;
             case ORE:
-                img = new Image(parent.oreTexture);
+                img = new Image(parent.game.gempiresAssetHandler.oreTexture);
                 break;
             case PURE_GEM:
-                img = new Image(parent.pureGemTexture);
+                img = new Image(parent.game.gempiresAssetHandler.pureGemTexture);
                 break;
         }
-        img.setSize(parent.foodTexture.getRegionWidth() * .9f, parent.foodTexture.getRegionHeight() * .9f);
+        img.setSize(parent.game.gempiresAssetHandler.foodTexture.getRegionWidth() * .9f, parent.game.gempiresAssetHandler.foodTexture.getRegionHeight() * .9f);
 
         updateText();
     }

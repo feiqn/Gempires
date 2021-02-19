@@ -54,7 +54,7 @@ public class HeroRoster {
             Gdx.app.log("HeroRoster", "New Player");
 
             // TODO: add starter heroes
-            final HeroCard leif = new Leif(parentCastle.natureCardTexture, parentCastle);
+            final HeroCard leif = new Leif(parentCastle.game.gempiresAssetHandler.natureCardTexture, parentCastle);
             addHero(leif);
             teams.get(defaultTeam).add(leif);
 
@@ -162,7 +162,7 @@ public class HeroRoster {
                         // ZERO-STAR, COMMON-NOUN UNITS ARE LOADED BY PlayerInventory
                         break;
                     case LEIF:
-                        final Leif leif = new Leif(parentCastle.natureCardTexture, parentCastle);
+                        final Leif leif = new Leif(parentCastle.game.gempiresAssetHandler.natureCardTexture, parentCastle);
                         restoreHero(leif);
                         break;
                 }
@@ -203,7 +203,7 @@ public class HeroRoster {
                 break;
             case LEIF:
                 if(!pref.contains("name" + newHero)) {
-                    addHero(new Leif(parentCastle.natureCardTexture, parentCastle));
+                    addHero(new Leif(parentCastle.game.gempiresAssetHandler.natureCardTexture, parentCastle));
                 } else {
                     addBraveryToken(newHero);
                 }

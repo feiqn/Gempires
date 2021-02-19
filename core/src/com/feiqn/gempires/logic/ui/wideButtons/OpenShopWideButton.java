@@ -8,7 +8,7 @@ import com.feiqn.gempires.logic.ui.PopupMenu;
 public class OpenShopWideButton extends WideButton {
 
     public OpenShopWideButton(final PopupMenu parentMenu) {
-        super(parentMenu.getParentStructure().getParentScreen().blueButtonTexture, parentMenu);
+        super(parentMenu.getParentStructure().getParentScreen().game.gempiresAssetHandler.blueButtonTexture, parentMenu);
 
         updateLabelText("Create Items");
         updateLabelFontScale(1.75f);

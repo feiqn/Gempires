@@ -3,12 +3,16 @@ package com.feiqn.gempires.models.stats;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.utils.DelayedRemovalArray;
+import com.feiqn.gempires.GempiresGame;
 import com.feiqn.gempires.logic.castle.*;
+import com.feiqn.gempires.logic.castle.structures.*;
+import com.feiqn.gempires.logic.castle.structures.altars.WaterAltar;
 import com.feiqn.gempires.models.ElementalType;
 
 public class CastleStats {
     // includes: which buildings are where, what level they are, if units are garrisoned and which units those are, and summoner stats
 
+    private final GempiresGame game;
     private final Preferences pref;
 
     public CastleScreen parentCastle;
@@ -20,8 +24,9 @@ public class CastleStats {
                 summonerExp,
                 numberOfStructures;
 
-    public CastleStats(CastleScreen parent) {
-        this.parentCastle = parent;
+    public CastleStats(GempiresGame game) {
+        this.game = game;
+        this.parentCastle = game.castle;
 
         pref = Gdx.app.getPreferences("PlayerCastleStats");
 
@@ -52,35 +57,35 @@ public class CastleStats {
 
             // do first time setup stuff here
 
-            final Barracks barracks = new Barracks(parentCastle.barracksTexture, parentCastle);
+            final Barracks barracks = new Barracks(game);
             barracks.setPosition(59.5f,64.5f);
             addStructure(barracks);
 
-            final GoddessStatue goddessStatue = new GoddessStatue(parentCastle.goddessStatueTexture, parentCastle);
+            final GoddessStatue goddessStatue = new GoddessStatue(game);
             goddessStatue.setPosition(55.5f, 64.5f);
             addStructure(goddessStatue);
 
-            final Mine mine = new Mine(parentCastle.mineTexture, parentCastle);
+            final Mine mine = new Mine(game);
             mine.setPosition(51.5f, 64f);
             addStructure(mine);
 
-            final Farm farm = new Farm(parentCastle.farmTexture, parentCastle);
+            final Farm farm = new Farm(game);
             farm.setPosition(52.5f, 63.5f);
             addStructure(farm);
 
-            final Warehouse warehouse = new Warehouse(parentCastle.warehouseTexture, parentCastle);
+            final Warehouse warehouse = new Warehouse(game);
             warehouse.setPosition( 55.5f, 60.5f);
             addStructure(warehouse);
 
-            final Silo silo = new Silo(parentCastle.siloTexture, parentCastle);
+            final Silo silo = new Silo(game);
             silo.setPosition(58.5f, 63.5f);
             addStructure(silo);
 
-            final Archive archive = new Archive(parentCastle.archivesTexture, parentCastle);
+            final Archive archive = new Archive(game);
             archive.setPosition(50.5f, 60.5f);
             addStructure(archive);
 
-            final Alchemist alchemist = new Alchemist(parentCastle.alchemistTexture, parentCastle);
+            final Alchemist alchemist = new Alchemist(game);
             alchemist.setPosition(40.5f, 50.5f);
             addStructure(alchemist);
 
@@ -112,40 +117,40 @@ public class CastleStats {
                     // TODO: finish this switch
                     switch(structType) {
                         case FARM:
-                            str = new Farm(parentCastle.farmTexture, parentCastle);
+                            str = new Farm(game);
                             break;
                         case MINE:
-                            str = new Mine(parentCastle.mineTexture, parentCastle);
+                            str = new Mine(game);
                             break;
                         case SILO:
-                            str = new Silo(parentCastle.siloTexture, parentCastle);
+                            str = new Silo(game);
                             break;
-                        case ALTAR:
-                            str = new Altar(parentCastle.altarWaterTexture, parentCastle, ElementalType.WATER); // TODO: other elements
+                        case ALTAR_WATER:
+                            str = new WaterAltar(game); // TODO: other elements
                             break;
                         case TURRET:
                         case ACADEMY:
                         case ARCHIVE:
-                            str = new Archive(parentCastle.archivesTexture, parentCastle);
+                            str = new Archive(game);
                             break;
                         case LIBRARY:
-                            str = new Library(parentCastle.libraryTexture, parentCastle);
+                            str = new Library(game);
                             break;
                         case BARRACKS:
-                            str = new Barracks(parentCastle.barracksTexture, parentCastle);
+                            str = new Barracks(game);
                             break;
                         case GARRISON:
                         case ALCHEMIST:
-                            str = new Alchemist(parentCastle.alchemistTexture, parentCastle);
+                            str = new Alchemist(game);
                             break;
                         case BARRICADE:
                         case WAREHOUSE:
-                            str = new Warehouse(parentCastle.warehouseTexture, parentCastle);
+                            str = new Warehouse(game);
                             break;
                         case SUMMONING_PYRE:
                         case CLAN_TOWER:
                         case GODDESS_STATUE:
-                            str = new GoddessStatue(parentCastle.goddessStatueTexture, parentCastle);
+                            str = new GoddessStatue(game);
                             break;
                         default:
                             throw new IllegalStateException("Unexpected value: " + structType);

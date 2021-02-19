@@ -1,11 +1,11 @@
-package com.feiqn.gempires.logic.castle;
+package com.feiqn.gempires.logic.castle.structures;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.feiqn.gempires.GempiresGame;
 
 public class Archive extends Structure {
 
-    public Archive(TextureRegion region, CastleScreen parent) {
-        super(region, parent);
+    public Archive(GempiresGame game) {
+        super(game.gempiresAssetHandler.archivesTexture, game);
 
         structureType = StructureType.ARCHIVE;
 

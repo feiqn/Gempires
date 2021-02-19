@@ -4,10 +4,12 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.feiqn.gempires.GempiresGame;
+import com.feiqn.gempires.logic.characters.Combatant;
 import com.feiqn.gempires.models.ElementalType;
 import com.feiqn.gempires.logic.castle.CastleScreen;
 
-public class HeroCard extends Image {
+public class HeroCard extends Combatant {
 
     public class HeroCardThumbnail extends Image {
         private final HeroCard parentCard;
@@ -66,17 +68,10 @@ public class HeroCard extends Image {
     public HeroCardThumbnail thumbnail;
     public ElementalType elementalType;
 
-    private CastleScreen parentCastle;
-
     private int bravery,
                 level;
 
     private boolean isPure;
-
-    private float strength,
-                  defense,
-                  maxHealth,
-                  currentHealth;
 
     public String heroName,
                   heroTitle,
@@ -86,18 +81,17 @@ public class HeroCard extends Image {
 
     public HeroList heroID;
 
-    public HeroCard(TextureRegion region, CastleScreen parentCastle) {
-        super(region);
+    public HeroCard(TextureRegion region, GempiresGame game) {
+        super(game, region);
         this.thumbnail = new HeroCardThumbnail(region, self);
         this.battleCard = new HeroBattleCard(region, self); // todo: different region
 
-        this.parentCastle = parentCastle;
         sharedInit();
     }
 
     private void sharedInit() {
 
-        this.setSize(parentCastle.gameCamera.viewportWidth, parentCastle.gameCamera.viewportHeight);
+        this.setSize(game.castle.gameCamera.viewportWidth, game.castle.gameCamera.viewportHeight);
 
         // base stats
         level = 1;
@@ -164,23 +158,6 @@ public class HeroCard extends Image {
             maxHealth *= 1.25f;
         }
     }
-    public void healPercentage(float percentage) {
-        final float heal = maxHealth * percentage;
-        healStaticAmount(heal);
-    }
-    public void healStaticAmount(float heal) {
-        if(currentHealth + heal < maxHealth) {
-            currentHealth += heal;
-        } else {
-            resetCurrentHealth();
-        }
-    }
-    public void resetCurrentHealth() {
-        currentHealth = maxHealth;
-    }
-    public void applyDamage(float damage) {
-        currentHealth -= damage;
-    }
 
     // GETTERS
     public int getTrueLevel() {
@@ -196,17 +173,5 @@ public class HeroCard extends Image {
     }
     public int getLevel() {
         return level;
-    }
-    public float getStrength() {
-        return strength;
-    }
-    public float getDefense() {
-        return defense;
-    }
-    public float getMaxHealth() {
-        return maxHealth;
-    }
-    public float getCurrentHealth() {
-        return currentHealth;
     }
 }

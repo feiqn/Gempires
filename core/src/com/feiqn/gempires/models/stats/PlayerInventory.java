@@ -3,7 +3,7 @@ package com.feiqn.gempires.models.stats;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.feiqn.gempires.logic.castle.CastleScreen;
-import com.feiqn.gempires.logic.castle.Structure;
+import com.feiqn.gempires.logic.castle.structures.Structure;
 import com.feiqn.gempires.logic.characters.heroes.HeroList;
 import com.feiqn.gempires.logic.items.ItemList;
 

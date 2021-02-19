@@ -1,4 +1,4 @@
-package com.feiqn.gempires.logic.castle;
+package com.feiqn.gempires.logic.castle.structures;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -6,6 +6,8 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.feiqn.gempires.GempiresGame;
+import com.feiqn.gempires.logic.castle.CastleScreen;
 import com.feiqn.gempires.logic.items.ItemList;
 import com.feiqn.gempires.logic.ui.PopupMenu;
 import com.feiqn.gempires.logic.ui.ItemNotifierBubble;
@@ -21,7 +23,12 @@ public class Structure extends Image {
         WAREHOUSE,          // store ore
         LIBRARY,            // research arcana to level up goddessStatue and others
         ARCHIVE,            // store arcana
-        ALTAR,              // power up heroes of corresponding element
+        ALTAR_WATER,        // power up heroes of corresponding element
+        ALTAR_FIRE,
+        ALTAR_STONE,
+        ALTAR_ELECTRIC,
+        ALTAR_VOID,
+        ALTAR_NATURE,
         ALCHEMIST,          // create items like healing potions or ascent stones
         SUMMONING_PYRE,     // use items to play special stages TODO
         CLAN_TOWER,         // interact with multiplayer guild TODO during Multiplayer implementation
@@ -60,14 +67,14 @@ public class Structure extends Image {
 
     private CastleScreen parentScreen;
 
-    public Structure(Texture texture, CastleScreen parent) {
+    public Structure(Texture texture, GempiresGame game) {
         super(texture);
-        sharedInit(parent);
+        sharedInit(game.castle);
     }
 
-    public Structure(TextureRegion region, CastleScreen parent) {
+    public Structure(TextureRegion region, GempiresGame game) {
         super(region);
-        sharedInit(parent);
+        sharedInit(game.castle);
     }
 
     private void sharedInit(CastleScreen parent) {
@@ -165,7 +172,7 @@ public class Structure extends Image {
     }
 
     public HashMap<ItemList, Integer> getLevelUpItemRequirements() {
-        final HashMap<ItemList, Integer> map = new HashMap<>();
+        final HashMap<ItemList, Integer> loot = new HashMap<>();
 
         switch(level) {
             case 1:
@@ -183,11 +190,16 @@ public class Structure extends Image {
                     case ARCHIVE:
                     case ACADEMY:
                     case TURRET:
-                    case ALTAR:
+                    case ALTAR_WATER:
+                    case ALTAR_FIRE:
+                    case ALTAR_NATURE:
+                    case ALTAR_VOID:
+                    case ALTAR_ELECTRIC:
+                    case ALTAR_STONE:
                     case SILO:
                     case MINE:
                     default:
-                        map.put(ItemList.MINT, 1);
+                        loot.put(ItemList.MINT, 1);
                         break;
                 }
                 break;
@@ -206,7 +218,12 @@ public class Structure extends Image {
                     case ARCHIVE:
                     case ACADEMY:
                     case TURRET:
-                    case ALTAR:
+                    case ALTAR_WATER:
+                    case ALTAR_FIRE:
+                    case ALTAR_NATURE:
+                    case ALTAR_VOID:
+                    case ALTAR_ELECTRIC:
+                    case ALTAR_STONE:
                     case SILO:
                     case MINE:
                     default:
@@ -228,7 +245,12 @@ public class Structure extends Image {
                     case ARCHIVE:
                     case ACADEMY:
                     case TURRET:
-                    case ALTAR:
+                    case ALTAR_WATER:
+                    case ALTAR_FIRE:
+                    case ALTAR_NATURE:
+                    case ALTAR_VOID:
+                    case ALTAR_ELECTRIC:
+                    case ALTAR_STONE:
                     case SILO:
                     case MINE:
                     default:
@@ -250,7 +272,12 @@ public class Structure extends Image {
                     case ARCHIVE:
                     case ACADEMY:
                     case TURRET:
-                    case ALTAR:
+                    case ALTAR_WATER:
+                    case ALTAR_FIRE:
+                    case ALTAR_NATURE:
+                    case ALTAR_VOID:
+                    case ALTAR_ELECTRIC:
+                    case ALTAR_STONE:
                     case SILO:
                     case MINE:
                     default:
@@ -272,7 +299,12 @@ public class Structure extends Image {
                     case ARCHIVE:
                     case ACADEMY:
                     case TURRET:
-                    case ALTAR:
+                    case ALTAR_WATER:
+                    case ALTAR_FIRE:
+                    case ALTAR_NATURE:
+                    case ALTAR_VOID:
+                    case ALTAR_ELECTRIC:
+                    case ALTAR_STONE:
                     case SILO:
                     case MINE:
                     default:
@@ -294,7 +326,12 @@ public class Structure extends Image {
                     case ARCHIVE:
                     case ACADEMY:
                     case TURRET:
-                    case ALTAR:
+                    case ALTAR_WATER:
+                    case ALTAR_FIRE:
+                    case ALTAR_NATURE:
+                    case ALTAR_VOID:
+                    case ALTAR_ELECTRIC:
+                    case ALTAR_STONE:
                     case SILO:
                     case MINE:
                     default:
@@ -316,7 +353,12 @@ public class Structure extends Image {
                     case ARCHIVE:
                     case ACADEMY:
                     case TURRET:
-                    case ALTAR:
+                    case ALTAR_WATER:
+                    case ALTAR_FIRE:
+                    case ALTAR_NATURE:
+                    case ALTAR_VOID:
+                    case ALTAR_ELECTRIC:
+                    case ALTAR_STONE:
                     case SILO:
                     case MINE:
                     default:
@@ -338,7 +380,12 @@ public class Structure extends Image {
                     case ARCHIVE:
                     case ACADEMY:
                     case TURRET:
-                    case ALTAR:
+                    case ALTAR_WATER:
+                    case ALTAR_FIRE:
+                    case ALTAR_NATURE:
+                    case ALTAR_VOID:
+                    case ALTAR_ELECTRIC:
+                    case ALTAR_STONE:
                     case SILO:
                     case MINE:
                     default:
@@ -360,7 +407,12 @@ public class Structure extends Image {
                     case ARCHIVE:
                     case ACADEMY:
                     case TURRET:
-                    case ALTAR:
+                    case ALTAR_WATER:
+                    case ALTAR_FIRE:
+                    case ALTAR_NATURE:
+                    case ALTAR_VOID:
+                    case ALTAR_ELECTRIC:
+                    case ALTAR_STONE:
                     case SILO:
                     case MINE:
                     default:
@@ -385,7 +437,12 @@ public class Structure extends Image {
                     case ARCHIVE:
                     case ACADEMY:
                     case TURRET:
-                    case ALTAR:
+                    case ALTAR_WATER:
+                    case ALTAR_FIRE:
+                    case ALTAR_NATURE:
+                    case ALTAR_VOID:
+                    case ALTAR_ELECTRIC:
+                    case ALTAR_STONE:
                     case SILO:
                     case MINE:
                     default:
@@ -394,7 +451,7 @@ public class Structure extends Image {
                 break;
         }
 
-        return map;
+        return loot;
     }
 
     @Override
