@@ -1,5 +1,6 @@
 package com.feiqn.gempires.logic.castle.structures;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
@@ -9,13 +10,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.feiqn.gempires.GempiresGame;
 import com.feiqn.gempires.logic.castle.CastleScreen;
 import com.feiqn.gempires.logic.items.ItemList;
-import com.feiqn.gempires.logic.ui.PopupMenu;
+import com.feiqn.gempires.logic.ui.popupMenus.PopupMenu;
 import com.feiqn.gempires.logic.ui.ItemNotifierBubble;
 
 import java.util.HashMap;
 
 public class Structure extends Image {
 
+    // I really should have put all the code for these into their respective child classes,
+    // but now it's a sunk-cost and I'm just going to keep making the mess worse.
     public enum StructureType {
         FARM,               // grow food to feed troops
         SILO,               // store food
@@ -104,6 +107,9 @@ public class Structure extends Image {
                     case FARM:
                     case MINE:
                     case LIBRARY:
+                    case SILO:
+                    case ARCHIVE:
+                    case WAREHOUSE:
                         final PopupMenu resourcePopupMenu = new PopupMenu(self, PopupMenu.MenuType.RESOURCE_STRUCTURE);
                         parentScreen.uiGroup.addActor(resourcePopupMenu);
                         break;
@@ -122,6 +128,42 @@ public class Structure extends Image {
                     case ALCHEMIST:
                         final PopupMenu menu = new PopupMenu(self, PopupMenu.MenuType.ALCHEMIST);
                         parentScreen.uiGroup.addActor(menu);
+                        break;
+                    case ACADEMY:
+                        Gdx.app.log("Academy","");
+                        break;
+                    case SUMMONING_PYRE:
+                        Gdx.app.log("Summoning Pyre","");
+                        break;
+                    case TURRET:
+                        Gdx.app.log("Turret","");
+                        break;
+                    case GARRISON:
+                        Gdx.app.log("Garrison","");
+                        break;
+                    case BARRICADE:
+                        Gdx.app.log("Barricade","");
+                        break;
+                    case ALTAR_FIRE:
+                        Gdx.app.log("Fire Altar","");
+                        break;
+                    case ALTAR_VOID:
+                        Gdx.app.log("Void Alter","");
+                        break;
+                    case ALTAR_STONE:
+                        Gdx.app.log("Stone Altar","");
+                        break;
+                    case ALTAR_WATER:
+                        Gdx.app.log("Water Altar","");
+                        break;
+                    case ALTAR_NATURE:
+                        Gdx.app.log("Nature Altar","");
+                        break;
+                    case ALTAR_ELECTRIC:
+                        Gdx.app.log("Electric Altar","");
+                        break;
+                    case CLAN_TOWER:
+                        Gdx.app.log("Clan Tower", "");
                         break;
                     default:
                         break;

@@ -46,7 +46,7 @@ public class Water_1 extends MatchScreen {
             // stage clear
             for(ItemList i : loot) {
                 Gdx.app.log("You got", "" + i);
-                playerInventory.addItem(i);
+                game.castle.playerInventory.addItem(i);
             }
             allowUserInput = false;
 

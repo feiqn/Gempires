@@ -1,9 +1,8 @@
 package com.feiqn.gempires.logic.ui.wideButtons;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.feiqn.gempires.logic.ui.PopupMenu;
+import com.feiqn.gempires.logic.ui.popupMenus.PopupMenu;
 
 public class OpenShopWideButton extends WideButton {
 

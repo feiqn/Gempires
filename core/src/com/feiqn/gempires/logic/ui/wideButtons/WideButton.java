@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.feiqn.gempires.logic.ui.PopupMenu;
+import com.feiqn.gempires.logic.ui.popupMenus.PopupMenu;
 
 public class WideButton extends Image {
 

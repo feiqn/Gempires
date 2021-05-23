@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.DelayedRemovalArray;
 import com.feiqn.gempires.logic.castle.CastleScreen;
 import com.feiqn.gempires.logic.characters.heroes.HeroCard;
 import com.feiqn.gempires.logic.characters.heroes.HeroList;
+import com.feiqn.gempires.logic.characters.heroes.dark.Vivain;
 import com.feiqn.gempires.logic.characters.heroes.nature.Leif;
 
 import java.util.ArrayList;
@@ -54,9 +55,10 @@ public class HeroRoster {
             Gdx.app.log("HeroRoster", "New Player");
 
             // TODO: add starter heroes
-            final HeroCard leif = new Leif(parentCastle.game.gempiresAssetHandler.natureCardTexture, parentCastle);
-            addHero(leif);
-            teams.get(defaultTeam).add(leif);
+
+            final HeroCard vivain = new Vivain(parentCastle);
+            addHero(vivain);
+            teams.get(defaultTeam).add(vivain);
 
             flushTeams();
         }
@@ -93,6 +95,7 @@ public class HeroRoster {
 
     public void fillTeams() {
         // load teams<>
+        // Any time a #NewHero is added to the game, this AND fillHeroes must be updated
 
         for(int t = 0; t < teams.size(); t++) {
             final ArrayList<HeroCard> thisTeam = teams.get(t);
@@ -111,7 +114,16 @@ public class HeroRoster {
                             }
                         }
                         break;
+                    case "VIVAIN":
+                        for(HeroCard hero : ownedHeroes) {
+                            if(hero.heroID == HeroList.VIVAIN) {
+                                thisTeam.add(hero);
+                                break;
+                            }
+                        }
+                        break;
                     case "none":
+                    default:
                         break;
                 }
             }
@@ -119,33 +131,38 @@ public class HeroRoster {
     }
 
     public void flushHeroes() {
-        // Save
+        // Save heroes and their stats
 
         for(HeroCard hero : ownedHeroes) {
             pref.putString("name" + hero.heroID, hero.heroName);
             pref.putInteger("level" + hero.heroID, hero.getLevel());
             pref.putInteger("bravery" + hero.heroID, hero.getBravery());
             pref.putBoolean("isPure" + hero.heroID, hero.getPurity());
+            pref.putInteger("experience" + hero.heroID, hero.getExperience());
         }
 
         pref.flush();
     }
 
     private void restoreHero(HeroCard hero) {
+        // set the newly created hero object to = the one saved in pref
 
         final int lvl = pref.getInteger("level" + hero.heroID);
         final int brv = pref.getInteger("bravery" + hero.heroID);
+        final int exp = pref.getInteger("experience" + hero.heroID);
         final boolean pure =  pref.getBoolean("isPure" + hero.heroID);
 
         final int targetTrueLevel = ((brv * 100) - 100) + lvl;
 
         hero.scaleToTrueLevel(targetTrueLevel);
+        hero.manuallySetExp(exp);
 
         ownedHeroes.add(hero);
     }
 
     private void fillHeroes() {
-        // Load
+        // Load heroes
+        // must be updated when adding a #NewHero
 
         for(int i = 0; i < HeroList.values().length; i++) {
             final HeroList h = HeroList.values()[i];
@@ -161,8 +178,13 @@ public class HeroRoster {
                     case DARING_CHEF:
                         // ZERO-STAR, COMMON-NOUN UNITS ARE LOADED BY PlayerInventory
                         break;
+
+                    case VIVAIN:
+                        final Vivain vivain = new Vivain(parentCastle);
+                        restoreHero(vivain);
+                        break;
                     case LEIF:
-                        final Leif leif = new Leif(parentCastle.game.gempiresAssetHandler.natureCardTexture, parentCastle);
+                        final Leif leif = new Leif(parentCastle);
                         restoreHero(leif);
                         break;
                 }
@@ -203,7 +225,7 @@ public class HeroRoster {
                 break;
             case LEIF:
                 if(!pref.contains("name" + newHero)) {
-                    addHero(new Leif(parentCastle.game.gempiresAssetHandler.natureCardTexture, parentCastle));
+                    addHero(new Leif(parentCastle));
                 } else {
                     addBraveryToken(newHero);
                 }

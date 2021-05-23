@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.feiqn.gempires.GempiresGame;
 import com.feiqn.gempires.logic.characters.enemies.Bestiary;
+import com.feiqn.gempires.logic.characters.heroes.HeroList;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,9 +16,17 @@ public class GempiresAssetHandler {
     private final GempiresGame game;
     private final AssetManager manager;
     private final HashMap<Bestiary, Boolean> enemyTextureIsInitialized;
+    private final HashMap<HeroList, Boolean> heroTextureIsInitialized;
 
-    public Texture barracksTexture,
-                   avatarTexture;
+    public Texture // STRUCTURES
+                   barracksTexture,
+
+                   // UI
+                   avatarTexture,
+
+                   // HEROES
+                   vivainTexture,
+                   vivainCardTexture;
 
     public TextureRegion[] gemTextures,
                            attackTokenTextures;
@@ -25,6 +35,8 @@ public class GempiresAssetHandler {
                          waterWizardTextureRegion,
                          darkKnightTextureRegion,
                          fireDragonTextureRegion,
+
+                         // HEROES
 
                          // UI
                          purpleButtonTexture,
@@ -75,6 +87,11 @@ public class GempiresAssetHandler {
         this.game = game;
         manager = new AssetManager();
 
+        heroTextureIsInitialized = new HashMap<>(HeroList.values().length);
+        for(int i = 0; i < HeroList.values().length; i++) {
+            heroTextureIsInitialized.put(HeroList.values()[i], false);
+        }
+
         enemyTextureIsInitialized = new HashMap<>(Bestiary.values().length);
         for(int i = 0; i < Bestiary.values().length; i++) {
             enemyTextureIsInitialized.put(Bestiary.values()[i], false);
@@ -108,7 +125,25 @@ public class GempiresAssetHandler {
         }
     }
 
-    public void initialiseEnemyTextures(ArrayList<Bestiary> neededEnemies) {
+    public void initialiseHeroTextures(ArrayList<HeroList> neededHeroes) {
+        vivainTexture = manager.get("characters/heroes/dark/vivain.png", Texture.class);
+        vivainCardTexture = manager.get("characters/heroes/dark/vivainCARD.png", Texture.class);
+//        for(HeroList list : neededHeroes) {
+//            switch (list) {
+//                case VIVAIN:
+//                    if(!heroTextureIsInitialized.get(HeroList.VIVAIN)) {
+//                        vivainTexture = manager.get("characters/heroes/dark/vivain.png", Texture.class);
+//                    }
+//                    break;
+//
+//                case LEIF:
+//                default:
+//                    break;
+//            }
+//        }
+    }
+
+    public void initialiseEnemyTextures(@NotNull ArrayList<Bestiary> neededEnemies) {
         for(Bestiary beast : neededEnemies) {
             switch(beast) {
                 case WATER_WIZARD:
@@ -169,11 +204,11 @@ public class GempiresAssetHandler {
 
         final Texture cardSpriteSheet = manager.get("ui/heroCards.png", Texture.class);
         electricCardTexture = new TextureRegion(cardSpriteSheet, 32*5, 32*4, 96, 128);
-        stoneCardTexture = new TextureRegion(cardSpriteSheet, 0, 32*8, 96, 128);
-        fireCardTexture = new TextureRegion(cardSpriteSheet, 32*5, 32*8, 96, 128);
-        waterCardTexture = new TextureRegion(cardSpriteSheet, 0, 32*12, 96, 128);
-        voidCardTexture = new TextureRegion(cardSpriteSheet, 32*5, 32*12, 96, 128);
-        natureCardTexture = new TextureRegion(cardSpriteSheet, 0, 0, 96, 128);
+        stoneCardTexture    = new TextureRegion(cardSpriteSheet, 0, 32*8, 96, 128);
+        fireCardTexture     = new TextureRegion(cardSpriteSheet, 32*5, 32*8, 96, 128);
+        waterCardTexture    = new TextureRegion(cardSpriteSheet, 0, 32*12, 96, 128);
+        voidCardTexture     = new TextureRegion(cardSpriteSheet, 160, 256, 96, 128);
+        natureCardTexture   = new TextureRegion(cardSpriteSheet, 0, 0, 96, 128);
 
         final Texture iconSpriteSheet = manager.get("icon-pack.png", Texture.class);
         foodTexture = new TextureRegion(iconSpriteSheet, 256, 0, 32, 32);
@@ -214,7 +249,8 @@ public class GempiresAssetHandler {
         manager.load("characters/enemies/DAGRONS5.png", Texture.class);
     }
     public void loadHeroTextures() {
-
+        manager.load("characters/heroes/dark/vivain.png", Texture.class);
+        manager.load("characters/heroes/dark/vivainCARD.png", Texture.class);
     }
     public void loadCastleTextures() {
         manager.load("avatars/vivian.png", Texture.class);

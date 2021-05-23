@@ -1,18 +1,24 @@
 package com.feiqn.gempires.logic.characters;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.feiqn.gempires.GempiresGame;
 
 public class Combatant extends Image {
+    // data shared between heroes and enemies
 
-    public float strength,
+    public float  strength,
                   defense,
                   maxHealth,
                   currentHealth;
 
     public final GempiresGame game;
 
+    public Combatant(GempiresGame game, Texture texture) {
+        super(texture);
+        this.game = game;
+    }
     public Combatant(GempiresGame game, TextureRegion region) {
         super(region);
         this.game = game;

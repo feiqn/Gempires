@@ -25,11 +25,16 @@ import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.feiqn.gempires.GempiresGame;
 import com.feiqn.gempires.logic.castle.structures.Structure;
+import com.feiqn.gempires.logic.characters.heroes.HeroList;
+import com.feiqn.gempires.logic.ui.popupMenus.PopupMenu;
 import com.feiqn.gempires.logic.ui.ResourceDisplay;
 import com.feiqn.gempires.models.CampaignLevelID;
 import com.feiqn.gempires.models.stats.CastleStats;
 import com.feiqn.gempires.models.stats.HeroRoster;
 import com.feiqn.gempires.models.stats.PlayerInventory;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class CastleScreen extends ScreenAdapter {
 
@@ -45,7 +50,7 @@ public class CastleScreen extends ScreenAdapter {
 
     final public GempiresGame game;
 
-    // TODO: use an AssetManager
+    public PopupMenu activeMenu;
 
     private Stage gameStage,
                   hudStage;
@@ -173,6 +178,7 @@ public class CastleScreen extends ScreenAdapter {
     }
 
     private void initialiseFont() {
+        // TODO: load via asset handler
         final Texture fontTexture = new Texture(Gdx.files.internal("ui/tinyFont.png"), true);
         fontTexture.setFilter(Texture.TextureFilter.MipMapNearestNearest, Texture.TextureFilter.Linear);
 
@@ -202,6 +208,9 @@ public class CastleScreen extends ScreenAdapter {
         isoMapRenderer = new IsometricTiledMapRenderer(castleMap, 1/32f);
 
         game.gempiresAssetHandler.initialiseCastleTextures();
+
+        final ArrayList<HeroList> h = new ArrayList<>(Arrays.asList(HeroList.values())); // debug
+        game.gempiresAssetHandler.initialiseHeroTextures(h);
 
         castleStats = new CastleStats(game);
 

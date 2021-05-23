@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.feiqn.gempires.logic.items.ItemList;
-import com.feiqn.gempires.logic.ui.PopupMenu;
+import com.feiqn.gempires.logic.ui.popupMenus.PopupMenu;
 
 import java.util.HashMap;
 

@@ -24,6 +24,7 @@ import com.feiqn.gempires.logic.castle.CastleScreen;
 import com.feiqn.gempires.logic.characters.enemies.Bestiary;
 import com.feiqn.gempires.logic.characters.enemies.Enemy;
 import com.feiqn.gempires.logic.characters.heroes.HeroCard;
+import com.feiqn.gempires.logic.characters.heroes.HeroList;
 import com.feiqn.gempires.logic.items.ItemList;
 import com.feiqn.gempires.logic.items.Tornado;
 import com.feiqn.gempires.models.CampaignLevelID;
@@ -56,6 +57,7 @@ public class MatchScreen extends ScreenAdapter {
                  topLayer;
 
     public boolean matchFound,
+                   possibleToMatch,
                    classicMode,
                    needToClearWave,
                    allowUserInput;
@@ -96,7 +98,6 @@ public class MatchScreen extends ScreenAdapter {
     public Boolean firstWaveClear;
     public Boolean secondWaveClear;
     public Boolean thirdWaveClear;
-    public PlayerInventory playerInventory;
     public ArrayList<HeroCard> team;
 
     public MatchScreen(GempiresGame game, CampaignLevelID levelID /* , Arraylist<HeroCard> team */){
@@ -110,6 +111,11 @@ public class MatchScreen extends ScreenAdapter {
         thirdWaveClear = false;
         neededEnemies = new ArrayList<>();
         this.team = game.castle.heroRoster.getTeam(game.castle.heroRoster.defaultTeam);
+        final ArrayList<HeroList> neededHeroes = new ArrayList<>();
+        for(HeroCard hero : team) {
+            neededHeroes.add(hero.heroID);
+        }
+        game.gempiresAssetHandler.initialiseHeroTextures(neededHeroes);
     }
     public MatchScreen(GempiresGame game) {
         // Classic constructor
@@ -591,18 +597,109 @@ public class MatchScreen extends ScreenAdapter {
             try {
                 final Gem target = gems.get(gem.GemIndex + (u * columns));
 
-                if(target.GemIndex != gem.GemIndex) {
-//                    Gdx.app.log("reader", "up: " + target.GemIndex + ", and it's " + gemColorAsString(target.GemColor));
-                }
                 if(target.GemColor == gem.GemColor && target.GemIndex != gem.GemIndex) {
 //                        Gdx.app.log("reader", "I call that an up match!");
                         verticalMatchLength++;
                         upMatches.add(target);
                 } else if(target.GemIndex != gem.GemIndex) {
 //                    Gdx.app.log("reader", "No match up.");
+
+                    if(!possibleToMatch) {
+
+                        boolean up1DidInitialize = false;
+                        boolean up2DidInitialize = false;
+                        boolean left1DidInitialize = false;
+                        boolean right1DidInitialize = false;
+                        boolean down1DidInitialize = false;
+
+                        Gem down1;
+                        Gem right1;
+                        Gem left1;
+                        Gem up2;
+                        Gem up1;
+
+                        try {
+                            up1 = gems.get(gem.GemIndex + columns);
+                            up1DidInitialize = true;
+                        } catch(Exception e){
+                            // this assignment is just to keep the variable Not Null, and in this case will never be called
+                            up1 = gem;
+                        }
+
+                        try {
+                            up2 = gems.get(gem.GemIndex + (columns*2));
+                            up2DidInitialize = true;
+                        } catch(Exception e){
+                            up2 = gem;
+                        }
+
+                        try {
+                            left1 = gems.get(gem.GemIndex - 1);
+                            left1DidInitialize = true;
+                        } catch(Exception e){
+                            left1 = gem;
+                        }
+
+                        try {
+                            right1 = gems.get(gem.GemIndex + 1);
+                            right1DidInitialize = true;
+                        } catch(Exception e){
+                            right1 = gem;
+                        }
+
+                        try {
+                            down1 = gems.get(gem.GemIndex -  columns);
+                            down1DidInitialize = true;
+                        } catch(Exception e){
+                            down1 = gem;
+                        }
+
+                        boolean up2Matches = false;
+                        boolean left1Matches = false;
+                        boolean right1Matches = false;
+                        boolean down1Matches = false;
+
+                        if(up1DidInitialize && up2DidInitialize){
+                            if(up2.GemColor == up1.GemColor) {
+                                // confirmed set of 2, only need 1 more to match
+                                up2Matches = true;
+                            }
+                        }
+
+                        if(left1DidInitialize && up1DidInitialize) {
+                            if(left1.GemColor == up1.GemColor) {
+                                left1Matches = true;
+                            }
+                        }
+
+                        if(up1DidInitialize && right1DidInitialize) {
+                            if(right1.GemColor == up1.GemColor) {
+                                right1Matches = true;
+                            }
+                        }
+
+                        if(up1DidInitialize && down1DidInitialize) {
+                            if(down1.GemColor == up1.GemColor) {
+                                down1Matches = true;
+                            }
+                        }
+
+                        if(up2Matches) {
+                            // only need 1 more to match
+                            if(down1Matches || left1Matches || right1Matches) {
+                                possibleToMatch = true;
+                            }
+                        } else {
+                            if(down1Matches && left1Matches
+                            || down1Matches && right1Matches
+                            || right1Matches && left1Matches) {
+                                possibleToMatch = true;
+                            }
+                        }
+                    }
                     break;
                 }
-            } catch(Exception e) { /* uwu */ }
+            } catch(Exception ignored) {}
         }
     }
 
@@ -617,20 +714,109 @@ public class MatchScreen extends ScreenAdapter {
             try {
                 final Gem target = gems.get(gem.GemIndex - (b * columns));
 
-                if(target.GemIndex != gem.GemIndex) {
-//                    Gdx.app.log("reader", "down: " + target.GemIndex + ", and it's " + gemColorAsString(target.GemColor));
-                }
                 if(target.GemColor == gem.GemColor && target.GemIndex != gem.GemIndex) {
 //                    Gdx.app.log("reader", "I call that a down match!");
                     verticalMatchLength++;
                     downMatches.add(target);
                 } else if(target.GemIndex != gem.GemIndex) {
 //                    Gdx.app.log("reader", "No match down.");
+
+                    if(!possibleToMatch) {
+
+                        boolean up1DidInitialize = false;
+                        boolean down2DidInitialize = false;
+                        boolean left1DidInitialize = false;
+                        boolean right1DidInitialize = false;
+                        boolean down1DidInitialize = false;
+
+                        Gem down1;
+                        Gem right1;
+                        Gem left1;
+                        Gem down2;
+                        Gem up1;
+
+                        try {
+                            up1 = gems.get(gem.GemIndex + columns);
+                            up1DidInitialize = true;
+                        } catch(Exception e){
+                            // this assignment is just to keep the variable Not Null, and in this case will never be called
+                            up1 = gem;
+                        }
+
+                        try {
+                            down2 = gems.get(gem.GemIndex - (columns*2));
+                            down2DidInitialize = true;
+                        } catch(Exception e){
+                            down2 = gem;
+                        }
+
+                        try {
+                            left1 = gems.get(gem.GemIndex - 1);
+                            left1DidInitialize = true;
+                        } catch(Exception e){
+                            left1 = gem;
+                        }
+
+                        try {
+                            right1 = gems.get(gem.GemIndex + 1);
+                            right1DidInitialize = true;
+                        } catch(Exception e){
+                            right1 = gem;
+                        }
+
+                        try {
+                            down1 = gems.get(gem.GemIndex -  columns);
+                            down1DidInitialize = true;
+                        } catch(Exception e){
+                            down1 = gem;
+                        }
+
+                        boolean down2Matches = false;
+                        boolean left1Matches = false;
+                        boolean right1Matches = false;
+                        boolean down1Matches = false;
+
+                        if(up1DidInitialize && down2DidInitialize){
+                            if(down2.GemColor == up1.GemColor) {
+                                // confirmed set of 2, only need 1 more to match
+                                down2Matches = true;
+                            }
+                        }
+
+                        if(left1DidInitialize && up1DidInitialize) {
+                            if(left1.GemColor == up1.GemColor) {
+                                left1Matches = true;
+                            }
+                        }
+
+                        if(up1DidInitialize && right1DidInitialize) {
+                            if(right1.GemColor == up1.GemColor) {
+                                right1Matches = true;
+                            }
+                        }
+
+                        if(up1DidInitialize && down1DidInitialize) {
+                            if(down1.GemColor == up1.GemColor) {
+                                down1Matches = true;
+                            }
+                        }
+
+                        if(down2Matches) {
+                            // only need 1 more to match
+                            if(down1Matches || left1Matches || right1Matches) {
+                                possibleToMatch = true;
+                            }
+                        } else {
+                            if(down1Matches && left1Matches
+                            || down1Matches && right1Matches
+                            || right1Matches && left1Matches) {
+                                possibleToMatch = true;
+                            }
+                        }
+                    }
                     break;
                 }
-            } catch(Exception e) {
-//                Gdx.app.log("reader", "broke down :(");
-            }
+            } catch(Exception ignored) {}
         }
     }
 
@@ -646,18 +832,109 @@ public class MatchScreen extends ScreenAdapter {
             try {
                 final Gem target = gems.get(gem.GemIndex + r);
 
-                if(target.GemIndex != gem.GemIndex) {
-//                    Gdx.app.log("reader", "right: " + target.GemIndex + ", and it's " + gemColorAsString(target.GemColor));
-                }
                 if (target.GemColor == gem.GemColor && target.GemIndex != gem.GemIndex) {
 //                        Gdx.app.log("reader", "I call that a right-match!");
                         horizontalMatchLength++;
                         rightMatches.add(target);
                 } else if(target.GemIndex != gem.GemIndex) {
 //                    Gdx.app.log("reader", "No match to the right.");
+
+                    if(!possibleToMatch) {
+
+                        boolean up1DidInitialize = false;
+                        boolean right2DidInitialize = false;
+                        boolean left1DidInitialize = false;
+                        boolean right1DidInitialize = false;
+                        boolean down1DidInitialize = false;
+
+                        Gem down1;
+                        Gem right1;
+                        Gem left1;
+                        Gem right2;
+                        Gem up1;
+
+                        try {
+                            up1 = gems.get(gem.GemIndex + columns);
+                            up1DidInitialize = true;
+                        } catch(Exception e){
+                            // this assignment is just to keep the variable Not Null, and in this case will never be called
+                            up1 = gem;
+                        }
+
+                        try {
+                            right2 = gems.get(gem.GemIndex + 2);
+                            right2DidInitialize = true;
+                        } catch(Exception e){
+                            right2 = gem;
+                        }
+
+                        try {
+                            left1 = gems.get(gem.GemIndex - 1);
+                            left1DidInitialize = true;
+                        } catch(Exception e){
+                            left1 = gem;
+                        }
+
+                        try {
+                            right1 = gems.get(gem.GemIndex + 1);
+                            right1DidInitialize = true;
+                        } catch(Exception e){
+                            right1 = gem;
+                        }
+
+                        try {
+                            down1 = gems.get(gem.GemIndex -  columns);
+                            down1DidInitialize = true;
+                        } catch(Exception e){
+                            down1 = gem;
+                        }
+
+                        boolean right2Matches = false;
+                        boolean left1Matches = false;
+                        boolean right1Matches = false;
+                        boolean down1Matches = false;
+
+                        if(up1DidInitialize && right2DidInitialize){
+                            if(right2.GemColor == up1.GemColor) {
+                                // confirmed set of 2, only need 1 more to match
+                                right2Matches = true;
+                            }
+                        }
+
+                        if(left1DidInitialize && up1DidInitialize) {
+                            if(left1.GemColor == up1.GemColor) {
+                                left1Matches = true;
+                            }
+                        }
+
+                        if(up1DidInitialize && right1DidInitialize) {
+                            if(right1.GemColor == up1.GemColor) {
+                                right1Matches = true;
+                            }
+                        }
+
+                        if(up1DidInitialize && down1DidInitialize) {
+                            if(down1.GemColor == up1.GemColor) {
+                                down1Matches = true;
+                            }
+                        }
+
+                        if(right2Matches) {
+                            // only need 1 more to match
+                            if(down1Matches || left1Matches || right1Matches) {
+                                possibleToMatch = true;
+                            }
+                        } else {
+                            if(down1Matches && left1Matches
+                            || down1Matches && right1Matches
+                            || right1Matches && left1Matches) {
+                                possibleToMatch = true;
+                            }
+                        }
+                    }
                     break;
                 }
-            } catch (Exception e) { /* uwu */ }
+            } catch (Exception ignored) {}
         }
     }
 
@@ -672,32 +949,134 @@ public class MatchScreen extends ScreenAdapter {
             try {
                 final Gem target = gems.get(gem.GemIndex - l);
 
-                if(target.GemIndex != gem.GemIndex) {
-//                    Gdx.app.log("reader", "left: " + target.GemIndex + ", and it's " + gemColorAsString(target.GemColor));
-                }
                 if (target.GemColor == gem.GemColor && target.GemIndex != gem.GemIndex) {
 //                    Gdx.app.log("reader", "I call that a left match!");
                     horizontalMatchLength++;
                     leftMatches.add(target);
                 } else if(target.GemIndex != gem.GemIndex) {
 //                    Gdx.app.log("reader", "No match to the left.");
+
+                    if(!possibleToMatch) {
+
+                        boolean up1DidInitialize = false;
+                        boolean left2DidInitialize = false;
+                        boolean left1DidInitialize = false;
+                        boolean right1DidInitialize = false;
+                        boolean down1DidInitialize = false;
+
+                        Gem down1;
+                        Gem right1;
+                        Gem left1;
+                        Gem left2;
+                        Gem up1;
+
+                        try {
+                            up1 = gems.get(gem.GemIndex + columns);
+                            up1DidInitialize = true;
+                        } catch(Exception e){
+                            // this assignment is just to keep the variable Not Null, and in this case will never be called
+                            up1 = gem;
+                        }
+
+                        try {
+                            left2 = gems.get(gem.GemIndex - 2);
+                            left2DidInitialize = true;
+                        } catch(Exception e){
+                            left2 = gem;
+                        }
+
+                        try {
+                            left1 = gems.get(gem.GemIndex - 1);
+                            left1DidInitialize = true;
+                        } catch(Exception e){
+                            left1 = gem;
+                        }
+
+                        try {
+                            right1 = gems.get(gem.GemIndex + 1);
+                            right1DidInitialize = true;
+                        } catch(Exception e){
+                            right1 = gem;
+                        }
+
+                        try {
+                            down1 = gems.get(gem.GemIndex -  columns);
+                            down1DidInitialize = true;
+                        } catch(Exception e){
+                            down1 = gem;
+                        }
+
+                        boolean left2Matches = false;
+                        boolean left1Matches = false;
+                        boolean right1Matches = false;
+                        boolean down1Matches = false;
+
+                        if(up1DidInitialize && left2DidInitialize){
+                            if(left2.GemColor == up1.GemColor) {
+                                // confirmed set of 2, only need 1 more to match
+                                left2Matches = true;
+                            }
+                        }
+
+                        if(left1DidInitialize && up1DidInitialize) {
+                            if(left1.GemColor == up1.GemColor) {
+                                left1Matches = true;
+                            }
+                        }
+
+                        if(up1DidInitialize && right1DidInitialize) {
+                            if(right1.GemColor == up1.GemColor) {
+                                right1Matches = true;
+                            }
+                        }
+
+                        if(up1DidInitialize && down1DidInitialize) {
+                            if(down1.GemColor == up1.GemColor) {
+                                down1Matches = true;
+                            }
+                        }
+
+                        if(left2Matches) {
+                            // only need 1 more to match
+                            if(down1Matches || left1Matches || right1Matches) {
+                                possibleToMatch = true;
+                            }
+                        } else {
+                            if(down1Matches && left1Matches
+                            || down1Matches && right1Matches
+                            || right1Matches && left1Matches) {
+                                possibleToMatch = true;
+                            }
+                        }
+                    }
                     break;
                 }
-            } catch(Exception e) {
-//                Gdx.app.log("break", "loop broken on revolution: " + l );
-            }
+            } catch(Exception ignored) { }
         }
     }
 
     public boolean checkWholeBoardForMatches() {
         matchFound = false;
         sendToDestroy = new ArrayList<>();
+        possibleToMatch = false;
 
-        // TODO: check for No Possible Matches
         for(Gem gem : gems) { look(gem); }
 
         if(matchFound) {
             destroyGems(sendToDestroy);
+        } else if(possibleToMatch = false) {
+
+            Gdx.app.log("No Matches", "No matches");
+
+            final Tornado debugShuffler = new Tornado(game.gempiresAssetHandler.gemTextures[1], this);
+            debugShuffler.shuffleWholeBoard();
+
+            Timer.schedule(new Timer.Task(){
+                @Override
+                public void run() {
+                    checkWholeBoardForMatches();
+                }
+            }, 1);
         }
 
         return matchFound;
@@ -988,6 +1367,7 @@ public class MatchScreen extends ScreenAdapter {
         horizontalMatchLength = 0;
         verticalMatchLength = 0;
 
+        possibleToMatch = false;
         allowUserInput = false;
         gameCamera = new OrthographicCamera();
         slots = new ArrayList<Vector2>();
@@ -1009,13 +1389,6 @@ public class MatchScreen extends ScreenAdapter {
         stage = new Stage(fitViewport);
 
         createAndFillSlots(rows, columns);
-
-        //
-        final Tornado debugShuffler = new Tornado(game.gempiresAssetHandler.gemTextures[1], this); // debug
-        debugShuffler.setY(12); //
-        debugShuffler.setX(1); //
-        stage.addActor(debugShuffler); //
-        //
 
         Gdx.input.setInputProcessor(stage);
 

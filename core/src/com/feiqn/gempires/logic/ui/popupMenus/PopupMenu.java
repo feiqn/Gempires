@@ -1,10 +1,11 @@
-package com.feiqn.gempires.logic.ui;
+package com.feiqn.gempires.logic.ui.popupMenus;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.feiqn.gempires.logic.castle.structures.Structure;
 import com.feiqn.gempires.logic.characters.heroes.HeroCard;
+import com.feiqn.gempires.logic.ui.BackButton;
 import com.feiqn.gempires.logic.ui.wideButtons.BeginStageWideButton;
 import com.feiqn.gempires.logic.ui.wideButtons.LevelUpWideButton;
 import com.feiqn.gempires.logic.ui.wideButtons.OpenShopWideButton;
@@ -29,6 +30,8 @@ public class PopupMenu extends Group {
         parentStructure = sender;
         menuType = type;
 
+        parentStructure.getParentScreen().activeMenu = this;
+
         final Image background = new Image(sender.getParentScreen().game.gempiresAssetHandler.menuTexture);
 
         switch(menuType) {
@@ -40,6 +43,8 @@ public class PopupMenu extends Group {
             case SHOP_ALCHEMY:
                 // TODO: make a mini-menu for simpler structures like farms and mines
                 background.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+                break;
+            default:
                 break;
         }
 
@@ -88,7 +93,6 @@ public class PopupMenu extends Group {
                 break;
 
             case ALCHEMIST:
-                // TODO: "enter shop" button to a scrolling menu of items
                 final OpenShopWideButton shopButton = new OpenShopWideButton(this);
                 shopButton.setPosition(Gdx.graphics.getWidth() * .12f, Gdx.graphics.getHeight() * .6f);
                 addActor(shopButton);
@@ -110,13 +114,15 @@ public class PopupMenu extends Group {
         header.setPosition(0, Gdx.graphics.getHeight() - header.getHeight());
         addActor(header);
 
-        final BackButton backButton = new BackButton(parentStructure.getParentScreen().game.gempiresAssetHandler.backButtonTexture);
+        final BackButton backButton = new BackButton(parentStructure.getParentScreen().game);
         backButton.setSize(Gdx.graphics.getHeight() * .04f, Gdx.graphics.getHeight() * .04f);
         backButton.setPosition(Gdx.graphics.getWidth() * .85f, header.getY() - (backButton.getHeight() * .5f));
         backButton.setParent(this);
         addActor(backButton);
 
     }
+
+    // constructBGLarge() {
 
     private void addLevelUpButton() {
 
@@ -131,7 +137,7 @@ public class PopupMenu extends Group {
     private void layoutShop() {
         /* TODO:
          * final ArrayList<ItemList> itemsAlchemistCanMake
-         * for each ItemList item in itemsAlchemistCan Make
+         * for each ItemList item in itemsAlchemistCanMake
          * add a little ui card to contain item info
          * show a picture of the item, its name,
          * amount owned, and a button to create more of the item

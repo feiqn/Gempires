@@ -1,6 +1,5 @@
 package com.feiqn.gempires.logic.characters.heroes.nature;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.feiqn.gempires.logic.characters.heroes.HeroList;
 import com.feiqn.gempires.models.ElementalType;
 import com.feiqn.gempires.logic.castle.CastleScreen;
@@ -8,8 +7,8 @@ import com.feiqn.gempires.logic.characters.heroes.HeroCard;
 
 public class Leif extends HeroCard {
 
-    public Leif(TextureRegion region, CastleScreen parent) {
-        super(region, parent);
+    public Leif(CastleScreen parent) {
+        super(parent.game.gempiresAssetHandler.natureCardTexture, parent, parent.game.gempiresAssetHandler.vivainTexture, ElementalType.NATURE); // DEBUG
 
         heroName = "Leif";
         heroTitle = "Flighty Planeswalker";
@@ -22,7 +21,7 @@ public class Leif extends HeroCard {
         heroID = HeroList.LEIF;
 
 //        initialiseThumbnail(element);
-        initializeStats(10, 5, 100);
+        manuallySetStats(10, 5, 100);
     }
 
     @Override

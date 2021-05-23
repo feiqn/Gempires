@@ -56,6 +56,11 @@ public class CastleStats {
             pref.putBoolean("NewGame?", false);
 
             // do first time setup stuff here
+            // currently this is all debug
+
+            final WaterAltar waterAltar = new WaterAltar(game);
+            waterAltar.setPosition(60f, 55f);
+            addStructure(waterAltar);
 
             final Barracks barracks = new Barracks(game);
             barracks.setPosition(59.5f,64.5f);
@@ -72,6 +77,10 @@ public class CastleStats {
             final Farm farm = new Farm(game);
             farm.setPosition(52.5f, 63.5f);
             addStructure(farm);
+
+            final Library library = new Library(game);
+            library.setPosition(50f, 57f);
+            addStructure(library);
 
             final Warehouse warehouse = new Warehouse(game);
             warehouse.setPosition( 55.5f, 60.5f);
