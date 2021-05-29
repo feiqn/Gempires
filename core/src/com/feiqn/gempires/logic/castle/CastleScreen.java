@@ -161,6 +161,7 @@ public class CastleScreen extends ScreenAdapter {
 
         final FitViewport fitViewport = new FitViewport(worldWidth, worldHeight);
 
+        // todo: scaling viewport
         gameStage = new Stage(fitViewport);
 
         gameCamera.position.set(0,0,0);

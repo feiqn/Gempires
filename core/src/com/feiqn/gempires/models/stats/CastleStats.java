@@ -75,7 +75,7 @@ public class CastleStats {
             addStructure(mine);
 
             final Farm farm = new Farm(game);
-            farm.setPosition(52.5f, 63.5f);
+            farm.setPosition(53.5f, 62.5f);
             addStructure(farm);
 
             final Library library = new Library(game);
@@ -87,7 +87,7 @@ public class CastleStats {
             addStructure(warehouse);
 
             final Silo silo = new Silo(game);
-            silo.setPosition(58.5f, 63.5f);
+            silo.setPosition(58.5f, 60.5f);
             addStructure(silo);
 
             final Archive archive = new Archive(game);

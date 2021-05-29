@@ -20,6 +20,8 @@ public class GempiresAssetHandler {
 
     public Texture // STRUCTURES
                    barracksTexture,
+                   mineTexture,
+                   mineTexture2,
 
                    // UI
                    avatarTexture,
@@ -50,7 +52,6 @@ public class GempiresAssetHandler {
                          thymeTexture,
                          pureGemTexture,
                          farmTexture,
-                         mineTexture,
                          libraryTexture,
                          siloTexture,
                          warehouseTexture,
@@ -214,9 +215,13 @@ public class GempiresAssetHandler {
         foodTexture = new TextureRegion(iconSpriteSheet, 256, 0, 32, 32);
         arcanaTexture = new TextureRegion(iconSpriteSheet, 320, 0, 32, 32);
 
+        final Texture alphaFarmSpriteSheet = manager.get("structures/picopicofarm.png", Texture.class);
+        farmTexture = new TextureRegion(alphaFarmSpriteSheet,0,0,64,32);
+
+        mineTexture = manager.get("structures/goldmine.png", Texture.class);
+        mineTexture2 = manager.get("structures/goldmine2.png", Texture.class);
+
         final Texture buildingSpriteSheet = manager.get("structures/buildingSpriteSheet.png", Texture.class);
-        farmTexture =                       new TextureRegion(buildingSpriteSheet, 0, 128, 32, 32);
-        mineTexture =                       new TextureRegion(buildingSpriteSheet, 160, 96, 32, 32);
         libraryTexture =                    new TextureRegion(buildingSpriteSheet, 64, 0, 32, 32);
         alchemistTexture =                  new TextureRegion(buildingSpriteSheet, 32*7, 0, 32,32);
         archivesTexture =                   new TextureRegion(buildingSpriteSheet, 32*5, 32*5, 32,32);
@@ -262,6 +267,9 @@ public class GempiresAssetHandler {
         manager.load("icon-pack.png", Texture.class);
         manager.load("structures/buildingSpriteSheet.png", Texture.class);
         manager.load("ui/RPG_Item_Pack.png", Texture.class);
+        manager.load("structures/goldmine.png", Texture.class);
+        manager.load("structures/goldmine2.png", Texture.class);
+        manager.load("structures/picopicofarm.png", Texture.class);
     }
     public void loadMatchScreenTextures() {
         manager.load("gem_set.png", Texture.class);

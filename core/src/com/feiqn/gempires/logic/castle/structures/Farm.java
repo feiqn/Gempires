@@ -12,6 +12,6 @@ public class Farm extends Structure {
 
         itemNotifierBubble = new ItemNotifierBubble(game.gempiresAssetHandler.foodTexture, this);
 
-        this.setSize(1.5f, 1.5f);
+        this.setSize(3f, 1.5f);
     }
 }
