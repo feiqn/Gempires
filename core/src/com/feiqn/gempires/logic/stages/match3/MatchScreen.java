@@ -14,6 +14,8 @@ import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.DelayedRemovalArray;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -38,8 +40,12 @@ import java.util.HashMap;
 import java.util.Random;
 
 public class MatchScreen extends ScreenAdapter {
-    // Tables are kind of made for this sort of thing.
-    // For no particular reason whatsoever, fuck tables.
+    // I am a woman humbled.
+
+    private Table rootTable,
+                  gemTable,
+                  enemyTable,
+                  uiTable;
 
     public OrthographicCamera gameCamera;
     public OrthogonalTiledMapRenderer orthoMapRenderer;
@@ -48,13 +54,10 @@ public class MatchScreen extends ScreenAdapter {
     public MapProperties mapProperties;
 
     public final float gemSwapTime = 0.2f;
-    float timeToCompleteSwaps = 0f;
+    private float timeToCompleteSwaps = 0f;
 
     final public GempiresGame game;
     public Stage stage;
-
-    public Group gemGroup,
-                 topLayer;
 
     public boolean matchFound,
                    possibleToMatch,
@@ -144,57 +147,82 @@ public class MatchScreen extends ScreenAdapter {
         game.gempiresAssetHandler.initialiseEnemyTextures(passToInitEnemies);
     }
 
+    public Gem generateRandomNewGem() {
+        final Random random = new Random();
+        final int gemColor = random.nextInt(7);
+        return new Gem(this, gemColor);
+    }
+
     private void createAndFillSlots(final int countRows, final int countColumns) {
         // Called by show()
 
         int revolution = 0;
 
-        final Vector2 firstPosition;
+        gemTable.defaults().width(1).height(1);
 
-        if(classicMode) {
-            firstPosition = new Vector2(.5f, .5f);
-        } else {
-            firstPosition = new Vector2(.5f, 3.05f);
-        }
 
-        Vector2 previousPosition = firstPosition;
-
-        for(int i = 0; i < countRows; i++) { // height
-            for (int x = 0; x < countColumns; x++) { // width
-
-                final Vector2 nextPosition;
-
-                if(x != 0) {
-                    nextPosition = new Vector2(previousPosition.x + 1, previousPosition.y);
-                } else {
-                    nextPosition = previousPosition;
-                }
-
-                slots.add(new Vector2(nextPosition.x, nextPosition.y));
+        for(int h = 0; h < rows; h++) { // height in rows
+            for(int w = 0; w < columns; w++) { // width in columns
+//                final Gem gem = generateRandomNewGem();
+//                gemTable.add(gem);
 
                 final Random random = new Random();
                 final int gemColor = random.nextInt(7);
                 final Gem gem = new Gem(game.gempiresAssetHandler.gemTextures[gemColor], gemColor, revolution, this);
 
-                gem.positionInRow = x;
-                gem.positionInColumn = i;
+                gem.positionInRow = h;
+                gem.positionInColumn = w;
 
-                gem.setPosition(nextPosition.x, nextPosition.y);
-
-                gems.add(gem);
-                stage.addActor(gem);
-
-                previousPosition = nextPosition;
-
+                gemTable.add(gem);
                 revolution++;
             }
-
-            previousPosition.x = firstPosition.x;
-
-            if (slots.size() < countColumns * countRows) {
-                previousPosition.y += 1;
-            }
+            gemTable.row();
         }
+
+//        final Vector2 firstPosition;
+//        if(classicMode) {
+//            firstPosition = new Vector2(.5f, .5f);
+//        } else {
+//            firstPosition = new Vector2(.5f, 3.05f);
+//        }
+//        Vector2 previousPosition = firstPosition;
+//
+//        for(int i = 0; i < countRows; i++) { // height
+//            for (int x = 0; x < countColumns; x++) { // width
+//
+//                final Vector2 nextPosition;
+//
+//                if(x != 0) {
+//                    nextPosition = new Vector2(previousPosition.x + 1, previousPosition.y);
+//                } else {
+//                    nextPosition = previousPosition;
+//                }
+//
+//                slots.add(new Vector2(nextPosition.x, nextPosition.y));
+//
+//                final Random random = new Random();
+//                final int gemColor = random.nextInt(7);
+//                final Gem gem = new Gem(game.gempiresAssetHandler.gemTextures[gemColor], gemColor, revolution, this);
+//
+//                gem.positionInRow = x;
+//                gem.positionInColumn = i;
+//
+//                gem.setPosition(nextPosition.x, nextPosition.y);
+//
+//                gems.add(gem);
+//                stage.addActor(gem);
+//
+//                previousPosition = nextPosition;
+//
+//                revolution++;
+//            }
+//
+//            previousPosition.x = firstPosition.x;
+//
+//            if (slots.size() < countColumns * countRows) {
+//                previousPosition.y += 1;
+//            }
+//        }
     }
 
     public void swapGems(Gem origin, Gem destination) {
@@ -1362,37 +1390,61 @@ public class MatchScreen extends ScreenAdapter {
         }
     }
 
+    private void initializeVariables(int phase) {
+        switch(phase) {
+            case 1:
+                horizontalMatchLength = 0;
+                verticalMatchLength = 0;
+
+                possibleToMatch = false;
+                allowUserInput = false;
+                gameCamera = new OrthographicCamera();
+                slots = new ArrayList<Vector2>();
+                gems = new DelayedRemovalArray<Gem>();
+                sendToDestroy = new ArrayList<Gem>();
+                break;
+            case 2:
+                orthoMapRenderer = new OrthogonalTiledMapRenderer(matchMap, 1/32f);
+
+                final int worldWidth = columns + 1;
+                final double worldHeight = Math.floor(worldWidth * 1.77777778f); // approx 9:16
+
+                FitViewport fitViewport = new FitViewport(worldWidth, (int) worldHeight);
+                gameCamera.setToOrtho(false, worldWidth, (int) worldHeight);
+
+                stage = new Stage(fitViewport);
+
+                rootTable = new Table();
+                rootTable.setFillParent(true);
+
+//                rootTable.row().fillX().top();
+                rootTable.add().fillX().expandX().top().height(7); // enemy cell
+                rootTable.row();
+
+                gemTable = new Table();
+                rootTable.add(gemTable).height(rows).width(columns);
+                rootTable.row();
+
+                // for each hero in team add cell(hero)
+
+                rootTable.setDebug(true);
+                stage.setDebugAll(true); // debug
+                break;
+            default:
+                break;
+        }
+    }
+
     @Override
     public void show() {
-        horizontalMatchLength = 0;
-        verticalMatchLength = 0;
-
-        possibleToMatch = false;
-        allowUserInput = false;
-        gameCamera = new OrthographicCamera();
-        slots = new ArrayList<Vector2>();
-        gems = new DelayedRemovalArray<Gem>();
-        sendToDestroy = new ArrayList<Gem>();
-
+        initializeVariables(1);
         game.gempiresAssetHandler.initialiseGemTextures(classicMode);
-
         loadMap();
-
-        orthoMapRenderer = new OrthogonalTiledMapRenderer(matchMap, 1/32f);
-
-        final int worldWidth = columns + 1;
-        final double worldHeight = Math.floor(worldWidth * 1.77777778f); // approx 9:16
-
-        FitViewport fitViewport = new FitViewport(worldWidth, (int) worldHeight);
-        gameCamera.setToOrtho(false, worldWidth, (int) worldHeight);
-
-        stage = new Stage(fitViewport);
-
+        initializeVariables(2);
         createAndFillSlots(rows, columns);
-
         Gdx.input.setInputProcessor(stage);
-
         gameCamera.update();
+        stage.addActor(rootTable);
 
         Timer.schedule(new Timer.Task(){
             @Override
