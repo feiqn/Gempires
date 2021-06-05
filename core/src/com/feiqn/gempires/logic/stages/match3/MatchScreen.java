@@ -40,12 +40,6 @@ import java.util.HashMap;
 import java.util.Random;
 
 public class MatchScreen extends ScreenAdapter {
-    // I am a woman humbled.
-
-    private Table rootTable,
-                  gemTable,
-                  enemyTable,
-                  uiTable;
 
     public OrthographicCamera gameCamera;
     public OrthogonalTiledMapRenderer orthoMapRenderer;
@@ -57,7 +51,13 @@ public class MatchScreen extends ScreenAdapter {
     private float timeToCompleteSwaps = 0f;
 
     final public GempiresGame game;
+
     public Stage stage;
+
+    private Group gemGroup,
+                  heroGroup,
+                  enemyGroup,
+                  uiGroup;
 
     public boolean matchFound,
                    possibleToMatch,
