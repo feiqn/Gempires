@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.feiqn.gempires.GempiresGame;
 import com.feiqn.gempires.logic.castle.CastleScreen;
 import com.feiqn.gempires.logic.characters.Combatant;
+import com.feiqn.gempires.logic.stages.match3.MatchScreen;
 import com.feiqn.gempires.logic.ui.BackButton;
 import com.feiqn.gempires.models.ElementalType;
 
@@ -147,6 +148,8 @@ public class HeroCard extends Combatant {
                  cardImage;
 
     public CastleScreen parentCastle;
+
+    public MatchScreen battleScreen;
 
     public HeroCard(Texture texture, CastleScreen castleScreen, Texture behindCardTexture, ElementalType element) {
         super(castleScreen.game, texture);

@@ -26,6 +26,7 @@ public class Vivain extends HeroCard {
 
     @Override
     public void heroAbility() {
-
+        battleScreen.showHint = true;
+        battleScreen.checkWholeBoardForMatches();
     }
 }
