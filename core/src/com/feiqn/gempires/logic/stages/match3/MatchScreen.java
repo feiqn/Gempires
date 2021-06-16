@@ -4,8 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -14,15 +12,12 @@ import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.DelayedRemovalArray;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.feiqn.gempires.GempiresGame;
 import com.feiqn.gempires.logic.AttackToken;
 import com.feiqn.gempires.logic.Gem;
-import com.feiqn.gempires.logic.castle.CastleScreen;
 import com.feiqn.gempires.logic.characters.enemies.Bestiary;
 import com.feiqn.gempires.logic.characters.enemies.Enemy;
 import com.feiqn.gempires.logic.characters.heroes.HeroCard;
@@ -32,11 +27,9 @@ import com.feiqn.gempires.logic.items.Tornado;
 import com.feiqn.gempires.models.CampaignLevelID;
 import com.feiqn.gempires.models.ElementalType;
 import com.feiqn.gempires.models.Formation;
-import com.feiqn.gempires.models.stats.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Random;
 
 public class MatchScreen extends ScreenAdapter {
@@ -208,16 +201,25 @@ public class MatchScreen extends ScreenAdapter {
         }
     }
 
-    public void swapGems(Gem origin, Gem destination) {
+    public void swapGems(final Gem origin, final Gem destination) {
 
 //        allowUserInput = false;
+
+        origin.isMoving = true;
+        destination.isMoving = true;
 
         final Vector2 originSlot = slots.get(origin.GemIndex);
         final Vector2 destinationSlot;
 
-        if(destination.GemIndex > (rows * columns)) {
-            // out of slots<> bounds
-            destinationSlot = new Vector2(destination.getX(), destination.getY());
+        if(destination.GemIndex > (rows * columns) || destination.GemIndex < 0) {
+
+            // out of slots<> bounds,
+            // this must be a new gem dropping in, so it can only move one direction
+//            if(classicMode) {
+//                destinationSlot = new Vector2(originSlot.x - 1, originSlot.y - 1);
+//            } else {
+                destinationSlot = new Vector2(originSlot.x + 1, originSlot.y + 1);
+//            }
         } else {
             destinationSlot = slots.get(destination.GemIndex);
         }
@@ -236,8 +238,30 @@ public class MatchScreen extends ScreenAdapter {
         destination.positionInRow = originPositionInRow;
         destination.positionInColumn = originPositionInColumn;
 
-        destination.addAction(Actions.moveTo(originSlot.x, originSlot.y, gemSwapTime));
-        origin.addAction(Actions.moveTo(destinationSlot.x, destinationSlot.y, gemSwapTime));
+        // TODO: change these to sequence actions, with Runnables() after they complete
+//        destination.addAction(Actions.moveTo(originSlot.x, originSlot.y, gemSwapTime));
+//        origin.addAction(Actions.moveTo(destinationSlot.x, destinationSlot.y, gemSwapTime));
+
+        destination.addAction(Actions.sequence(Actions.moveTo(originSlot.x, originSlot.y, gemSwapTime), Actions.run((new Runnable() {
+            @Override
+            public void run() {
+                destination.isMoving = false;
+            }
+        }))));
+
+        origin.addAction(Actions.sequence(Actions.moveTo(destinationSlot.x, destinationSlot.y, gemSwapTime), Actions.run(new Runnable() {
+            @Override
+            public void run() {
+                origin.isMoving = false;
+            }
+        })));
+
+//        actor.addAction(sequence(fadeIn(2), run(new Runnable() {
+//            public void run () {
+//                System.out.println("Action complete!");
+//            }
+//        })));
+
 
 //        Timer.schedule(new Timer.Task(){
 //            @Override
@@ -249,6 +273,7 @@ public class MatchScreen extends ScreenAdapter {
     }
 
     public void checkBoundsThenSwap(final float mouseUpAtX, final float mouseUpAtY, final int index) {
+        // Called by Gem touch listener
 
         // TODO: refactor
 
@@ -346,7 +371,7 @@ public class MatchScreen extends ScreenAdapter {
     }
 
     private ElementalType translateGemColorToElement(Integer color) {
-        // this class solely exists as a stop-gap until Gem class refactor is complete
+        // this function solely exists as a stop-gap until Gem class refactor is complete
 
         switch (color) {
             case 0:
@@ -402,29 +427,96 @@ public class MatchScreen extends ScreenAdapter {
                     }, 2);
                 }
             }
+
+            switch(gem.specialType) {
+                case SPECIAL_4:
+                case SPECIAL_5:
+                case SPECIAL_6:
+                case SPECIAL_7:
+                case SPECIAL_8:
+                    // spawn a new, special gem in this gem's place (to update the sprite)
+                case NONE:
+                default:
+                    break;
+            }
+
             gem.setToBlank();
         }
 
-        checkIfGemsShouldBeDropped();
+        dropGems();
 
-        if(timeToCompleteSwaps < 1) {
-            timeToCompleteSwaps = (int) Math.ceil(timeToCompleteSwaps);
-        }
+        waitForGemsToSettleThenCheckForMatches();
 
-        Timer.schedule(new Timer.Task(){
-            @Override
-            public void run() {
-                Gdx.app.log("timer", "fired");
-                matchFound = checkWholeBoardForMatches();
-                if(!matchFound) {
-                    allowUserInput = true;
-                }
-                timeToCompleteSwaps = 0f;
-            }
-        }, timeToCompleteSwaps);
+
+//        if(timeToCompleteSwaps < 1) {
+//            timeToCompleteSwaps = 1;
+//        }
+
+//        Timer.schedule(new Timer.Task(){
+//            @Override
+//            public void run() {
+//                Gdx.app.log("timer", "fired");
+//                matchFound = checkWholeBoardForMatches();
+//                if(!matchFound) {
+//                    allowUserInput = true;
+//                }
+//                timeToCompleteSwaps = 0;
+//            }
+//        }, timeToCompleteSwaps);
     }
 
-    public void checkIfGemsShouldBeDropped() {
+
+    public boolean waitForGemsToSettleThenCheckForMatches() {
+        final boolean gemsAreMoving = checkIfGemsAreMoving();
+
+        if(!gemsAreMoving) {
+            Gdx.app.log("timer", "fired");
+            matchFound = checkWholeBoardForMatches();
+            if(!matchFound) {
+                allowUserInput = true;
+            }
+        } else {
+            Timer.schedule(new Timer.Task(){
+                @Override
+                public void run() {
+                    waitForGemsToSettleThenCheckForMatches();
+                }
+            }, .4f);
+        }
+        return matchFound;
+    }
+
+    public boolean checkIfGemsAreMoving() {
+        boolean gemsAreMoving = false;
+
+        for(Gem gem : gems) {
+            if(gem.isMoving) {
+                allowUserInput = false;
+                gemsAreMoving = true;
+                break;
+            }
+        }
+
+        if(!gemsAreMoving) {
+            allowUserInput = true;
+        }
+        return gemsAreMoving;
+    }
+
+    public boolean checkIfGemsAreBlank() {
+        boolean gemsAreBlank = false;
+
+        for(Gem gem : gems) {
+            if(gem.GemColor == 7) {
+                allowUserInput = false;
+                gemsAreBlank = true;
+                break;
+            }
+        }
+        return gemsAreBlank;
+    }
+
+    public void dropGems() {
         /* This checks for "blank" gems on the board, which have been destroyed.
         *  It then decides weather there is an existing gem above/below which should be
         *  "dropped" into this empty space. This repeats until all existing gems have been
@@ -433,55 +525,58 @@ public class MatchScreen extends ScreenAdapter {
         for(final int[] g = {0}; g[0] < gems.size; g[0]++) {
             final Gem gem = gems.get(g[0]);
             if(gem.GemColor == 7) {
-                if(classicMode) {
-                    // standard bejewelled style, gems fall from the top down
-                    // TODO: broken
-                    if(gem.positionInColumn == rows - 1) {
-                        // need to spawn a new gem,
-                        // TODO: newGem pooling
-                        Gdx.app.log("", "spawn new gem");
-
-                        final Random random = new Random();
-                        final int gemColor = random.nextInt(7);
-                        final int newIndex = gems.size + 1;
-                        final Gem newGem = new Gem(game.gempiresAssetHandler.gemTextures[gemColor], gemColor, newIndex, this);
-
-                        newGem.positionInColumn = gem.positionInColumn;
-                        newGem.positionInRow = gem.positionInRow;
-
-                        newGem.setPosition(gem.getX(), gem.getY() + 2);
-
-                        gems.add(newGem);
-                        stage.addActor(newGem);
-
-                        // swap() the blank gem with the new gem below it,
-                        swapGems(gem, newGem);
-                        timeToCompleteSwaps += gemSwapTime;
-
-                        // and safely remove() the blank gem to end the loop!
-
-                        gems.begin();
-                        gems.removeValue(gem, true);
-                        gems.end();
-
-                        gem.remove();
-
-                    } else {
-                        // just swap the blank gem with the gem above it and repeat loop
-                        swapGems(gem, gems.get(gem.GemIndex + columns));
-                        timeToCompleteSwaps += gemSwapTime;
-
-                        Timer.schedule(new Timer.Task(){
-                            @Override
-                            public void run() {
-                                checkIfGemsShouldBeDropped();
-                            }
-                        }, 0.06f);
-
-                        break;
-                    }
-
-                } else {
+//                if(classicMode) {
+//                    // standard bejewelled style, gems fall from the top down
+//                    // TODO: broken
+//                    if(gem.positionInColumn == (rows - 1)) {
+//                        // need to spawn a new gem,
+//                        // TODO: newGem pooling
+//                        Gdx.app.log("BROKEN", "spawn new gem");
+//
+//                        final Random random = new Random();
+//                        final int gemColor = random.nextInt(7);
+//                        final int newIndex = gems.size - 1;
+//                        final Gem newGem = new Gem(game.gempiresAssetHandler.gemTextures[gemColor], gemColor, newIndex, this);
+//
+//                        newGem.positionInColumn = gem.positionInColumn;
+//                        newGem.positionInRow = gem.positionInRow;
+//                        newGem.setSize(1,1);
+//
+//                        newGem.setPosition(gem.getX(), gem.getY() + 4f);
+//
+//                        gems.add(newGem);
+//                        stage.addActor(newGem);
+//
+//                        // swap() the blank gem with the new gem below it,
+//                        swapGems(gem, newGem);
+//                        timeToCompleteSwaps += gemSwapTime;
+//
+//                        // and safely remove() the blank gem to end the loop!
+//
+//                        gems.begin();
+//                        gems.removeValue(gem, true);
+//                        gems.end();
+//
+//                        gem.remove();
+//
+//                    } else {
+//                        // just swap the blank gem with the gem above it and repeat loop
+//                        Gdx.app.log("Trying to swap", "BROKEN");
+//                        swapGems(gem, gems.get(gem.GemIndex + columns));
+//                        timeToCompleteSwaps += gemSwapTime;
+//
+//                        Timer.schedule(new Timer.Task(){
+//                            @Override
+//                            public void run() {
+//                                g[0] = gems.size;
+//                                checkIfGemsShouldBeDropped();
+//                            }
+//                        }, timeToCompleteSwaps);
+//
+//                        break;
+//                    }
+//
+//                } else {
                     // adventure mode, gems come from the bottom up
                     if(gem.positionInColumn == 0) {
                         // need to spawn a new gem,
@@ -515,8 +610,8 @@ public class MatchScreen extends ScreenAdapter {
 
                     } else {
                         // just swap the blank gem with the gem below it and restart loop
-                        swapGems(gem, gems.get(gem.GemIndex - columns));
                         timeToCompleteSwaps += gemSwapTime;
+                        swapGems(gem, gems.get(gem.GemIndex - columns));
 
                          Timer.schedule(new Timer.Task(){
                             @Override
@@ -524,13 +619,13 @@ public class MatchScreen extends ScreenAdapter {
                                 g[0] = gems.size;
                                 // Thank you IntelliJ for this big brain constant array trick.
                                 // but why tho?
-                                checkIfGemsShouldBeDropped();
+                                dropGems();
                             }
                         }, 0.06f);
 
                         break;
                     }
-                }
+//                }
             }
         }
     }
@@ -586,17 +681,87 @@ public class MatchScreen extends ScreenAdapter {
         // Gdx.app.log("reader", "HML: " + horizontalMatchLength + ", VML: " + verticalMatchLength);
 
         if(horizontalMatchLength >= 2) {
+
             matchFound = true;
-//            Gdx.app.log("matchFound", "Good horizontal matches.");
             sendToDestroy.addAll(leftMatches);
             sendToDestroy.addAll(rightMatches);
+
+            // TODO: make the gem that most recently moved the one that becomes special
+
+            switch(gem.specialType) {
+                case NONE:
+                    if(!sendToDestroy.contains(gem)) {
+                        switch(horizontalMatchLength) {
+                            case 3:
+                                gem.specialType = Gem.SpecialType.SPECIAL_4;
+                                break;
+                            case 4:
+                                gem.specialType = Gem.SpecialType.SPECIAL_5;
+                                break;
+                            case 5:
+                                gem.specialType = Gem.SpecialType.SPECIAL_6;
+                                break;
+                            case 6:
+                                gem.specialType = Gem.SpecialType.SPECIAL_7;
+                                break;
+                            case 7:
+                                gem.specialType = Gem.SpecialType.SPECIAL_8;
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    break;
+                case SPECIAL_4:
+                case SPECIAL_5:
+                case SPECIAL_6:
+                case SPECIAL_7:
+                case SPECIAL_8:
+                    // perform special behavior of special gem (i.e., add adjacent gems to destroy array)
+                default:
+                    break;
+            }
         }
 
         if(verticalMatchLength >= 2) {
+
             matchFound = true;
-//            Gdx.app.log("matchFound", "Good vertical matches.");
             sendToDestroy.addAll(upMatches);
             sendToDestroy.addAll(downMatches);
+
+            switch(gem.specialType) {
+                case NONE:
+                    if(!sendToDestroy.contains(gem)) {
+                        switch(verticalMatchLength) {
+                            case 3:
+                                gem.specialType = Gem.SpecialType.SPECIAL_4;
+                                break;
+                            case 4:
+                                gem.specialType = Gem.SpecialType.SPECIAL_5;
+                                break;
+                            case 5:
+                                gem.specialType = Gem.SpecialType.SPECIAL_6;
+                                break;
+                            case 6:
+                                gem.specialType = Gem.SpecialType.SPECIAL_7;
+                                break;
+                            case 7:
+                                gem.specialType = Gem.SpecialType.SPECIAL_8;
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    break;
+                case SPECIAL_4:
+                case SPECIAL_5:
+                case SPECIAL_6:
+                case SPECIAL_7:
+                case SPECIAL_8:
+                    // perform special behavior of special gem (i.e., add adjacent gems to destroy array)
+                default:
+                    break;
+            }
         }
     }
 
@@ -620,7 +785,6 @@ public class MatchScreen extends ScreenAdapter {
 //                    Gdx.app.log("reader", "No match up.");
 
                     if(!possibleToMatch) {
-                        // todo: account for wraparound
 
                         boolean up1DidInitialize = false;
                         boolean up2DidInitialize = false;
@@ -724,7 +888,7 @@ public class MatchScreen extends ScreenAdapter {
                             // only need 1 more to match
                             if(down1Matches || left1Matches || right1Matches) {
                                 possibleToMatch = true;
-                                Gdx.app.log("match found by", "look up");
+//                                Gdx.app.log("match found by", "look up");
                                 if(showHint) {
                                     down1.setColor(.5f,.5f,.5f,1);
                                     left1.setColor(.5f,.5f,.5f,1);
@@ -736,7 +900,7 @@ public class MatchScreen extends ScreenAdapter {
                             || down1Matches && right1Matches
                             || right1Matches && left1Matches) {
                                 possibleToMatch = true;
-                                Gdx.app.log("match found by", "look up");
+//                                Gdx.app.log("match found by", "look up");
                                 if(showHint) {
                                     down1.setColor(.5f,.5f,.5f,1);
                                     left1.setColor(.5f,.5f,.5f,1);
@@ -873,7 +1037,7 @@ public class MatchScreen extends ScreenAdapter {
                             // only need 1 more to match
                             if(up1Matches || left1Matches || right1Matches) {
                                 possibleToMatch = true;
-                                Gdx.app.log("match found by", "look down");
+//                                Gdx.app.log("match found by", "look down");
                                 if(showHint) {
                                     up1.setColor(.5f,.5f,.5f,1);
                                     left1.setColor(.5f,.5f,.5f,1);
@@ -885,7 +1049,7 @@ public class MatchScreen extends ScreenAdapter {
                             || up1Matches && right1Matches
                             || right1Matches && left1Matches) {
                                 possibleToMatch = true;
-                                Gdx.app.log("match found by", "look down");
+//                                Gdx.app.log("match found by", "look down");
                                 if(showHint) {
                                     up1.setColor(.5f,.5f,.5f,1);
                                     left1.setColor(.5f,.5f,.5f,1);
@@ -1023,7 +1187,7 @@ public class MatchScreen extends ScreenAdapter {
                             // only need 1 more to match
                             if(down1Matches || left1Matches || up1Matches) {
                                 possibleToMatch = true;
-                                Gdx.app.log("match found by", "look right SINGLE");
+//                                Gdx.app.log("match found by", "look right SINGLE");
                                 if(showHint) {
                                     up1.setColor(.5f,.5f,.5f,1);
                                     left1.setColor(.5f,.5f,.5f,1);
@@ -1035,7 +1199,7 @@ public class MatchScreen extends ScreenAdapter {
                             || down1Matches && up1Matches
                             || up1Matches && left1Matches) {
                                 possibleToMatch = true;
-                                Gdx.app.log("match found by", "look right DOUBLE");
+//                                Gdx.app.log("match found by", "look right DOUBLE");
                                 if(showHint) {
                                     up1.setColor(.5f,.5f,.5f,1);
                                     left1.setColor(.5f,.5f,.5f,1);
@@ -1173,7 +1337,7 @@ public class MatchScreen extends ScreenAdapter {
                             // only need 1 more to match
                             if(down1Matches || up1Matches || right1Matches) {
                                 possibleToMatch = true;
-                                Gdx.app.log("match found by", "look left SINGLE");
+//                                Gdx.app.log("match found by", "look left SINGLE");
                                 if(showHint) {
                                     up1.setColor(.5f,.5f,.5f,1);
                                     right1.setColor(.5f,.5f,.5f,1);
@@ -1185,7 +1349,7 @@ public class MatchScreen extends ScreenAdapter {
                             || down1Matches && right1Matches
                             || right1Matches && up1Matches) {
                                 possibleToMatch = true;
-                                Gdx.app.log("match found by", "look left DOUBLE");
+//                                Gdx.app.log("match found by", "look left DOUBLE");
                                 if(showHint) {
                                     up1.setColor(.5f,.5f,.5f,1);
                                     right1.setColor(.5f,.5f,.5f,1);
@@ -1202,19 +1366,22 @@ public class MatchScreen extends ScreenAdapter {
 
     public boolean checkWholeBoardForMatches() {
         matchFound = false;
+        allowUserInput = false;
         sendToDestroy = new ArrayList<>();
         possibleToMatch = false;
+
+        Gdx.app.log("Checking for matches", "...");
 
         for(Gem gem : gems) { look(gem); }
 
         if(matchFound) {
             destroyGems(sendToDestroy);
-        }
-
-        if(!possibleToMatch) {
+        } else if(possibleToMatch) {
+            allowUserInput = true;
+        } else {
             // todo: polish
 
-            Gdx.app.log("No Matches", "No matches");
+            Gdx.app.log("No Possible Matches", "No matches");
 
             final Tornado debugShuffler = new Tornado(game.gempiresAssetHandler.gemTextures[1], this);
             debugShuffler.shuffleWholeBoard();
@@ -1222,7 +1389,7 @@ public class MatchScreen extends ScreenAdapter {
             Timer.schedule(new Timer.Task(){
                 @Override
                 public void run() {
-                    checkWholeBoardForMatches();
+                    waitForGemsToSettleThenCheckForMatches();
                 }
             }, 1);
         }
@@ -1295,8 +1462,8 @@ public class MatchScreen extends ScreenAdapter {
             case CLASSIC_2:
             default:
                 matchMap = new TmxMapLoader().load("testMap.tmx");
-                rows = 5;
-                columns = 7;
+                rows = 15;
+                columns = 8;
                 break;
         }
 
@@ -1555,7 +1722,11 @@ public class MatchScreen extends ScreenAdapter {
         Timer.schedule(new Timer.Task(){
             @Override
             public void run() {
-                checkWholeBoardForMatches();
+                Gdx.app.log("Initial Check", "running...");
+                final boolean match = checkWholeBoardForMatches();
+                if(!match){
+                    allowUserInput = true;
+                }
             }
         }, 1);
     }

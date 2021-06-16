@@ -15,9 +15,20 @@ import java.util.Random;
 public class Gem extends Image {
     // What is a gem, but a miserable front for microtransactions?
 
+    public enum SpecialType {
+        NONE,
+        SPECIAL_4,
+        SPECIAL_5,
+        SPECIAL_6,
+        SPECIAL_7,
+        SPECIAL_8
+    }
+
     public Rectangle bounds;
 
     public int GemColor;
+
+    public SpecialType specialType;
 
     public ElementalType elementalType;
 
@@ -25,11 +36,16 @@ public class Gem extends Image {
                positionInRow,
                positionInColumn;
 
+    public volatile boolean isMoving;
+
     private final MatchScreen parentMatchScreen;
 
     public Gem(final MatchScreen parentMatchScreen, int color) {
         super(parentMatchScreen.game.gempiresAssetHandler.gemTextures[color]);
         this.parentMatchScreen = parentMatchScreen;
+        this.specialType = SpecialType.NONE;
+        this.isMoving = false;
+
         switch(color){
             case 0:
                 this.elementalType = ElementalType.NATURE;
@@ -101,23 +117,41 @@ public class Gem extends Image {
         this.GemIndex = gemIndex; // TODO: getting gemIndex may be redundant with the addition of positionInRow/Column
         this.parentMatchScreen = parentMatchScreen;
         this.bounds = new Rectangle((int) getX(), (int) getY(), (int) getWidth(), (int) getHeight());
+        this.specialType = SpecialType.NONE;
+        this.isMoving = false;
 
         addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                if(Gem.this.parentMatchScreen.allowUserInput) {
+//                if(Gem.this.parentMatchScreen.allowUserInput) {
+//                    setColor(.5f, .5f, .5f, 1);
+//                    return true;
+//                } else {
+//                    return false;
+//                }
+
+                final boolean gemsAreMoving = parentMatchScreen.checkIfGemsAreMoving();
+                if(!gemsAreMoving) {
                     setColor(.5f, .5f, .5f, 1);
                     return true;
-                } else {
+                }else {
                     return false;
                 }
+
             }
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int point, int button) {
                 // Gdx.app.log("touchUP", "x: " + x + ", y: " + y);
-                if(Gem.this.parentMatchScreen.allowUserInput) {
-                    Gem.this.parentMatchScreen.allowUserInput = false;
+//                if(Gem.this.parentMatchScreen.allowUserInput) {
+//                    Gem.this.parentMatchScreen.allowUserInput = false;
+//                    Gem.this.isMoving = true;
+//                    setColor(1.5f, 1.5f, 1.5f, 1);
+//                    Gem.this.parentMatchScreen.checkBoundsThenSwap(x, y, GemIndex);
+//                }
+
+                final boolean gemsAreMoving = parentMatchScreen.checkIfGemsAreMoving();
+                if(!gemsAreMoving) {
                     setColor(1.5f, 1.5f, 1.5f, 1);
                     Gem.this.parentMatchScreen.checkBoundsThenSwap(x, y, GemIndex);
                 }
