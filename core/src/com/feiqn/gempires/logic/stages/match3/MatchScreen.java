@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.DelayedRemovalArray;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -52,11 +53,12 @@ public class MatchScreen extends ScreenAdapter {
                   enemyGroup,
                   uiGroup;
 
-    public boolean matchFound,
-                   possibleToMatch,
-                   classicMode,
-                   needToClearWave,
-                   allowUserInput;
+    public boolean classicMode,
+                   needToClearWave;
+
+    public volatile boolean matchFound,
+                            possibleToMatch,
+                            allowUserInput;
 
     public int rows,
                columns,
@@ -428,25 +430,25 @@ public class MatchScreen extends ScreenAdapter {
                 }
             }
 
-            switch(gem.specialType) {
-                case SPECIAL_4:
-                case SPECIAL_5:
-                case SPECIAL_6:
-                case SPECIAL_7:
-                case SPECIAL_8:
-                    // spawn a new, special gem in this gem's place (to update the sprite)
-                case NONE:
-                default:
-                    break;
-            }
+//            switch(gem.specialType) {
+//                case SPECIAL_4:
+//                case SPECIAL_5:
+//                case SPECIAL_6:
+//                case SPECIAL_7:
+//                case SPECIAL_8:
+//                case NONE:
+//                default:
+//                    break;
+//            }
 
-            gem.setToBlank();
+            if(gem.specialType == Gem.SpecialType.NONE) {
+                gem.setToBlank();
+            }
         }
 
         dropGems();
 
         waitForGemsToSettleThenCheckForMatches();
-
 
 //        if(timeToCompleteSwaps < 1) {
 //            timeToCompleteSwaps = 1;
@@ -465,6 +467,19 @@ public class MatchScreen extends ScreenAdapter {
 //        }, timeToCompleteSwaps);
     }
 
+    public void waitForGemsToSettleThenDestroyGems() {
+        final boolean gemsAreMoving = checkIfGemsAreMoving();
+        if(!gemsAreMoving) {
+            destroyGems(sendToDestroy);
+        } else {
+            Timer.schedule(new Timer.Task(){
+                @Override
+                public void run() {
+                    waitForGemsToSettleThenDestroyGems();
+                }
+            }, .1f);
+        }
+    }
 
     public boolean waitForGemsToSettleThenCheckForMatches() {
         final boolean gemsAreMoving = checkIfGemsAreMoving();
@@ -472,16 +487,16 @@ public class MatchScreen extends ScreenAdapter {
         if(!gemsAreMoving) {
             Gdx.app.log("timer", "fired");
             matchFound = checkWholeBoardForMatches();
-            if(!matchFound) {
-                allowUserInput = true;
-            }
+//            if(!matchFound) {
+//                allowUserInput = true;
+//            }
         } else {
             Timer.schedule(new Timer.Task(){
                 @Override
                 public void run() {
                     waitForGemsToSettleThenCheckForMatches();
                 }
-            }, .4f);
+            }, .1f);
         }
         return matchFound;
     }
@@ -682,86 +697,286 @@ public class MatchScreen extends ScreenAdapter {
 
         if(horizontalMatchLength >= 2) {
 
+            updateSpecialType(gem);
+
             matchFound = true;
             sendToDestroy.addAll(leftMatches);
             sendToDestroy.addAll(rightMatches);
 
-            // TODO: make the gem that most recently moved the one that becomes special
 
-            switch(gem.specialType) {
-                case NONE:
-                    if(!sendToDestroy.contains(gem)) {
-                        switch(horizontalMatchLength) {
-                            case 3:
-                                gem.specialType = Gem.SpecialType.SPECIAL_4;
-                                break;
-                            case 4:
-                                gem.specialType = Gem.SpecialType.SPECIAL_5;
-                                break;
-                            case 5:
-                                gem.specialType = Gem.SpecialType.SPECIAL_6;
-                                break;
-                            case 6:
-                                gem.specialType = Gem.SpecialType.SPECIAL_7;
-                                break;
-                            case 7:
-                                gem.specialType = Gem.SpecialType.SPECIAL_8;
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                    break;
-                case SPECIAL_4:
-                case SPECIAL_5:
-                case SPECIAL_6:
-                case SPECIAL_7:
-                case SPECIAL_8:
-                    // perform special behavior of special gem (i.e., add adjacent gems to destroy array)
-                default:
-                    break;
-            }
         }
 
         if(verticalMatchLength >= 2) {
+
+            updateSpecialType(gem);
 
             matchFound = true;
             sendToDestroy.addAll(upMatches);
             sendToDestroy.addAll(downMatches);
 
-            switch(gem.specialType) {
-                case NONE:
-                    if(!sendToDestroy.contains(gem)) {
-                        switch(verticalMatchLength) {
-                            case 3:
-                                gem.specialType = Gem.SpecialType.SPECIAL_4;
-                                break;
-                            case 4:
-                                gem.specialType = Gem.SpecialType.SPECIAL_5;
-                                break;
-                            case 5:
-                                gem.specialType = Gem.SpecialType.SPECIAL_6;
-                                break;
-                            case 6:
-                                gem.specialType = Gem.SpecialType.SPECIAL_7;
-                                break;
-                            case 7:
-                                gem.specialType = Gem.SpecialType.SPECIAL_8;
-                                break;
-                            default:
-                                break;
-                        }
+        }
+    }
+
+    private void updateGemDrawable(Gem gem) {
+        // called by updateSpecialType
+
+        switch(gem.specialType) {
+            case NONE:
+                switch(gem.elementalType) {
+                    case ELECTRIC:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.gemTextures[4]));
+                        break;
+                    case FIRE:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.gemTextures[2]));
+                        break;
+                    case NATURE:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.gemTextures[0]));
+                        break;
+                    case PURE:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.gemTextures[6]));
+                        break;
+                    case STONE:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.gemTextures[3]));
+                        break;
+                    case VOID:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.gemTextures[1]));
+                        break;
+                    case WATER:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.gemTextures[5]));
+                        break;
+                }
+                break;
+            case SPECIAL_4:
+                switch(gem.elementalType) {
+                    case ELECTRIC:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.circleElectricTexture));
+                        break;
+                    case FIRE:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.circleFireTexture));
+                        break;
+                    case NATURE:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.circleNatureTexture));
+                        break;
+                    case PURE:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.circlePureTexture));
+                        break;
+                    case STONE:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.circleStoneTexture));
+                        break;
+                    case VOID:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.circleVoidTexture));
+                        break;
+                    case WATER:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.circleWaterTexture));
+                        break;
+                }
+                break;
+            case SPECIAL_5:
+                switch(gem.elementalType) {
+                    case ELECTRIC:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.heartElectricTexture));
+                        break;
+                    case FIRE:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.heartFireTexture));
+                        break;
+                    case NATURE:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.heartNatureTexture));
+                        break;
+                    case PURE:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.heartPureTexture));
+                        break;
+                    case STONE:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.heartStoneTexture));
+                        break;
+                    case VOID:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.heartVoidTexture));
+                        break;
+                    case WATER:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.heartWaterTexture));
+                        break;
+                }
+                break;
+            case SPECIAL_6:
+                switch(gem.elementalType) {
+                    case ELECTRIC:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.hexagonElectricTexture));
+                        break;
+                    case FIRE:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.hexagonFireTexture));
+                        break;
+                    case NATURE:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.hexagonNatureTexture));
+                        break;
+                    case PURE:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.hexagonPureTexture));
+                        break;
+                    case STONE:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.hexagonStoneTexture));
+                        break;
+                    case VOID:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.heartVoidTexture));
+                        break;
+                    case WATER:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.hexagonWaterTexture));
+                        break;
+                }
+                break;
+            case SPECIAL_7:
+                switch(gem.elementalType) {
+                    case ELECTRIC:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.starElectricTexture));
+                        break;
+                    case FIRE:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.starFireTexture));
+                        break;
+                    case NATURE:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.starNatureTexture));
+                        break;
+                    case PURE:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.starPureTexture));
+                        break;
+                    case STONE:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.starStoneTexture));
+                        break;
+                    case VOID:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.starVoidTexture));
+                        break;
+                    case WATER:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.starWaterTexture));
+                        break;
+                }
+                break;
+            case SPECIAL_8:
+                switch(gem.elementalType) {
+                    case ELECTRIC:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.flowerElectricTexture));
+                        break;
+                    case FIRE:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.flowerFireTexture));
+                        break;
+                    case NATURE:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.flowerNatureTexture));
+                        break;
+                    case PURE:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.flowerPureTexture));
+                        break;
+                    case STONE:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.flowerStoneTexture));
+                        break;
+                    case VOID:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.flowerVoidTexture));
+                        break;
+                    case WATER:
+                        gem.setDrawable(new TextureRegionDrawable(game.gempiresAssetHandler.flowerWaterTexture));
+                        break;
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void updateSpecialType(Gem gem) {
+        // called by Look()
+
+        // TODO: make the gem that most recently moved the one that becomes special
+
+        switch(gem.specialType) {
+            case NONE:
+                if(!sendToDestroy.contains(gem)) {
+                    switch(verticalMatchLength) {
+                        case 3:
+                            gem.specialType = Gem.SpecialType.SPECIAL_4;
+                            updateGemDrawable(gem);
+                            break;
+                        case 4:
+                            gem.specialType = Gem.SpecialType.SPECIAL_5;
+                            updateGemDrawable(gem);
+                            break;
+                        case 5:
+                            gem.specialType = Gem.SpecialType.SPECIAL_6;
+                            updateGemDrawable(gem);
+                            break;
+                        case 6:
+                            gem.specialType = Gem.SpecialType.SPECIAL_7;
+                            updateGemDrawable(gem);
+                            break;
+                        case 7:
+                            gem.specialType = Gem.SpecialType.SPECIAL_8;
+                            updateGemDrawable(gem);
+                            break;
+                        default:
+                            break;
                     }
-                    break;
-                case SPECIAL_4:
-                case SPECIAL_5:
-                case SPECIAL_6:
-                case SPECIAL_7:
-                case SPECIAL_8:
-                    // perform special behavior of special gem (i.e., add adjacent gems to destroy array)
-                default:
-                    break;
-            }
+
+                    switch(horizontalMatchLength) {
+                        case 3:
+                            if(gem.specialType == Gem.SpecialType.NONE) {
+                                gem.specialType = Gem.SpecialType.SPECIAL_4;
+                                updateGemDrawable(gem);
+                            }
+                            break;
+                        case 4:
+                            switch(gem.specialType) {
+                                case NONE:
+                                case SPECIAL_4:
+                                    gem.specialType = Gem.SpecialType.SPECIAL_5;
+                                    updateGemDrawable(gem);
+                                default:
+                                    break;
+                            }
+                            break;
+                        case 5:
+                            switch(gem.specialType) {
+                                case NONE:
+                                case SPECIAL_4:
+                                case SPECIAL_5:
+                                    gem.specialType = Gem.SpecialType.SPECIAL_6;
+                                    updateGemDrawable(gem);
+                                default:
+                                    break;
+                            }
+                            break;
+                        case 6:
+                            switch(gem.specialType) {
+                                case NONE:
+                                case SPECIAL_4:
+                                case SPECIAL_5:
+                                case SPECIAL_6:
+                                    gem.specialType = Gem.SpecialType.SPECIAL_7;
+                                    updateGemDrawable(gem);
+                                default:
+                                    break;
+                            }
+                            break;
+                        case 7:
+                            switch(gem.specialType) {
+                                case NONE:
+                                case SPECIAL_4:
+                                case SPECIAL_5:
+                                case SPECIAL_6:
+                                case SPECIAL_7:
+                                    gem.specialType = Gem.SpecialType.SPECIAL_8;
+                                    updateGemDrawable(gem);
+                                default:
+                                    break;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                break;
+            case SPECIAL_4:
+            case SPECIAL_5:
+            case SPECIAL_6:
+            case SPECIAL_7:
+            case SPECIAL_8:
+                gem.specialType = Gem.SpecialType.NONE;
+                updateGemDrawable(gem);
+                // perform special behavior of special gem (i.e., add adjacent gems to destroy array) and return special gem to NONE type so that it gets destroyed
+            default:
+                break;
         }
     }
 
@@ -1370,15 +1585,18 @@ public class MatchScreen extends ScreenAdapter {
         sendToDestroy = new ArrayList<>();
         possibleToMatch = false;
 
-        Gdx.app.log("Checking for matches", "...");
-
         for(Gem gem : gems) { look(gem); }
 
         if(matchFound) {
-            destroyGems(sendToDestroy);
-        } else if(possibleToMatch) {
+            final boolean gemsAreMoving = checkIfGemsAreMoving();
+            if(!gemsAreMoving) {
+                destroyGems(sendToDestroy);
+            } else {
+                waitForGemsToSettleThenDestroyGems();
+            }
+        } /* else if(possibleToMatch) {
             allowUserInput = true;
-        } else {
+        } */ else if(!possibleToMatch) {
             // todo: polish
 
             Gdx.app.log("No Possible Matches", "No matches");
@@ -1711,6 +1929,7 @@ public class MatchScreen extends ScreenAdapter {
 
     @Override
     public void show() {
+        super.show();
         initializeVariables(1);
         game.gempiresAssetHandler.initialiseGemTextures(classicMode);
         loadMap();

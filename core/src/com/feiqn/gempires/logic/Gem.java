@@ -120,6 +120,33 @@ public class Gem extends Image {
         this.specialType = SpecialType.NONE;
         this.isMoving = false;
 
+        switch(gemColor){
+            case 0:
+                this.elementalType = ElementalType.NATURE;
+                break;
+            case 1:
+                this.elementalType = ElementalType.VOID;
+                break;
+            case 2:
+                this.elementalType = ElementalType.FIRE;
+                break;
+            case 3:
+                this.elementalType = ElementalType.STONE;
+                break;
+            case 4:
+                this.elementalType = ElementalType.ELECTRIC;
+                break;
+            case 5:
+                this.elementalType = ElementalType.WATER;
+                break;
+            case 6:
+                this.elementalType = ElementalType.PURE;
+                break;
+            case 7:
+            default:
+                break;
+        }
+
         addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -134,7 +161,7 @@ public class Gem extends Image {
                 if(!gemsAreMoving) {
                     setColor(.5f, .5f, .5f, 1);
                     return true;
-                }else {
+                } else {
                     return false;
                 }
 

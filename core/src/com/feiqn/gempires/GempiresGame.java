@@ -10,6 +10,7 @@ import com.feiqn.gempires.models.GempiresAssetHandler;
 import java.awt.*;
 
 public class GempiresGame extends Game {
+
 	public SpriteBatch batch;
 	public GempiresAssetHandler gempiresAssetHandler;
 	public CastleScreen castle;

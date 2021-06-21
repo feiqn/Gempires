@@ -18,10 +18,53 @@ public class GempiresAssetHandler {
     private final HashMap<Bestiary, Boolean> enemyTextureIsInitialized;
     private final HashMap<HeroList, Boolean> heroTextureIsInitialized;
 
+    // TODO: y'all know we need to use that TexturePacker boi ye ye
+
     public Texture // STRUCTURES
                    barracksTexture,
                    mineTexture,
                    mineTexture2,
+
+                   // SPECIAL GEMS
+                   circleElectricTexture,
+                   circleFireTexture,
+                   circleNatureTexture,
+                   circlePureTexture,
+                   circleStoneTexture,
+                   circleVoidTexture,
+                   circleWaterTexture,
+
+                   flowerElectricTexture,
+                   flowerFireTexture,
+                   flowerNatureTexture,
+                   flowerPureTexture,
+                   flowerStoneTexture,
+                   flowerVoidTexture,
+                   flowerWaterTexture,
+
+                   heartElectricTexture,
+                   heartFireTexture,
+                   heartNatureTexture,
+                   heartPureTexture,
+                   heartStoneTexture,
+                   heartVoidTexture,
+                   heartWaterTexture,
+
+                   hexagonElectricTexture,
+                   hexagonFireTexture,
+                   hexagonNatureTexture,
+                   hexagonPureTexture,
+                   hexagonStoneTexture,
+                   hexagonVoidTexture,
+                   hexagonWaterTexture,
+
+                   starElectricTexture,
+                   starFireTexture,
+                   starNatureTexture,
+                   starPureTexture,
+                   starStoneTexture,
+                   starVoidTexture,
+                   starWaterTexture,
 
                    // UI
                    avatarTexture,
@@ -104,13 +147,13 @@ public class GempiresAssetHandler {
     public void initialiseGemTextures(Boolean classicMode) {
         final Texture gemSpriteSheet = manager.get("gem_set.png", Texture.class);
         gemTextures = new TextureRegion[] {
-                new TextureRegion(gemSpriteSheet, 160, 0,   32, 32),  // GREEN 0
-                new TextureRegion(gemSpriteSheet, 128, 64,  32, 32),  // PURPLE 1
-                new TextureRegion(gemSpriteSheet, 32,  128, 32, 32),  // RED 2
-                new TextureRegion(gemSpriteSheet, 0,   192, 32, 32),  // ORANGE 3
-                new TextureRegion(gemSpriteSheet, 0,   288, 32, 32),  // YELLOW 4
-                new TextureRegion(gemSpriteSheet, 160, 320, 32, 32),  // BLUE 5
-                new TextureRegion(gemSpriteSheet, 160, 384, 32, 32)   // CLEAR 6, not to be confused with BLANK 7
+                new TextureRegion(gemSpriteSheet, 160, 0  , 32, 32),  // GREEN  NATURE - 0
+                new TextureRegion(gemSpriteSheet, 128, 64 , 32, 32),  // PURPLE VOID --- 1
+                new TextureRegion(gemSpriteSheet, 32 , 128, 32, 32),  // RED -- FIRE --- 2
+                new TextureRegion(gemSpriteSheet, 0  , 192, 32, 32),  // ORANGE STONE -- 3
+                new TextureRegion(gemSpriteSheet, 0  , 288, 32, 32),  // YELLOW ELECTRIC 4
+                new TextureRegion(gemSpriteSheet, 160, 320, 32, 32),  // BLUE - WATER -- 5
+                new TextureRegion(gemSpriteSheet, 160, 384, 32, 32)   // CLEAR  PURE --- 6 (not to be confused with BLANK 7)
         };
 
         if(!classicMode) {
@@ -124,6 +167,46 @@ public class GempiresAssetHandler {
                     new TextureRegion(gemSpriteSheet, 128,384, 32, 32)
             };
         }
+
+        circleElectricTexture = manager.get("gems/Circle_electric.png", Texture.class);
+        circleFireTexture     = manager.get("gems/Circle_fire.png"    , Texture.class);
+        circleNatureTexture   = manager.get("gems/Circle_nature.png"  , Texture.class);
+        circlePureTexture     = manager.get("gems/Circle_pure.png"    , Texture.class);
+        circleStoneTexture    = manager.get("gems/Circle_stone.png"   , Texture.class);
+        circleVoidTexture     = manager.get("gems/Circle_void.png"    , Texture.class);
+        circleWaterTexture    = manager.get("gems/Circle_water.png"   , Texture.class);
+
+        flowerElectricTexture = manager.get("gems/Flower_electric.png", Texture.class);
+        flowerFireTexture     = manager.get("gems/Flower_fire.png"    , Texture.class);
+        flowerNatureTexture   = manager.get("gems/Flower_nature.png"  , Texture.class);
+        flowerPureTexture     = manager.get("gems/Flower_pure.png"    , Texture.class);
+        flowerStoneTexture    = manager.get("gems/Flower_stone.png"   , Texture.class);
+        flowerVoidTexture     = manager.get("gems/Flower_void.png"    , Texture.class);
+        flowerWaterTexture    = manager.get("gems/Flower_water.png"   , Texture.class);
+
+        heartElectricTexture = manager.get("gems/Heart_electric.png", Texture.class);
+        heartFireTexture     = manager.get("gems/Heart_fire.png"    , Texture.class);
+        heartNatureTexture   = manager.get("gems/Heart_nature.png"  , Texture.class);
+        heartPureTexture     = manager.get("gems/Heart_pure.png"    , Texture.class);
+        heartStoneTexture    = manager.get("gems/Heart_stone.png"   , Texture.class);
+        heartVoidTexture     = manager.get("gems/Heart_void.png"    , Texture.class);
+        heartWaterTexture    = manager.get("gems/Heart_water.png"   , Texture.class);
+
+        heartElectricTexture = manager.get("gems/Hexagon_electric.png", Texture.class);
+        heartFireTexture     = manager.get("gems/Hexagon_fire.png"    , Texture.class);
+        heartNatureTexture   = manager.get("gems/Hexagon_nature.png"  , Texture.class);
+        heartPureTexture     = manager.get("gems/Hexagon_pure.png"    , Texture.class);
+        heartStoneTexture    = manager.get("gems/Hexagon_stone.png"   , Texture.class);
+        heartVoidTexture     = manager.get("gems/Hexagon_void.png"    , Texture.class);
+        heartWaterTexture    = manager.get("gems/Hexagon_water.png"   , Texture.class);
+
+        starElectricTexture = manager.get("gems/Star_electric.png", Texture.class);
+        starFireTexture     = manager.get("gems/Star_fire.png"    , Texture.class);
+        starNatureTexture   = manager.get("gems/Star_nature.png"  , Texture.class);
+        starPureTexture     = manager.get("gems/Star_pure.png"    , Texture.class);
+        starStoneTexture    = manager.get("gems/Star_stone.png"   , Texture.class);
+        starVoidTexture     = manager.get("gems/Star_void.png"    , Texture.class);
+        starWaterTexture    = manager.get("gems/Star_water.png"   , Texture.class);
     }
 
     public void initialiseHeroTextures(ArrayList<HeroList> neededHeroes) {
@@ -273,6 +356,46 @@ public class GempiresAssetHandler {
     }
     public void loadMatchScreenTextures() {
         manager.load("gem_set.png", Texture.class);
+
+        manager.load("gems/Circle_electric.png", Texture.class);
+        manager.load("gems/Circle_fire.png"    , Texture.class);
+        manager.load("gems/Circle_nature.png"  , Texture.class);
+        manager.load("gems/Circle_pure.png"    , Texture.class);
+        manager.load("gems/Circle_stone.png"   , Texture.class);
+        manager.load("gems/Circle_void.png"    , Texture.class);
+        manager.load("gems/Circle_water.png"   , Texture.class);
+
+        manager.load("gems/Flower_electric.png", Texture.class);
+        manager.load("gems/Flower_fire.png"    , Texture.class);
+        manager.load("gems/Flower_nature.png"  , Texture.class);
+        manager.load("gems/Flower_pure.png"    , Texture.class);
+        manager.load("gems/Flower_stone.png"   , Texture.class);
+        manager.load("gems/Flower_void.png"    , Texture.class);
+        manager.load("gems/Flower_water.png"   , Texture.class);
+
+        manager.load("gems/Heart_electric.png", Texture.class);
+        manager.load("gems/Heart_fire.png"    , Texture.class);
+        manager.load("gems/Heart_nature.png"  , Texture.class);
+        manager.load("gems/Heart_pure.png"    , Texture.class);
+        manager.load("gems/Heart_stone.png"   , Texture.class);
+        manager.load("gems/Heart_void.png"    , Texture.class);
+        manager.load("gems/Heart_water.png"   , Texture.class);
+
+        manager.load("gems/Hexagon_electric.png", Texture.class);
+        manager.load("gems/Hexagon_fire.png"    , Texture.class);
+        manager.load("gems/Hexagon_nature.png"  , Texture.class);
+        manager.load("gems/Hexagon_pure.png"    , Texture.class);
+        manager.load("gems/Hexagon_stone.png"   , Texture.class);
+        manager.load("gems/Hexagon_void.png"    , Texture.class);
+        manager.load("gems/Hexagon_water.png"   , Texture.class);
+
+        manager.load("gems/Star_electric.png", Texture.class);
+        manager.load("gems/Star_fire.png"    , Texture.class);
+        manager.load("gems/Star_nature.png"  , Texture.class);
+        manager.load("gems/Star_pure.png"    , Texture.class);
+        manager.load("gems/Star_stone.png"   , Texture.class);
+        manager.load("gems/Star_void.png"    , Texture.class);
+        manager.load("gems/Star_water.png"   , Texture.class);
     }
 
     // GETTERS
