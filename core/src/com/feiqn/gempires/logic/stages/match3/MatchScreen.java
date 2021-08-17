@@ -477,7 +477,7 @@ public class MatchScreen extends ScreenAdapter {
                 public void run() {
                     waitForGemsToSettleThenDestroyGems();
                 }
-            }, .1f);
+            }, .15f);
         }
     }
 
@@ -496,7 +496,7 @@ public class MatchScreen extends ScreenAdapter {
                 public void run() {
                     waitForGemsToSettleThenCheckForMatches();
                 }
-            }, .1f);
+            }, .15f);
         }
         return matchFound;
     }
